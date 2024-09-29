@@ -3,9 +3,10 @@
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Github, Linkedin, Mail } from 'lucide-react';
+import { Github, Linkedin, Mail } from 'lucide-react';
 import Link from 'next/link';
 import Navbar from './components/Navbar';
+
 
 const skills = [
   { name: 'JavaScript', icon: '🟨', description: 'Proficient in modern JavaScript, including ES6+ features.' },
@@ -27,22 +28,20 @@ const certifications = [
 ];
 
 const HomePage = () => {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [, setMousePosition] = useState({ x: 0, y: 0 });
   const [heroMousePosition, setHeroMousePosition] = useState({ x: 0, y: 0 });
-  const [activeSkill, setActiveSkill] = useState(null);
+  const [activeSkill, setActiveSkill] = useState<{ name: string; icon: string; description: string } | null>(null);
   const [typedText, setTypedText] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [isProjectsHovered, setIsProjectsHovered] = useState(false);
-  const [isProjectsExpanded, setIsProjectsExpanded] = useState(false);
-  const [isProjectsLoaded, setIsProjectsLoaded] = useState(false);
   const [isBooklistHovered, setIsBooklistHovered] = useState(false);
   const [isBooklistExpanded, setIsBooklistExpanded] = useState(false);
   const [isBooklistLoaded, setIsBooklistLoaded] = useState(false);
   const skillsRef = useRef(null);
-  const mouseTrailRef = useRef([]);
+  const mouseTrailRef = useRef<{ x: number; y: number }[]>([]);
 
   useEffect(() => {
-    const handleMouseMove = (e) => {
+    const handleMouseMove = (e: MouseEvent) => {
       setMousePosition({ x: e.clientX, y: e.clientY });
       mouseTrailRef.current = [...mouseTrailRef.current.slice(-5), { x: e.clientX, y: e.clientY }];
     };
@@ -82,14 +81,14 @@ const HomePage = () => {
     background: `radial-gradient(circle at ${100 - heroMousePosition.x}% ${100 - heroMousePosition.y}%, #FF6B6B, #FEC601)`,
   };
 
-  const handleHeroMouseMove = (e) => {
+  const handleHeroMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
     const x = ((e.clientX - rect.left) / rect.width) * 100;
     const y = ((e.clientY - rect.top) / rect.height) * 100;
     setHeroMousePosition({ x, y });
   };
 
-  const renderSkillsTrack = (items, offset) => (
+  const renderSkillsTrack = (items: { name: string; icon: string; description: string }[], offset: number) => (
     <div className="flex" style={{ transform: `translateX(${offset}px)` }}>
       {[...items, ...items].map((item, index) => (
         <motion.div
@@ -119,11 +118,12 @@ const HomePage = () => {
   );
 
   const projectsCardVariants = {
-    hover: (mousePosition) => ({
+    hover: (mousePosition: { x: number; y: number }) => ({
       rotateX: (mousePosition.y - 0.5) * 10,
       rotateY: (mousePosition.x - 0.5) * 10,
     }),
   };
+  
 
   return (
     <AnimatePresence>
@@ -229,20 +229,6 @@ const HomePage = () => {
               </a>
             </div>
           </footer>
-
-          <AnimatePresence>
-            {isProjectsExpanded && (
-              <motion.div
-                className="fixed inset-0 bg-[#FF6B6B] text-white overflow-auto"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-              >
-                <Projects onClose={() => setIsProjectsExpanded(false)} />
-              </motion.div>
-            )}
-          </AnimatePresence>
-
 
           <AnimatePresence>
             {isBooklistExpanded && (
