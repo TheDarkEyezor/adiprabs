@@ -1,9 +1,11 @@
+// Homepage
+
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Github, Linkedin, Mail } from 'lucide-react';
+import Link from 'next/link';
 import Navbar from './components/Navbar';
-import Projects from './components/Projects';
 
 const skills = [
   { name: 'JavaScript', icon: '🟨', description: 'Proficient in modern JavaScript, including ES6+ features.' },
@@ -142,6 +144,7 @@ const HomePage = () => {
           style={gradientStyle}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
           key="content"
         >
           <Navbar/>
@@ -163,28 +166,29 @@ const HomePage = () => {
               {renderSkillsTrack(certifications, -160)}
             </div>
 
-            <motion.div
-              className="projects-card bg-[#FF6B6B] text-white p-8 rounded-lg shadow-lg m-8 cursor-pointer"
-              whileHover={{ rotateZ: 1, scale: 1.05 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-              onClick={() => setIsProjectsExpanded(true)}
-              onHoverStart={() => setIsProjectsHovered(true)}
-              onHoverEnd={() => setIsProjectsHovered(false)}
-            >
-              <h2 className="text-2xl font-bold mb-4">Projects</h2>
-              <AnimatePresence>
-                {isProjectsHovered && (
-                  <motion.p
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="text-lg"
-                  >
-                    Click to explore my portfolio of projects, showcasing my skills and experiences in web development, data analysis, and more.
-                  </motion.p>
-                )}
-              </AnimatePresence>
-            </motion.div>
+            <Link href="/projects" passHref>
+              <motion.div
+                className="projects-card bg-[#FF6B6B] text-white p-8 rounded-lg shadow-lg m-8 cursor-pointer"
+                whileHover={{ rotateZ: 1, scale: 1.05 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                onHoverStart={() => setIsProjectsHovered(true)}
+                onHoverEnd={() => setIsProjectsHovered(false)}
+              >
+                <h2 className="text-2xl font-bold mb-4">Projects</h2>
+                <AnimatePresence>
+                  {isProjectsHovered && (
+                    <motion.p
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="text-lg"
+                    >
+                      Click to explore my portfolio of projects, showcasing my skills and experiences in web development, data analysis, and more.
+                    </motion.p>
+                  )}
+                </AnimatePresence>
+              </motion.div>
+            </Link>
 
             <motion.div
               className="booklist-card bg-[#52B788] text-white p-8 rounded-lg shadow-lg m-8 cursor-pointer"
