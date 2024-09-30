@@ -117,14 +117,6 @@ const HomePage = () => {
     </div>
   );
 
-  const projectsCardVariants = {
-    hover: (mousePosition: { x: number; y: number }) => ({
-      rotateX: (mousePosition.y - 0.5) * 10,
-      rotateY: (mousePosition.x - 0.5) * 10,
-    }),
-  };
-  
-
   return (
     <AnimatePresence>
       {isLoading ? (
