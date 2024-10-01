@@ -3,9 +3,10 @@
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Github, Linkedin, Mail } from 'lucide-react';
-import Link from 'next/link';
+import { ArrowRight, Github, Linkedin, Mail } from 'lucide-react';
 import Navbar from './components/Navbar';
+import Projects from './components/Projects';
+import Timeline from './components/Timeline';
 
 
 const skills = [
@@ -37,8 +38,60 @@ const HomePage = () => {
   const [isBooklistHovered, setIsBooklistHovered] = useState(false);
   const [isBooklistExpanded, setIsBooklistExpanded] = useState(false);
   const [isBooklistLoaded, setIsBooklistLoaded] = useState(false);
+  const [isProjectsExpanded, setIsProjectsExpanded] = useState(false);
+  const projectCardRef = useRef(null);
+  const [projectCardBounds, setProjectCardBounds] = useState(null);
   const skillsRef = useRef(null);
   const mouseTrailRef = useRef<{ x: number; y: number }[]>([]);
+  const [isTimelineExpanded, setIsTimelineExpanded] = useState(false);
+  const timelineCardRef = useRef(null);
+  const [timelineCardBounds, setTimelineCardBounds] = useState(null);
+  
+
+  useEffect(() => {
+    if (projectCardRef.current && timelineCardRef.current) {
+      const projectRect = projectCardRef.current.getBoundingClientRect();
+      const timelineRect = timelineCardRef.current.getBoundingClientRect();
+      setProjectCardBounds({
+        left: projectRect.left,
+        top: projectRect.top,
+        width: projectRect.width,
+        height: projectRect.height,
+      });
+      setTimelineCardBounds({
+        left: timelineRect.left,
+        top: timelineRect.top,
+        width: timelineRect.width,
+        height: timelineRect.height,
+      });
+    }
+  }, []);
+
+  const handleExpandProjects = () => {
+    if (projectCardRef.current) {
+      const rect = projectCardRef.current.getBoundingClientRect();
+      setProjectCardBounds({
+        left: rect.left,
+        top: rect.top,
+        width: rect.width,
+        height: rect.height,
+      });
+    }
+    setIsProjectsExpanded(true);
+  };
+
+  const handleExpandTimeline = () => {
+    if (timelineCardRef.current) {
+      const rect = timelineCardRef.current.getBoundingClientRect();
+      setTimelineCardBounds({
+        left: rect.left,
+        top: rect.top,
+        width: rect.width,
+        height: rect.height,
+      });
+    }
+    setIsTimelineExpanded(true);
+  };
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -117,6 +170,18 @@ const HomePage = () => {
     </div>
   );
 
+  useEffect(() => {
+    if (projectCardRef.current) {
+      const rect = projectCardRef.current.getBoundingClientRect();
+      setProjectCardBounds({
+        left: rect.left,
+        top: rect.top,
+        width: rect.width,
+        height: rect.height,
+      });
+    }
+  }, []);
+
   return (
     <AnimatePresence>
       {isLoading ? (
@@ -136,7 +201,6 @@ const HomePage = () => {
           style={gradientStyle}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
           key="content"
         >
           <Navbar/>
@@ -158,29 +222,29 @@ const HomePage = () => {
               {renderSkillsTrack(certifications, -160)}
             </div>
 
-            <Link href="/projects" passHref>
+            <div className="flex flex-col md:flex-row justify-between m-8 space-y-8 md:space-y-0 md:space-x-8">
               <motion.div
-                className="projects-card bg-[#FF6B6B] text-white p-8 rounded-lg shadow-lg m-8 cursor-pointer"
-                whileHover={{ rotateZ: 1, scale: 1.05 }}
+                ref={projectCardRef}
+                className="projects-card bg-[#FF6B6B] text-white p-8 rounded-lg shadow-lg cursor-pointer flex-1"
+                whileHover={{ scale: 1.05 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                onHoverStart={() => setIsProjectsHovered(true)}
-                onHoverEnd={() => setIsProjectsHovered(false)}
+                onClick={handleExpandProjects}
               >
                 <h2 className="text-2xl font-bold mb-4">Projects</h2>
-                <AnimatePresence>
-                  {isProjectsHovered && (
-                    <motion.p
-                      initial={{ opacity: 0, height: 0 }}
-                      animate={{ opacity: 1, height: 'auto' }}
-                      exit={{ opacity: 0, height: 0 }}
-                      className="text-lg"
-                    >
-                      Click to explore my portfolio of projects, showcasing my skills and experiences in web development, data analysis, and more.
-                    </motion.p>
-                  )}
-                </AnimatePresence>
+                <p className="text-lg">Explore my portfolio of projects, showcasing my skills in web development, data analysis, and more.</p>
               </motion.div>
-            </Link>
+
+              <motion.div
+                ref={timelineCardRef}
+                className="timeline-card bg-[#FEC601] text-gray-800 p-8 rounded-lg shadow-lg cursor-pointer flex-1"
+                whileHover={{ scale: 1.05 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+                onClick={handleExpandTimeline}
+              >
+                <h2 className="text-2xl font-bold mb-4">My Journey</h2>
+                <p className="text-lg">Discover my professional timeline and key milestones in my career.</p>
+              </motion.div>
+            </div>
 
             <motion.div
               className="booklist-card bg-[#52B788] text-white p-8 rounded-lg shadow-lg m-8 cursor-pointer"
@@ -221,7 +285,78 @@ const HomePage = () => {
               </a>
             </div>
           </footer>
-
+          <AnimatePresence>
+            {isProjectsExpanded && projectCardBounds && (
+              <motion.div
+                className="fixed inset-0 z-50"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                <motion.div
+                  className="absolute bg-[#FF6B6B] rounded-lg overflow-hidden"
+                  initial={{
+                    left: projectCardBounds.left,
+                    top: projectCardBounds.top,
+                    width: projectCardBounds.width,
+                    height: projectCardBounds.height,
+                  }}
+                  animate={{
+                    left: 0,
+                    top: 0,
+                    width: '100vw',
+                    height: '100vh',
+                    transition: { duration: 0.3, ease: 'easeInOut' },
+                  }}
+                  exit={{
+                    left: projectCardBounds.left,
+                    top: projectCardBounds.top,
+                    width: projectCardBounds.width,
+                    height: projectCardBounds.height,
+                    transition: { duration: 0.3, ease: 'easeInOut' },
+                  }}
+                >
+                  <Projects onClose={() => setIsProjectsExpanded(false)} />
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+          <AnimatePresence>
+            {isTimelineExpanded && timelineCardBounds && (
+              <motion.div
+                className="fixed inset-0 z-50"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                <motion.div
+                  className="absolute bg-[#FEC601] rounded-lg overflow-hidden"
+                  initial={{
+                    left: timelineCardBounds.left,
+                    top: timelineCardBounds.top,
+                    width: timelineCardBounds.width,
+                    height: timelineCardBounds.height,
+                  }}
+                  animate={{
+                    left: 0,
+                    top: 0,
+                    width: '100vw',
+                    height: '100vh',
+                    transition: { duration: 0.3, ease: 'easeInOut' },
+                  }}
+                  exit={{
+                    left: timelineCardBounds.left,
+                    top: timelineCardBounds.top,
+                    width: timelineCardBounds.width,
+                    height: timelineCardBounds.height,
+                    transition: { duration: 0.3, ease: 'easeInOut' },
+                  }}
+                >
+                  <Timeline onClose={() => setIsTimelineExpanded(false)} />
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
           <AnimatePresence>
             {isBooklistExpanded && (
               <motion.div
