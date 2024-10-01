@@ -3,7 +3,7 @@
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence, MotionValue } from 'framer-motion';
-import { Github, Linkedin, Mail } from 'lucide-react';
+import { Github, Linkedin, Mail, Instagram } from 'lucide-react';
 import Navbar from './components/Navbar';
 import Projects from './components/Projects';
 import Timeline from './components/Timeline';
@@ -307,14 +307,17 @@ const HomePage: React.FC = () => {
 
           <footer className="bg-[#040303] text-white p-4 mt-auto">
             <div className="flex justify-center space-x-4">
-              <a href="https://github.com" target="_blank" rel="noopener noreferrer">
+              <a href="https://github.com/TheDarkEyezor" target="_blank" rel="noopener noreferrer">
                 <Github className="w-6 h-6 hover:text-[#FF6B6B]" />
               </a>
-              <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer">
+              <a href="https://www.linkedin.com/in/adiprabs/" target="_blank" rel="noopener noreferrer">
                 <Linkedin className="w-6 h-6 hover:text-[#FF6B6B]" />
               </a>
-              <a href="mailto:your.email@example.com">
+              <a href="mailto:aditya.prabakaran@gmail.com">
                 <Mail className="w-6 h-6 hover:text-[#FF6B6B]" />
+              </a>
+              <a href="https://www.instagram.com/adiprabs/" target="_blank" rel="noopener noreferrer">
+                <Instagram className="w-6 h-6 hover:text-[#FF6B6B]" />
               </a>
             </div>
           </footer>
