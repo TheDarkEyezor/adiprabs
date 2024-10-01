@@ -1,6 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, X } from 'lucide-react';
+
+interface Project {
+  title: string;
+  description: string;
+  tags: string[];
+  link: string;
+  date: string;
+  demoUrl: string;
+  longDescription: string;
+}
+
+interface ProjectsProps {
+  onClose: () => void;
+}
 
 const projectsData = [
   {
@@ -12,12 +26,59 @@ const projectsData = [
     demoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ", // Replace with your actual demo video URL
     longDescription: "This e-commerce platform provides a seamless shopping experience with features like user authentication, product catalog, shopping cart, and secure checkout. The frontend is built with React for a responsive UI, while the backend uses Node.js and Express for robust API endpoints. MongoDB is used for efficient data storage and retrieval."
   },
-  // ... (add more projects with similar structure)
+  {
+    title: "E-commerce Platform",
+    description: "A full-stack e-commerce solution built with React, Node.js, and MongoDB.",
+    tags: ["React", "Node.js", "MongoDB", "Express"],
+    link: "https://github.com/yourusername/ecommerce-platform",
+    date: "June 2023",
+    demoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ", // Replace with your actual demo video URL
+    longDescription: "This e-commerce platform provides a seamless shopping experience with features like user authentication, product catalog, shopping cart, and secure checkout. The frontend is built with React for a responsive UI, while the backend uses Node.js and Express for robust API endpoints. MongoDB is used for efficient data storage and retrieval."
+  },
+  {
+    title: "E-commerce Platform",
+    description: "A full-stack e-commerce solution built with React, Node.js, and MongoDB.",
+    tags: ["React", "Node.js", "MongoDB", "Express"],
+    link: "https://github.com/yourusername/ecommerce-platform",
+    date: "June 2023",
+    demoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ", // Replace with your actual demo video URL
+    longDescription: "This e-commerce platform provides a seamless shopping experience with features like user authentication, product catalog, shopping cart, and secure checkout. The frontend is built with React for a responsive UI, while the backend uses Node.js and Express for robust API endpoints. MongoDB is used for efficient data storage and retrieval."
+  },
+  {
+    title: "E-commerce Platform",
+    description: "A full-stack e-commerce solution built with React, Node.js, and MongoDB.",
+    tags: ["React", "Node.js", "MongoDB", "Express"],
+    link: "https://github.com/yourusername/ecommerce-platform",
+    date: "June 2023",
+    demoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ", // Replace with your actual demo video URL
+    longDescription: "This e-commerce platform provides a seamless shopping experience with features like user authentication, product catalog, shopping cart, and secure checkout. The frontend is built with React for a responsive UI, while the backend uses Node.js and Express for robust API endpoints. MongoDB is used for efficient data storage and retrieval."
+  },
+  {
+    title: "E-commerce Platform",
+    description: "A full-stack e-commerce solution built with React, Node.js, and MongoDB.",
+    tags: ["React", "Node.js", "MongoDB", "Express"],
+    link: "https://github.com/yourusername/ecommerce-platform",
+    date: "June 2023",
+    demoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ", // Replace with your actual demo video URL
+    longDescription: "This e-commerce platform provides a seamless shopping experience with features like user authentication, product catalog, shopping cart, and secure checkout. The frontend is built with React for a responsive UI, while the backend uses Node.js and Express for robust API endpoints. MongoDB is used for efficient data storage and retrieval."
+  },
+  {
+    title: "E-commerce Platform",
+    description: "A full-stack e-commerce solution built with React, Node.js, and MongoDB.",
+    tags: ["React", "Node.js", "MongoDB", "Express"],
+    link: "https://github.com/yourusername/ecommerce-platform",
+    date: "June 2023",
+    demoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ", // Replace with your actual demo video URL
+    longDescription: "This e-commerce platform provides a seamless shopping experience with features like user authentication, product catalog, shopping cart, and secure checkout. The frontend is built with React for a responsive UI, while the backend uses Node.js and Express for robust API endpoints. MongoDB is used for efficient data storage and retrieval."
+  },
+
 ];
 
-const Projects = ({ onClose }) => {
-  const [loadedProjects, setLoadedProjects] = useState([]);
-  const [expandedProject, setExpandedProject] = useState(null);
+const Projects: React.FC<ProjectsProps> = ({ onClose }) => {
+  const [loadedProjects, setLoadedProjects] = useState<Project[]>([]);
+  const [expandedProject, setExpandedProject] = useState<Project | null>(null);
+  const projectCardRef = useRef<HTMLDivElement>(null);
+  const timelineCardRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -27,7 +88,7 @@ const Projects = ({ onClose }) => {
     return () => clearTimeout(timer);
   }, []);
 
-  const handleExpandProject = (project) => {
+  const handleExpandProject = (project: Project) => {
     setExpandedProject(project);
   };
 
