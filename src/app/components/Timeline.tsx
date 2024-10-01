@@ -1,52 +1,57 @@
-import React, { useRef } from 'react';
-import { motion } from 'framer-motion';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import React, { useRef, useState } from 'react';
+import { motion, useMotionValue, useTransform, useMotionValueEvent } from 'framer-motion';
+import { ArrowLeft } from 'lucide-react';
 import Image from 'next/image';
+
 
 const timelineData = [
   {
-    date: "2020",
-    title: "Started Web Development",
-    description: "Began learning HTML, CSS, and JavaScript",
-    image: "/api/placeholder/400/300"
+    date: "2019",
+    title: "The robotics competition that started it all",
+    description: "Thanks to FRC, organised by the non-profit in FIRST, my interest in engineering was solifdified, almost guaranteeting my future in applied sciences and engineering",
+    image: ""
   },
   {
-    date: "2021",
-    title: "First Freelance Project",
-    description: "Completed a website for a local business",
-    image: "/api/placeholder/400/300"
+    date: "Feb 2021 - Mar 2023",
+    title: "Head of Marketing",
+    description: "This was my first time taking part in enterprise (although it was non-profit). The role of managing a team and being involved in a company's day to day running got me enamoured with the idea of one day running my own venture.",
+    image: ""
   },
   {
-    date: "2022",
-    title: "Joined Tech Startup",
-    description: "Worked as a full-stack developer on an innovative app",
-    image: "/api/placeholder/400/300"
+    date: "Jan 2024",
+    title: "Joined Altus Reach, a tech startup",
+    description: "I finally got an amazing opportunity to work as an ML engineer and full-stack developer at Altus reach. The fynamic startup environment, multiple experiences that came with the role and massive exposure to Cloud Computing",
+    image: ""
   },
   {
     date: "2023",
-    title: "Led Development Team",
-    description: "Managed a team of developers on a large-scale project",
-    image: "/api/placeholder/400/300"
+    title: "Now this website",
+    description: "I'm determined to put myself on the map now, showcasing my skills and passions in every possible way. here's to hoping for more milestones in the future",
+    image: ""
   },
-  // Add more timeline items as needed
 ];
 
 interface TimelineProps {
   onClose: () => void;
 }
 
-const Timeline = ({ onClose }: TimelineProps) => {
-  const scrollRef = useRef<HTMLDivElement>(null);
+const Timeline: React.FC<TimelineProps> = ({ onClose }) => {
+  const constraintsRef = useRef<HTMLDivElement | null>(null);
+  const y = useMotionValue(0);
+  const background = useTransform(
+    y,
+    [-300, 0, 300],
+    ['#FEC601', '#FEC601', '#FEC601']
+  );
 
-  const handleScroll = (direction: string) => {
-    const scrollAmount = direction === 'left' ? -400 : 400;
-    if (scrollRef.current) {
-      scrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
-    }
-  };
+  const [backgroundStyle, setBackgroundStyle] = useState<string>('');
+
+  useMotionValueEvent(background, "change", (latest) => {
+    setBackgroundStyle(latest);
+  });
 
   return (
-    <div className="min-h-screen bg-[#FEC601] text-gray-800 p-8 overflow-hidden">
+    <div className="min-h-screen bg-[#FEC601] text-gray-800 p-8 overflow-hidden" style={{ background: backgroundStyle }}>
       <motion.button
         className="mb-6 flex items-center text-xl font-bold"
         onClick={onClose}
@@ -58,46 +63,41 @@ const Timeline = ({ onClose }: TimelineProps) => {
 
       <h1 className="text-4xl font-bold mb-8">My Journey</h1>
 
-      <div className="relative">
-        <div 
-          ref={scrollRef}
-          className="flex overflow-x-scroll pb-10 hide-scrollbar"
-          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+      <div className="relative h-[calc(100vh-200px)] overflow-hidden" ref={constraintsRef}>
+        <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-gray-800 transform -translate-x-1/2"></div>
+        <motion.div
+          className="absolute top-0 left-0 right-0 cursor-grab active:cursor-grabbing"
+          drag="y"
+          dragConstraints={constraintsRef}
+          style={{ y }}
         >
-          <div className="flex flex-nowrap space-x-8">
-            {timelineData.map((item, index) => (
+          {timelineData.map((item, index) => (
+            <motion.div
+              key={index}
+              className={`flex items-center mb-16 ${
+                index % 2 === 0 ? 'flex-row' : 'flex-row-reverse'
+              }`}
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.1 }}
+            >
               <motion.div
-                key={index}
-                className={`flex flex-col items-center w-96 flex-shrink-0 ${
-                  index % 2 === 0 ? 'mt-20' : 'mb-20'
-                }`}
-                initial={{ opacity: 0, y: 50 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
+                className={`w-1/2 ${index % 2 === 0 ? 'pr-8 text-right' : 'pl-8'}`}
+                whileHover={{ scale: 1.05 }}
               >
-                <div className="w-1 h-20 bg-gray-800 mb-4"></div>
-                <div className="bg-white p-6 rounded-lg shadow-lg w-full">
+                <div className="bg-white p-6 rounded-lg shadow-lg inline-block">
                   <h3 className="text-2xl font-bold mb-2">{item.date}</h3>
                   <h4 className="text-xl font-semibold mb-2">{item.title}</h4>
                   <p className="mb-4">{item.description}</p>
-                  <Image src={item.image} alt={item.title} className="w-full h-48 object-cover rounded-lg" />
+                  {item.image && (
+                    <Image src={item.image} alt={item.title} className="w-full h-48 object-cover rounded-lg" width={200} height={200} />
+                  )}
                 </div>
               </motion.div>
-            ))}
-          </div>
-        </div>
-        <button
-          className="absolute left-0 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-2 shadow-lg"
-          onClick={() => handleScroll('left')}
-        >
-          <ArrowLeft size={24} />
-        </button>
-        <button
-          className="absolute right-0 top-1/2 transform -translate-y-1/2 bg-white rounded-full p-2 shadow-lg"
-          onClick={() => handleScroll('right')}
-        >
-          <ArrowRight size={24} />
-        </button>
+              <div className="w-4 h-4 bg-gray-800 rounded-full absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2"></div>
+            </motion.div>
+          ))}
+        </motion.div>
       </div>
     </div>
   );

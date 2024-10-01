@@ -7,8 +7,10 @@ import { Github, Linkedin, Mail } from 'lucide-react';
 import Navbar from './components/Navbar';
 import Projects from './components/Projects';
 import Timeline from './components/Timeline';
+import Booklist from './components/Booklist';
 import { useMotionValue, useSpring, useTransform } from 'framer-motion';
 import Image from 'next/image';
+import Contact from './components/Contact';
 
 interface Bounds {
   left: number;
@@ -36,8 +38,7 @@ const skills = [
 
 const certifications = [
   { name: 'Harvard CS50', icon: '/icons/cs50.jpg', description: 'Finished Harvard CS50 including the AI extension of the course' },
-  { name: 'MCSD', icon: '/icons/azure.png', description: 'Microsoft Certified Solutions Developer' },
-  // { name: 'Google Cloud Certified', icon: '☁️', description: 'Professional Cloud Architect' },
+  { name: 'MS Azure', icon: '/icons/azure.png', description: 'Experience in MS cloud computing, undergoing certification' },
 ];
 
 const HomePage: React.FC = () => {
@@ -45,9 +46,8 @@ const HomePage: React.FC = () => {
   const [heroMousePosition, setHeroMousePosition] = useState({ x: 0, y: 0 });
   const [typedText, setTypedText] = useState('');
   const [isLoading, setIsLoading] = useState(true);
-  const [isBooklistHovered, setIsBooklistHovered] = useState(false);
   const [isBooklistExpanded, setIsBooklistExpanded] = useState(false);
-  const [isBooklistLoaded, setIsBooklistLoaded] = useState(false);
+  const [isContactExpanded, setIsContactExpanded] = useState(false);
   const [isProjectsExpanded, setIsProjectsExpanded] = useState(false);
   const skillsRef = useRef(null);
   const mouseTrailRef = useRef<{ x: number; y: number }[]>([]);
@@ -126,7 +126,7 @@ const HomePage: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    const text = '$ npm run dev\n> Building webpage...\n> Webpage built successfully!';
+    const text = '$ npm run adiprab\'s-super-secret website\n> Building webpage...\n> Webpage built successfully!';
     let i = 0;
     const typing = setInterval(() => {
       setTypedText(text.slice(0, i));
@@ -239,7 +239,7 @@ const HomePage: React.FC = () => {
             >
               <div className="flex-1 pr-8">
                 <h1 className="text-4xl font-bold mb-4">Hey there! Nice to meet you</h1>
-                <p className="text-xl">My name is Aditya Prabakaran, but I often go by Adi. I&apos;m studying CS at Imperial College London. I&apos;m always looking for an exciting new project to dip my feet into because, as they often say with coding, projects are the best way to learn! Below, you can find more information on my skills, the projects I&apos;ve participated in, my journey in STEM and my current leading in. <br/> (This website is being actively developed, so if you spot any bugs, please do drop me a message on Instagram)</p>
+                <p className="text-xl">My name is Aditya Prabakaran, but I often go by Adi. I&apos;m studying CS at Imperial College London. I&apos;m always looking for an exciting new project to dip my feet into because, as they often say with coding, projects are the best way to learn! Below, you can find more information on my skills, the projects I&apos;ve participated in, my journey in STEM and my current leading in. <br/> (This website is being actively developed, so if you spot any bugs, please do drop me a message using the contact button below)</p>
               </div>
               <div className="flex-shrink-0 w-48 h-48 rounded-full overflow-hidden border-4 border-white shadow-lg">
                 <Image
@@ -285,26 +285,23 @@ const HomePage: React.FC = () => {
             <motion.div
               className="booklist-card bg-[#52B788] text-white p-8 rounded-lg shadow-lg m-8 cursor-pointer"
               whileHover={{ scale: 1.05 }}
-              onClick={() => {
-                setIsBooklistExpanded(true);
-                setTimeout(() => setIsBooklistLoaded(true), 2000);
-              }}
-              onHoverStart={() => setIsBooklistHovered(true)}
-              onHoverEnd={() => setIsBooklistHovered(false)}
+              onClick={() => setIsBooklistExpanded(true)}
             >
               <h2 className="text-2xl font-bold mb-4">Booklist</h2>
-              <AnimatePresence>
-                {isBooklistHovered && (
-                  <motion.p
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="text-lg"
-                  >
-                    Explore my curated booklist, featuring my favorite reads and recommendations across various genres and topics.
-                  </motion.p>
-                )}
-              </AnimatePresence>
+              <p className="text-lg">
+                Explore my curated booklist, featuring my favorite reads and recommendations across various genres and topics.
+              </p>
+            </motion.div>
+
+            <motion.div
+              className="contact-card bg-[#4A90E2] text-white p-8 rounded-lg shadow-lg m-8 cursor-pointer"
+              whileHover={{ scale: 1.05 }}
+              onClick={() => setIsContactExpanded(true)}
+            >
+              <h2 className="text-2xl font-bold mb-4">Contact Me</h2>
+              <p className="text-lg">
+                Have a question or want to collaborate? Get in touch with me!
+              </p>
             </motion.div>
           </main>
 
@@ -396,38 +393,19 @@ const HomePage: React.FC = () => {
           <AnimatePresence>
             {isBooklistExpanded && (
               <motion.div
-                className="fixed inset-0 bg-[#52B788] text-white p-8 overflow-auto"
+                className="fixed inset-0 bg-[#52B788] text-white overflow-auto z-50"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
               >
-                {isBooklistLoaded ? (
-                  <motion.div className="grid grid-cols-4 gap-4">
-                    {[...Array(16)].map((_, index) => (
-                      <motion.div
-                        key={index}
-                        className="bg-white h-40 rounded-lg"
-                        initial={{ rotateY: 180 }}
-                        animate={{ rotateY: 0 }}
-                        transition={{ delay: index * 0.1 }}
-                      />
-                    ))}
-                  </motion.div>
-                ) : (
-                  <div className="flex items-center justify-center h-full">
-                    <p className="text-2xl">Loading booklist...</p>
-                  </div>
-                )}
-                <button
-                  className="absolute top-4 right-4 text-2xl"
-                  onClick={() => {
-                    setIsBooklistExpanded(false);
-                    setIsBooklistLoaded(false);
-                  }}
-                >
-                  &times;
-                </button>
+                <Booklist onClose={() => setIsBooklistExpanded(false)} />
               </motion.div>
+            )}
+          </AnimatePresence>
+
+          <AnimatePresence>
+            {isContactExpanded && (
+              <Contact onClose={() => setIsContactExpanded(false)} />
             )}
           </AnimatePresence>
         </motion.div>
