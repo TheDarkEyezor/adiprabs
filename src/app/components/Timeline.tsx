@@ -1,6 +1,7 @@
-import React, { useState, useRef } from 'react';
+import React, { useRef } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
+import Image from 'next/image';
 
 const timelineData = [
   {
@@ -30,13 +31,18 @@ const timelineData = [
   // Add more timeline items as needed
 ];
 
-const Timeline = ({ onClose }) => {
-  const [activeIndex, setActiveIndex] = useState(0);
-  const scrollRef = useRef(null);
+interface TimelineProps {
+  onClose: () => void;
+}
 
-  const handleScroll = (direction) => {
+const Timeline = ({ onClose }: TimelineProps) => {
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  const handleScroll = (direction: string) => {
     const scrollAmount = direction === 'left' ? -400 : 400;
-    scrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    if (scrollRef.current) {
+      scrollRef.current.scrollBy({ left: scrollAmount, behavior: 'smooth' });
+    }
   };
 
   return (
@@ -74,7 +80,7 @@ const Timeline = ({ onClose }) => {
                   <h3 className="text-2xl font-bold mb-2">{item.date}</h3>
                   <h4 className="text-xl font-semibold mb-2">{item.title}</h4>
                   <p className="mb-4">{item.description}</p>
-                  <img src={item.image} alt={item.title} className="w-full h-48 object-cover rounded-lg" />
+                  <Image src={item.image} alt={item.title} className="w-full h-48 object-cover rounded-lg" />
                 </div>
               </motion.div>
             ))}

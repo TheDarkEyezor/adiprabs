@@ -2,51 +2,70 @@
 
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowRight, Github, Linkedin, Mail } from 'lucide-react';
+import { motion, AnimatePresence, MotionValue } from 'framer-motion';
+import { Github, Linkedin, Mail } from 'lucide-react';
 import Navbar from './components/Navbar';
 import Projects from './components/Projects';
 import Timeline from './components/Timeline';
+import { useMotionValue, useSpring, useTransform } from 'framer-motion';
+import Image from 'next/image';
 
+interface Bounds {
+  left: number;
+  top: number;
+  width: number;
+  height: number;
+}
+
+interface Skill {
+  name: string;
+  icon: string;
+  description: string;
+}
 
 const skills = [
-  { name: 'JavaScript', icon: '🟨', description: 'Proficient in modern JavaScript, including ES6+ features.' },
-  { name: 'React', icon: '⚛️', description: 'Experienced in building complex UIs with React and its ecosystem.' },
-  { name: 'Node.js', icon: '🟩', description: 'Skilled in server-side JavaScript with Node.js.' },
-  { name: 'Python', icon: '🐍', description: 'Proficient in Python for various applications and data analysis.' },
-  { name: 'SQL', icon: '🗃️', description: 'Experienced in database design and complex queries.' },
-  { name: 'Git', icon: '🌿', description: 'Proficient in version control and collaborative development.' },
-  { name: 'Docker', icon: '🐳', description: 'Experienced in containerization and deployment.' },
-  { name: 'AWS', icon: '☁️', description: 'Skilled in cloud computing and serverless architectures.' },
-  { name: 'TypeScript', icon: '🔷', description: 'Proficient in static typing and advanced JavaScript features.' },
-  { name: 'GraphQL', icon: '🔗', description: 'Experienced in building and consuming GraphQL APIs.' },
+  { name: 'TypeScript', icon: '/icons/ts.png', description: 'Proficient in modern JavaScript, including ES6+ features.' },
+  { name: 'React', icon: '/icons/react.png', description: 'Experienced in building complex UIs with React and its ecosystem.' },
+  { name: 'Kotlin', icon: '/icons/kt.png', description: 'Experienced in OOP and building applications' },
+  { name: 'Java', icon: '/icons/java.png', description: 'Experienced in Java semantics and debugging' },
+  { name: 'Python', icon: '/icons/py.png', description: 'Proficient in Python for various applications and data analysis.' },
+  { name: 'SQL', icon: '/icons/sql.png', description: 'Experienced in database design and complex queries.' },
+  { name: 'Git', icon: '/icons/git.png', description: 'Proficient in version control and collaborative development.' },
+  { name: 'Haskell', icon: '/icons/hs.png', description: 'Proficient in functional programming.' },
 ];
 
 const certifications = [
-  { name: 'AWS Certified Developer', icon: '🏆', description: 'Amazon Web Services Certified Developer - Associate' },
-  { name: 'MCSD', icon: '🖥️', description: 'Microsoft Certified Solutions Developer' },
-  { name: 'Google Cloud Certified', icon: '☁️', description: 'Professional Cloud Architect' },
+  { name: 'Harvard CS50', icon: '/icons/cs50.jpg', description: 'Finished Harvard CS50 including the AI extension of the course' },
+  { name: 'MCSD', icon: '/icons/azure.png', description: 'Microsoft Certified Solutions Developer' },
+  // { name: 'Google Cloud Certified', icon: '☁️', description: 'Professional Cloud Architect' },
 ];
 
-const HomePage = () => {
+const HomePage: React.FC = () => {
   const [, setMousePosition] = useState({ x: 0, y: 0 });
   const [heroMousePosition, setHeroMousePosition] = useState({ x: 0, y: 0 });
-  const [activeSkill, setActiveSkill] = useState<{ name: string; icon: string; description: string } | null>(null);
   const [typedText, setTypedText] = useState('');
   const [isLoading, setIsLoading] = useState(true);
-  const [isProjectsHovered, setIsProjectsHovered] = useState(false);
   const [isBooklistHovered, setIsBooklistHovered] = useState(false);
   const [isBooklistExpanded, setIsBooklistExpanded] = useState(false);
   const [isBooklistLoaded, setIsBooklistLoaded] = useState(false);
   const [isProjectsExpanded, setIsProjectsExpanded] = useState(false);
-  const projectCardRef = useRef(null);
-  const [projectCardBounds, setProjectCardBounds] = useState(null);
   const skillsRef = useRef(null);
   const mouseTrailRef = useRef<{ x: number; y: number }[]>([]);
   const [isTimelineExpanded, setIsTimelineExpanded] = useState(false);
-  const timelineCardRef = useRef(null);
-  const [timelineCardBounds, setTimelineCardBounds] = useState(null);
-  
+  const projectCardRef = useRef<HTMLDivElement | null>(null);
+  const timelineCardRef = useRef<HTMLDivElement | null>(null);
+  const [projectCardBounds, setProjectCardBounds] = useState<Bounds | null>(null);
+  const [timelineCardBounds, setTimelineCardBounds] = useState<Bounds | null>(null);
+  const [activeSkill, setActiveSkill] = useState<Skill | null>(null);
+  const skillsTrack1 = useMotionValue(0);
+  const skillsTrack2 = useMotionValue(0);
+  const skillsSpring1 = useSpring(skillsTrack1, { stiffness: 100, damping: 30 });
+  const skillsSpring2 = useSpring(skillsTrack2, { stiffness: 100, damping: 30 });
+
+  // Pre-calculate transforms for both tracks
+  const transformTrack1 = useTransform(skillsSpring1, (x) => x);
+  const transformTrack2 = useTransform(skillsSpring2, (x) => -x);
+
 
   useEffect(() => {
     if (projectCardRef.current && timelineCardRef.current) {
@@ -141,17 +160,23 @@ const HomePage = () => {
     setHeroMousePosition({ x, y });
   };
 
-  const renderSkillsTrack = (items: { name: string; icon: string; description: string }[], offset: number) => (
-    <div className="flex" style={{ transform: `translateX(${offset}px)` }}>
+  const renderSkillsTrack = (items: Skill[], trackMotion: MotionValue<number>, transformMotion: MotionValue<number>) => (
+    <motion.div 
+      className="flex cursor-grab active:cursor-grabbing"
+      drag="x"
+      dragConstraints={{ left: -1000, right: 1000 }}
+      style={{ x: trackMotion }}
+    >
       {[...items, ...items].map((item, index) => (
         <motion.div
-          key={index}
-          className="flex-shrink-0 w-32 h-32 m-2 bg-[#52B788] rounded-lg flex items-center justify-center text-4xl cursor-pointer relative x-50%"
-          whileHover={{ scale: 1.2, zIndex: 10 }}
+          key={`${item.name}-${index}`}
+          className="flex-shrink-0 w-40 h-40 m-2 bg-[#52B788] rounded-lg flex items-center justify-center cursor-pointer relative"
+          whileHover={{ scale: 1.3, zIndex: 10 }}
           onHoverStart={() => setActiveSkill(item)}
           onHoverEnd={() => setActiveSkill(null)}
+          style={{ x: transformMotion }}
         >
-          <span className="skill-icon">{item.icon}</span>
+          <Image src={item.icon} alt={item.name} width={60} height={60} />
           <AnimatePresence>
             {activeSkill === item && (
               <motion.div
@@ -167,7 +192,7 @@ const HomePage = () => {
           </AnimatePresence>
         </motion.div>
       ))}
-    </div>
+    </motion.div>
   );
 
   useEffect(() => {
@@ -206,20 +231,31 @@ const HomePage = () => {
           <Navbar/>
           <main className="flex-grow">
             <motion.section 
-              className="hero text-white p-8 rounded-lg shadow-lg m-8 overflow-hidden"
+              className="hero text-white p-8 rounded-lg shadow-lg m-8 overflow-hidden flex items-center"
               style={heroGradientStyle}
               onMouseMove={handleHeroMouseMove}
               whileHover={{ scale: 1.05 }}
               transition={{ type: "spring", stiffness: 300 }}
             >
-              <h1 className="text-4xl font-bold mb-4">Your Name</h1>
-              <p className="text-xl">A short bio about yourself. Highlight your key skills and passion for coding.</p>
+              <div className="flex-1 pr-8">
+                <h1 className="text-4xl font-bold mb-4">Hey there! Nice to meet you</h1>
+                <p className="text-xl">My name is Aditya Prabakaran, but I often go by Adi. I&apos;m studying CS at Imperial College London. I&apos;m always looking for an exciting new project to dip my feet into because, as they often say with coding, projects are the best way to learn! Below, you can find more information on my skills, the projects I&apos;ve participated in, my journey in STEM and my current leading in. <br/> (This website is being actively developed, so if you spot any bugs, please do drop me a message on Instagram)</p>
+              </div>
+              <div className="flex-shrink-0 w-48 h-48 rounded-full overflow-hidden border-4 border-white shadow-lg">
+                <Image
+                  src="/picc.jpg"
+                  alt="Your Name"
+                  width={192}
+                  height={192}
+                  objectFit="cover"
+                />
+              </div>
             </motion.section>
 
             <div className="skills-banner overflow-hidden my-8 relative" ref={skillsRef}>
               <div className="parallax-bg" style={{ backgroundImage: 'url("/path-to-your-background-image.jpg")', backgroundAttachment: 'fixed' }} />
-              {renderSkillsTrack(skills, 0)}
-              {renderSkillsTrack(certifications, -160)}
+              {renderSkillsTrack(skills, skillsSpring1, transformTrack1)}
+              {renderSkillsTrack(certifications, skillsSpring2, transformTrack2)}
             </div>
 
             <div className="flex flex-col md:flex-row justify-between m-8 space-y-8 md:space-y-0 md:space-x-8">
