@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import emailjs from '@emailjs/browser';
+import { browser } from 'process';
 
 interface FormData {
   name: string;
@@ -18,17 +20,27 @@ const Contact: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Here you would typically send the form data to your backend
-    // For demonstration, we'll just set isSubmitted to true
-    setIsSubmitted(true);
     
-    // Simulate sending email (replace with actual email sending logic)
-    console.log('Sending email:', formData);
-    
-    // Close the form after animation
-    setTimeout(() => {
-      onClose();
-    }, 2000);
+    try {
+      await emailjs.send(
+        'service_gzt6hj8',
+        'template_6k9go1v',
+        {
+          from_name: formData.name,
+          reply_to: formData.email,
+          message: formData.message,
+        },
+        'JX1_kltSZm6UjQkWi'
+      );
+  
+      setIsSubmitted(true);
+      setTimeout(() => {
+        onClose();
+      }, 2000);
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Failed to send message. Please try again.');
+    }
   };
 
   const formVariants = {
@@ -50,6 +62,7 @@ const Contact: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center p-4">
+      <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
       <AnimatePresence>
         {!isSubmitted ? (
           <motion.form

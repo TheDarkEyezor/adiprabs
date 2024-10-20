@@ -20,11 +20,11 @@ const timelineData = [
   {
     date: "Jan 2024",
     title: "Joined Altus Reach, a tech startup",
-    description: "I finally got an amazing opportunity to work as an ML engineer and full-stack developer at Altus reach. The fynamic startup environment, multiple experiences that came with the role and massive exposure to Cloud Computing",
+    description: "I finally got an amazing opportunity to work as an ML engineer and full-stack developer at Altus reach. The dynamic startup environment, exciting nature of the role and fantastic exposure to Cloud Computing helped develop my skills to become a better employee in the tech sector",
     image: ""
   },
   {
-    date: "2023",
+    date: "Sept 2024",
     title: "Now this website",
     description: "I'm determined to put myself on the map now, showcasing my skills and passions in every possible way. here's to hoping for more milestones in the future",
     image: ""
