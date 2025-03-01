@@ -2,7 +2,7 @@
 
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence, MotionValue } from 'framer-motion';
+import { motion, AnimatePresence, MotionValue, animate } from 'framer-motion';
 import { Github, Linkedin, Mail, Instagram } from 'lucide-react';
 import Navbar from './components/Navbar';
 import Projects from './components/Projects';
@@ -11,6 +11,10 @@ import Booklist from './components/Booklist';
 import { useMotionValue, useSpring, useTransform } from 'framer-motion';
 import Image from 'next/image';
 import Contact from './components/Contact';
+import Card from '@/components/Card';
+import useMeasure from "react-use-measure"
+import dynamic from 'next/dynamic';
+
 
 interface Bounds {
   left: number;
@@ -41,6 +45,15 @@ const certifications = [
   { name: 'MS Azure', icon: '/icons/azure.png', description: 'Experience in MS cloud computing, undergoing certification' },
 ];
 
+const workCities = [
+    { name: 'New York', lat: 40.7128, lng: -74.0060, color: '#FF6B6B' },
+    { name: 'San Francisco', lat: 37.7749, lng: -122.4194, color: '#4ECDC4' },
+    { name: 'London', lat: 51.5074, lng: -0.1278, color: '#FFD166' },
+    { name: 'Berlin', lat: 52.5200, lng: 13.4050, color: '#F86624' },
+    { name: 'Tokyo', lat: 35.6762, lng: 139.6503, color: '#6A0572' },
+    { name: 'Singapore', lat: 1.3521, lng: 103.8198, color: '#5D2E8C' },
+];
+
 const HomePage: React.FC = () => {
   const [, setMousePosition] = useState({ x: 0, y: 0 });
   const [heroMousePosition, setHeroMousePosition] = useState({ x: 0, y: 0 });
@@ -50,7 +63,11 @@ const HomePage: React.FC = () => {
   const [isContactExpanded, setIsContactExpanded] = useState(false);
   const [isProjectsExpanded, setIsProjectsExpanded] = useState(false);
   const skillsRef = useRef(null);
-  const mouseTrailRef = useRef<{ x: number; y: number }[]>([]);
+  const mouseTrailRef = useRef<{ x: number; y: number }[]>([
+    { x: window.innerWidth / 2, y: window.innerHeight / 2 }, // Initial centered position
+    { x: window.innerWidth / 2, y: window.innerHeight / 2 }, // Add multiple points to ensure the gradient works
+    { x: window.innerWidth / 2, y: window.innerHeight / 2 }
+  ]);
   const [isTimelineExpanded, setIsTimelineExpanded] = useState(false);
   const projectCardRef = useRef<HTMLDivElement | null>(null);
   const timelineCardRef = useRef<HTMLDivElement | null>(null);
@@ -118,6 +135,12 @@ const HomePage: React.FC = () => {
       mouseTrailRef.current = [...mouseTrailRef.current.slice(-5), { x: e.clientX, y: e.clientY }];
     };
 
+    // Set initial positions based on window size on mount
+    mouseTrailRef.current = Array(5).fill({ 
+      x: window.innerWidth / 2, 
+      y: window.innerHeight / 2 
+    });
+
     window.addEventListener('mousemove', handleMouseMove);
 
     return () => {
@@ -141,12 +164,14 @@ const HomePage: React.FC = () => {
   }, []);
 
   const gradientStyle = {
-    background: `
-      ${mouseTrailRef.current.map((pos, index) => 
-        `radial-gradient(circle at ${pos.x}px ${pos.y}px, rgba(82, 183, 136, ${0.2 * (index + 1) / mouseTrailRef.current.length}), transparent ${50 * (index + 1)}px)`
-      ).join(', ')},
-      #33658A
-    `,
+    background: mouseTrailRef.current.length > 0 
+      ? `
+        ${mouseTrailRef.current.map((pos, index) => 
+          `radial-gradient(circle at ${pos.x}px ${pos.y}px, rgba(82, 183, 136, ${0.2 * (index + 1) / mouseTrailRef.current.length}), transparent ${50 * (index + 1)}px)`
+        ).join(', ')},
+        #33658A
+      `
+      : '#33658A', // Fallback solid color when no mouse positions are available
   };
 
   const heroGradientStyle = {
@@ -207,6 +232,45 @@ const HomePage: React.FC = () => {
     }
   }, []);
 
+  let [ref, {width}] = useMeasure();
+
+  const xTranslation = useMotionValue(0);
+  const FastDuration = 25;
+  const SlowDuration = 75;
+
+
+  const [duration, setDuration] = useState(FastDuration)
+  const [mustFinish, setMustFinish] = useState(false) ;
+  const [rerender, setRerender] = useState(false);
+
+  useEffect(()=> {
+    let controls;
+    let finalPosition = -width/2 - 8;
+
+    if (mustFinish) {
+      controls = animate( xTranslation, [xTranslation.get(), finalPosition], {
+        ease: 'linear',
+        duration: duration * (1 - xTranslation.get() / finalPosition),
+        onComplete: () => {
+          setMustFinish(false)
+          setRerender(!rerender)
+        }
+      });
+
+    } else  {
+      controls = animate( xTranslation, [0, finalPosition], {
+        ease: 'linear',
+        duration: duration,
+        repeat: Infinity,
+        repeatType: 'loop',
+        repeatDelay: 0,
+      });
+
+    }
+
+    return controls.stop
+  }, [xTranslation, width, duration, rerender]);
+
   return (
     <AnimatePresence>
       {isLoading ? (
@@ -252,11 +316,23 @@ const HomePage: React.FC = () => {
               </div>
             </motion.section>
 
-            <div className="skills-banner overflow-hidden my-8 relative" ref={skillsRef}>
-              <div className="parallax-bg" style={{ backgroundImage: 'url("/path-to-your-background-image.jpg")', backgroundAttachment: 'fixed' }} />
-              {renderSkillsTrack(skills, skillsSpring1, transformTrack1)}
-              {renderSkillsTrack(certifications, skillsSpring2, transformTrack2)}
-            </div>
+            <motion.div 
+              className='relative left-0 flex gap-4 z-10'
+              ref={ref} 
+              style={{x:xTranslation}}
+              onHoverStart={() => {
+                setMustFinish(true);
+                setDuration(SlowDuration);
+              }}
+              onHoverEnd={() => {
+                setMustFinish(true);
+                setDuration(FastDuration);
+              }}
+              >
+              {[...skills, ...skills].map((item, idx) => (
+                <Card image={item.icon} key={idx} description={item.description} name={item.name}/>
+              ))}
+            </motion.div>
 
             <div className="flex flex-col md:flex-row justify-between m-8 space-y-8 md:space-y-0 md:space-x-8">
               <motion.div
