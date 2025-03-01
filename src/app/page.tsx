@@ -2,18 +2,17 @@
 
 "use client";
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence, MotionValue, animate } from 'framer-motion';
+import { motion, AnimatePresence, animate } from 'framer-motion';
 import { Github, Linkedin, Mail, Instagram } from 'lucide-react';
 import Navbar from './components/Navbar';
 import Projects from './components/Projects';
 import Timeline from './components/Timeline';
 import Booklist from './components/Booklist';
-import { useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { useMotionValue} from 'framer-motion';
 import Image from 'next/image';
 import Contact from './components/Contact';
 import Card from '@/components/Card';
 import useMeasure from "react-use-measure"
-import dynamic from 'next/dynamic';
 
 
 interface Bounds {
@@ -23,11 +22,11 @@ interface Bounds {
   height: number;
 }
 
-interface Skill {
-  name: string;
-  icon: string;
-  description: string;
-}
+// interface Skill {
+//   name: string;
+//   icon: string;
+//   description: string;
+// }
 
 const skills = [
   { name: 'TypeScript', icon: '/icons/ts.png', description: 'Proficient in modern JavaScript, including ES6+ features.' },
@@ -40,19 +39,19 @@ const skills = [
   { name: 'Haskell', icon: '/icons/hs.png', description: 'Proficient in functional programming.' },
 ];
 
-const certifications = [
-  { name: 'Harvard CS50', icon: '/icons/cs50.jpg', description: 'Finished Harvard CS50 including the AI extension of the course' },
-  { name: 'MS Azure', icon: '/icons/azure.png', description: 'Experience in MS cloud computing, undergoing certification' },
-];
+// const certifications = [
+//   { name: 'Harvard CS50', icon: '/icons/cs50.jpg', description: 'Finished Harvard CS50 including the AI extension of the course' },
+//   { name: 'MS Azure', icon: '/icons/azure.png', description: 'Experience in MS cloud computing, undergoing certification' },
+// ];
 
-const workCities = [
-    { name: 'New York', lat: 40.7128, lng: -74.0060, color: '#FF6B6B' },
-    { name: 'San Francisco', lat: 37.7749, lng: -122.4194, color: '#4ECDC4' },
-    { name: 'London', lat: 51.5074, lng: -0.1278, color: '#FFD166' },
-    { name: 'Berlin', lat: 52.5200, lng: 13.4050, color: '#F86624' },
-    { name: 'Tokyo', lat: 35.6762, lng: 139.6503, color: '#6A0572' },
-    { name: 'Singapore', lat: 1.3521, lng: 103.8198, color: '#5D2E8C' },
-];
+// const workCities = [
+//     { name: 'New York', lat: 40.7128, lng: -74.0060, color: '#FF6B6B' },
+//     { name: 'San Francisco', lat: 37.7749, lng: -122.4194, color: '#4ECDC4' },
+//     { name: 'London', lat: 51.5074, lng: -0.1278, color: '#FFD166' },
+//     { name: 'Berlin', lat: 52.5200, lng: 13.4050, color: '#F86624' },
+//     { name: 'Tokyo', lat: 35.6762, lng: 139.6503, color: '#6A0572' },
+//     { name: 'Singapore', lat: 1.3521, lng: 103.8198, color: '#5D2E8C' },
+// ];
 
 const HomePage: React.FC = () => {
   const [, setMousePosition] = useState({ x: 0, y: 0 });
@@ -62,27 +61,24 @@ const HomePage: React.FC = () => {
   const [isBooklistExpanded, setIsBooklistExpanded] = useState(false);
   const [isContactExpanded, setIsContactExpanded] = useState(false);
   const [isProjectsExpanded, setIsProjectsExpanded] = useState(false);
-  const skillsRef = useRef(null);
-  const mouseTrailRef = useRef<{ x: number; y: number }[]>([
-    { x: window.innerWidth / 2, y: window.innerHeight / 2 }, // Initial centered position
-    { x: window.innerWidth / 2, y: window.innerHeight / 2 }, // Add multiple points to ensure the gradient works
-    { x: window.innerWidth / 2, y: window.innerHeight / 2 }
-  ]);
+  const mouseTrailRef = useRef<{ x: number; y: number }[]>(
+    typeof window !== 'undefined'
+      ? [
+          { x: window.innerWidth / 2, y: window.innerHeight / 2 },
+          { x: window.innerWidth / 2, y: window.innerHeight / 2 },
+          { x: window.innerWidth / 2, y: window.innerHeight / 2 },
+        ]
+      : [
+          { x: 0, y: 0 },
+          { x: 0, y: 0 },
+          { x: 0, y: 0 },
+        ]
+  );
   const [isTimelineExpanded, setIsTimelineExpanded] = useState(false);
   const projectCardRef = useRef<HTMLDivElement | null>(null);
   const timelineCardRef = useRef<HTMLDivElement | null>(null);
   const [projectCardBounds, setProjectCardBounds] = useState<Bounds | null>(null);
   const [timelineCardBounds, setTimelineCardBounds] = useState<Bounds | null>(null);
-  const [activeSkill, setActiveSkill] = useState<Skill | null>(null);
-  const skillsTrack1 = useMotionValue(0);
-  const skillsTrack2 = useMotionValue(0);
-  const skillsSpring1 = useSpring(skillsTrack1, { stiffness: 100, damping: 30 });
-  const skillsSpring2 = useSpring(skillsTrack2, { stiffness: 100, damping: 30 });
-
-  // Pre-calculate transforms for both tracks
-  const transformTrack1 = useTransform(skillsSpring1, (x) => x);
-  const transformTrack2 = useTransform(skillsSpring2, (x) => -x);
-
 
   useEffect(() => {
     if (projectCardRef.current && timelineCardRef.current) {
@@ -136,16 +132,18 @@ const HomePage: React.FC = () => {
     };
 
     // Set initial positions based on window size on mount
-    mouseTrailRef.current = Array(5).fill({ 
-      x: window.innerWidth / 2, 
-      y: window.innerHeight / 2 
-    });
-
-    window.addEventListener('mousemove', handleMouseMove);
-
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-    };
+    if (typeof window !== 'undefined') {      
+      mouseTrailRef.current = Array(5).fill({ 
+        x: window.innerWidth / 2, 
+        y: window.innerHeight / 2 
+      });
+  
+      window.addEventListener('mousemove', handleMouseMove);
+  
+      return () => {
+        window.removeEventListener('mousemove', handleMouseMove);
+      };
+    }
   }, []);
 
   useEffect(() => {
@@ -185,41 +183,6 @@ const HomePage: React.FC = () => {
     setHeroMousePosition({ x, y });
   };
 
-  const renderSkillsTrack = (items: Skill[], trackMotion: MotionValue<number>, transformMotion: MotionValue<number>) => (
-    <motion.div 
-      className="flex cursor-grab active:cursor-grabbing"
-      drag="x"
-      dragConstraints={{ left: -1000, right: 1000 }}
-      style={{ x: trackMotion }}
-    >
-      {[...items, ...items].map((item, index) => (
-        <motion.div
-          key={`${item.name}-${index}`}
-          className="flex-shrink-0 w-40 h-40 m-2 bg-[#52B788] rounded-lg flex items-center justify-center cursor-pointer relative"
-          whileHover={{ scale: 1.3, zIndex: 10 }}
-          onHoverStart={() => setActiveSkill(item)}
-          onHoverEnd={() => setActiveSkill(null)}
-          style={{ x: transformMotion }}
-        >
-          <Image src={item.icon} alt={item.name} width={60} height={60} />
-          <AnimatePresence>
-            {activeSkill === item && (
-              <motion.div
-                className="absolute inset-0 bg-white bg-opacity-90 p-2 rounded-lg flex flex-col justify-center items-center text-black"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-              >
-                <p className="text-sm font-bold">{item.name}</p>
-                <p className="text-xs mt-1">{item.description}</p>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </motion.div>
-      ))}
-    </motion.div>
-  );
-
   useEffect(() => {
     if (projectCardRef.current) {
       const rect = projectCardRef.current.getBoundingClientRect();
@@ -232,7 +195,7 @@ const HomePage: React.FC = () => {
     }
   }, []);
 
-  let [ref, {width}] = useMeasure();
+  const [ref, {width}] = useMeasure();
 
   const xTranslation = useMotionValue(0);
   const FastDuration = 25;
@@ -245,7 +208,7 @@ const HomePage: React.FC = () => {
 
   useEffect(()=> {
     let controls;
-    let finalPosition = -width/2 - 8;
+    const finalPosition = -width/2 - 8;
 
     if (mustFinish) {
       controls = animate( xTranslation, [xTranslation.get(), finalPosition], {
@@ -269,7 +232,7 @@ const HomePage: React.FC = () => {
     }
 
     return controls.stop
-  }, [xTranslation, width, duration, rerender]);
+  }, [xTranslation, width, duration, rerender, mustFinish]);
 
   return (
     <AnimatePresence>
