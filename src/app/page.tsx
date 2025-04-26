@@ -11,7 +11,7 @@ import Booklist from './components/Booklist';
 import { useMotionValue} from 'framer-motion';
 import Image from 'next/image';
 import Contact from './components/Contact';
-import Card from '@/components/Card';
+import Card from './components/Card';
 import useMeasure from "react-use-measure"
 
 
@@ -22,11 +22,6 @@ interface Bounds {
   height: number;
 }
 
-// interface Skill {
-//   name: string;
-//   icon: string;
-//   description: string;
-// }
 
 const skills = [
   { name: 'TypeScript', icon: '/icons/ts.png', description: 'Proficient in modern JavaScript, including ES6+ features.' },
@@ -38,20 +33,6 @@ const skills = [
   { name: 'Git', icon: '/icons/git.png', description: 'Proficient in version control and collaborative development.' },
   { name: 'Haskell', icon: '/icons/hs.png', description: 'Proficient in functional programming.' },
 ];
-
-// const certifications = [
-//   { name: 'Harvard CS50', icon: '/icons/cs50.jpg', description: 'Finished Harvard CS50 including the AI extension of the course' },
-//   { name: 'MS Azure', icon: '/icons/azure.png', description: 'Experience in MS cloud computing, undergoing certification' },
-// ];
-
-// const workCities = [
-//     { name: 'New York', lat: 40.7128, lng: -74.0060, color: '#FF6B6B' },
-//     { name: 'San Francisco', lat: 37.7749, lng: -122.4194, color: '#4ECDC4' },
-//     { name: 'London', lat: 51.5074, lng: -0.1278, color: '#FFD166' },
-//     { name: 'Berlin', lat: 52.5200, lng: 13.4050, color: '#F86624' },
-//     { name: 'Tokyo', lat: 35.6762, lng: 139.6503, color: '#6A0572' },
-//     { name: 'Singapore', lat: 1.3521, lng: 103.8198, color: '#5D2E8C' },
-// ];
 
 const HomePage: React.FC = () => {
   const [, setMousePosition] = useState({ x: 0, y: 0 });
@@ -447,7 +428,14 @@ const HomePage: React.FC = () => {
 
           <AnimatePresence>
             {isContactExpanded && (
-              <Contact onClose={() => setIsContactExpanded(false)} />
+              <motion.div
+                className="fixed inset-0 z-50" // Add z-index here
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                <Contact onClose={() => setIsContactExpanded(false)} />
+              </motion.div>
             )}
           </AnimatePresence>
         </motion.div>
