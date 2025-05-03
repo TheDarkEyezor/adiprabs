@@ -37,8 +37,6 @@ const skills = [
 const HomePage: React.FC = () => {
   const [, setMousePosition] = useState({ x: 0, y: 0 });
   const [heroMousePosition, setHeroMousePosition] = useState({ x: 0, y: 0 });
-  const [typedText, setTypedText] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
   const [isBooklistExpanded, setIsBooklistExpanded] = useState(false);
   const [isContactExpanded, setIsContactExpanded] = useState(false);
   const [isProjectsExpanded, setIsProjectsExpanded] = useState(false);
@@ -127,21 +125,6 @@ const HomePage: React.FC = () => {
     }
   }, []);
 
-  useEffect(() => {
-    const text = '$ npm run adiprab\'s-super-secret website\n> Building webpage...\n> Webpage built successfully!';
-    let i = 0;
-    const typing = setInterval(() => {
-      setTypedText(text.slice(0, i));
-      i++;
-      if (i > text.length) {
-        clearInterval(typing);
-        setTimeout(() => setIsLoading(false), 1000);
-      }
-    }, 50);
-
-    return () => clearInterval(typing);
-  }, []);
-
   const gradientStyle = {
     background: mouseTrailRef.current.length > 0 
       ? `
@@ -216,231 +199,234 @@ const HomePage: React.FC = () => {
   }, [xTranslation, width, duration, rerender, mustFinish]);
 
   return (
-    <AnimatePresence>
-      {isLoading ? (
-        <motion.div
-          className="fixed inset-0 bg-black flex items-center justify-center"
-          exit={{ opacity: 0 }}
-          key="loading"
+    <motion.div
+      className="min-h-screen flex flex-col font-['Roboto', sans-serif]"
+      style={gradientStyle}
+      initial={{ opacity: 0 }} // Keep initial opacity for fade-in
+      animate={{ opacity: 1 }}
+      key="content"
+    >
+      <Navbar/>
+      <main className="flex-grow">
+        <motion.section 
+          className="hero text-white p-8 rounded-lg shadow-lg m-8 overflow-hidden flex items-center"
+          style={heroGradientStyle}
+          onMouseMove={handleHeroMouseMove}
+          whileHover={{ scale: 1.05 }}
+          transition={{ type: "spring", stiffness: 300 }}
         >
-          <pre className="text-green-400 font-mono">
-            {typedText}
-            <span className="animate-blink">|</span>
-          </pre>
-        </motion.div>
-      ) : (
+          <div className="flex-1 pr-8">
+            <h1 className="text-4xl font-bold mb-4">Hey there! Nice to meet you</h1>
+            <p className="text-xl">My name is Aditya Prabakaran, but I often go by Adi. I&apos;m studying CS at Imperial College London. I&apos;m always looking for an exciting new project to dip my feet into because, as they often say with coding, projects are the best way to learn! Below, you can find more information on my skills, the projects I&apos;ve participated in, my journey in STEM and my current leading in. <br/> (This website is being actively developed, so if you spot any bugs, please do drop me a message using the contact button below)</p>
+          </div>
+          <div className="flex-shrink-0 w-48 h-48 rounded-full overflow-hidden border-4 border-white shadow-lg">
+            <Image
+              src="/picc.jpg"
+              alt="Your Name"
+              width={192}
+              height={192}
+              objectFit="cover"
+            />
+          </div>
+        </motion.section>
+
+        {/* Wrap the skills track in a div with overflow-hidden and max-w-full */}
+        <div className="m-8 overflow-hidden max-w-full"> {/* Added max-w-full */}
+          <motion.div 
+            className='relative left-0 flex gap-4 z-10'
+            ref={ref} 
+            style={{x:xTranslation}}
+            onHoverStart={() => {
+              setMustFinish(true);
+              setDuration(SlowDuration);
+            }}
+            onHoverEnd={() => {
+              setMustFinish(true);
+              setDuration(FastDuration);
+            }}
+            >
+            {[...skills, ...skills].map((item, idx) => (
+              <Card image={item.icon} key={idx} description={item.description} name={item.name}/>
+            ))}
+          </motion.div>
+        </div>
+
+        <div className="flex flex-col md:flex-row justify-between m-8 space-y-8 md:space-y-0 md:space-x-8">
+          <motion.div
+            ref={projectCardRef}
+            className="projects-card bg-[#FF6B6B] text-white p-8 rounded-lg shadow-lg cursor-pointer flex-1"
+            whileHover={{ scale: 1.05 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+            onClick={handleExpandProjects}
+          >
+            <h2 className="text-2xl font-bold mb-4">Projects</h2>
+            <p className="text-lg">Explore my portfolio of projects, showcasing my skills in web development, data analysis, and more.</p>
+          </motion.div>
+
+          <motion.div
+            ref={timelineCardRef}
+            className="timeline-card bg-[#FEC601] text-gray-800 p-8 rounded-lg shadow-lg cursor-pointer flex-1"
+            whileHover={{ scale: 1.05 }}
+            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+            onClick={handleExpandTimeline}
+          >
+            <h2 className="text-2xl font-bold mb-4">My Journey</h2>
+            <p className="text-lg">Discover my professional timeline and key milestones in my career.</p>
+          </motion.div>
+        </div>
+
+        {/* Update Resume Card to be a link */}
         <motion.div
-          className="min-h-screen flex flex-col font-['Roboto', sans-serif]"
-          style={gradientStyle}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          key="content"
+          className="resume-card bg-[#6A8D92] text-white p-8 rounded-lg shadow-lg m-8 cursor-pointer" // Example color
+          whileHover={{ scale: 1.05 }}
+          // Remove onClick handler
+          transition={{ type: 'spring', stiffness: 300, damping: 20 }}
         >
-          <Navbar/>
-          <main className="flex-grow">
-            <motion.section 
-              className="hero text-white p-8 rounded-lg shadow-lg m-8 overflow-hidden flex items-center"
-              style={heroGradientStyle}
-              onMouseMove={handleHeroMouseMove}
-              whileHover={{ scale: 1.05 }}
-              transition={{ type: "spring", stiffness: 300 }}
-            >
-              <div className="flex-1 pr-8">
-                <h1 className="text-4xl font-bold mb-4">Hey there! Nice to meet you</h1>
-                <p className="text-xl">My name is Aditya Prabakaran, but I often go by Adi. I&apos;m studying CS at Imperial College London. I&apos;m always looking for an exciting new project to dip my feet into because, as they often say with coding, projects are the best way to learn! Below, you can find more information on my skills, the projects I&apos;ve participated in, my journey in STEM and my current leading in. <br/> (This website is being actively developed, so if you spot any bugs, please do drop me a message using the contact button below)</p>
-              </div>
-              <div className="flex-shrink-0 w-48 h-48 rounded-full overflow-hidden border-4 border-white shadow-lg">
-                <Image
-                  src="/picc.jpg"
-                  alt="Your Name"
-                  width={192}
-                  height={192}
-                  objectFit="cover"
-                />
-              </div>
-            </motion.section>
-
-            <motion.div 
-              className='relative left-0 flex gap-4 z-10'
-              ref={ref} 
-              style={{x:xTranslation}}
-              onHoverStart={() => {
-                setMustFinish(true);
-                setDuration(SlowDuration);
-              }}
-              onHoverEnd={() => {
-                setMustFinish(true);
-                setDuration(FastDuration);
-              }}
-              >
-              {[...skills, ...skills].map((item, idx) => (
-                <Card image={item.icon} key={idx} description={item.description} name={item.name}/>
-              ))}
-            </motion.div>
-
-            <div className="flex flex-col md:flex-row justify-between m-8 space-y-8 md:space-y-0 md:space-x-8">
-              <motion.div
-                ref={projectCardRef}
-                className="projects-card bg-[#FF6B6B] text-white p-8 rounded-lg shadow-lg cursor-pointer flex-1"
-                whileHover={{ scale: 1.05 }}
-                transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                onClick={handleExpandProjects}
-              >
-                <h2 className="text-2xl font-bold mb-4">Projects</h2>
-                <p className="text-lg">Explore my portfolio of projects, showcasing my skills in web development, data analysis, and more.</p>
-              </motion.div>
-
-              <motion.div
-                ref={timelineCardRef}
-                className="timeline-card bg-[#FEC601] text-gray-800 p-8 rounded-lg shadow-lg cursor-pointer flex-1"
-                whileHover={{ scale: 1.05 }}
-                transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                onClick={handleExpandTimeline}
-              >
-                <h2 className="text-2xl font-bold mb-4">My Journey</h2>
-                <p className="text-lg">Discover my professional timeline and key milestones in my career.</p>
-              </motion.div>
-            </div>
-
-            <motion.div
-              className="booklist-card bg-[#52B788] text-white p-8 rounded-lg shadow-lg m-8 cursor-pointer"
-              whileHover={{ scale: 1.05 }}
-              onClick={() => setIsBooklistExpanded(true)}
-            >
-              <h2 className="text-2xl font-bold mb-4">Booklist</h2>
-              <p className="text-lg">
-                Explore my curated booklist, featuring my favorite reads and recommendations across various genres and topics.
-              </p>
-            </motion.div>
-
-            <motion.div
-              className="contact-card bg-[#4A90E2] text-white p-8 rounded-lg shadow-lg m-8 cursor-pointer"
-              whileHover={{ scale: 1.05 }}
-              onClick={() => setIsContactExpanded(true)}
-            >
-              <h2 className="text-2xl font-bold mb-4">Contact Me</h2>
-              <p className="text-lg">
-                Have a question or want to collaborate? Get in touch with me!
-              </p>
-            </motion.div>
-          </main>
-
-          <footer className="bg-[#040303] text-white p-4 mt-auto">
-            <div className="flex justify-center space-x-4">
-              <a href="https://github.com/TheDarkEyezor" target="_blank" rel="noopener noreferrer">
-                <Github className="w-6 h-6 hover:text-[#FF6B6B]" />
-              </a>
-              <a href="https://www.linkedin.com/in/adiprabs/" target="_blank" rel="noopener noreferrer">
-                <Linkedin className="w-6 h-6 hover:text-[#FF6B6B]" />
-              </a>
-              <a href="mailto:aditya.prabakaran@gmail.com">
-                <Mail className="w-6 h-6 hover:text-[#FF6B6B]" />
-              </a>
-              <a href="https://www.instagram.com/adiprabs/" target="_blank" rel="noopener noreferrer">
-                <Instagram className="w-6 h-6 hover:text-[#FF6B6B]" />
-              </a>
-            </div>
-          </footer>
-          <AnimatePresence>
-            {isProjectsExpanded && projectCardBounds && (
-              <motion.div
-                className="fixed inset-0 z-50"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-              >
-                <motion.div
-                  className="absolute bg-[#FF6B6B] rounded-lg overflow-hidden"
-                  initial={{
-                    left: projectCardBounds.left,
-                    top: projectCardBounds.top,
-                    width: projectCardBounds.width,
-                    height: projectCardBounds.height,
-                  }}
-                  animate={{
-                    left: 0,
-                    top: 0,
-                    width: '100vw',
-                    height: '100vh',
-                    transition: { duration: 0.3, ease: 'easeInOut' },
-                  }}
-                  exit={{
-                    left: projectCardBounds.left,
-                    top: projectCardBounds.top,
-                    width: projectCardBounds.width,
-                    height: projectCardBounds.height,
-                    transition: { duration: 0.3, ease: 'easeInOut' },
-                  }}
-                >
-                  <Projects onClose={() => setIsProjectsExpanded(false)} />
-                </motion.div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-          <AnimatePresence>
-            {isTimelineExpanded && timelineCardBounds && (
-              <motion.div
-                className="fixed inset-0 z-50"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-              >
-                <motion.div
-                  className="absolute bg-[#FEC601] rounded-lg overflow-hidden"
-                  initial={{
-                    left: timelineCardBounds.left,
-                    top: timelineCardBounds.top,
-                    width: timelineCardBounds.width,
-                    height: timelineCardBounds.height,
-                  }}
-                  animate={{
-                    left: 0,
-                    top: 0,
-                    width: '100vw',
-                    height: '100vh',
-                    transition: { duration: 0.3, ease: 'easeInOut' },
-                  }}
-                  exit={{
-                    left: timelineCardBounds.left,
-                    top: timelineCardBounds.top,
-                    width: timelineCardBounds.width,
-                    height: timelineCardBounds.height,
-                    transition: { duration: 0.3, ease: 'easeInOut' },
-                  }}
-                >
-                  <Timeline onClose={() => setIsTimelineExpanded(false)} />
-                </motion.div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-          <AnimatePresence>
-            {isBooklistExpanded && (
-              <motion.div
-                className="fixed inset-0 bg-[#52B788] text-white overflow-auto z-50"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-              >
-                <Booklist onClose={() => setIsBooklistExpanded(false)} />
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          <AnimatePresence>
-            {isContactExpanded && (
-              <motion.div
-                className="fixed inset-0 z-50" // Add z-index here
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-              >
-                <Contact onClose={() => setIsContactExpanded(false)} />
-              </motion.div>
-            )}
-          </AnimatePresence>
+          <a href="/resume" className="block w-full h-full"> {/* Add anchor tag for navigation */}
+            <h2 className="text-2xl font-bold mb-4">Resume</h2>
+            <p className="text-lg">
+              View my professional resume detailing my experience, skills, and education.
+            </p>
+          </a>
         </motion.div>
-      )}
-    </AnimatePresence>
+
+        <motion.div
+          className="booklist-card bg-[#52B788] text-white p-8 rounded-lg shadow-lg m-8 cursor-pointer"
+          whileHover={{ scale: 1.05 }}
+          onClick={() => setIsBooklistExpanded(true)}
+        >
+          <h2 className="text-2xl font-bold mb-4">Booklist</h2>
+          <p className="text-lg">
+            Explore my curated booklist, featuring my favorite reads and recommendations across various genres and topics.
+          </p>
+        </motion.div>
+
+        <motion.div
+          className="contact-card bg-[#4A90E2] text-white p-8 rounded-lg shadow-lg m-8 cursor-pointer"
+          whileHover={{ scale: 1.05 }}
+          onClick={() => setIsContactExpanded(true)}
+        >
+          <h2 className="text-2xl font-bold mb-4">Contact Me</h2>
+          <p className="text-lg">
+            Have a question or want to collaborate? Get in touch with me!
+          </p>
+        </motion.div>
+      </main>
+
+      <footer className="bg-[#040303] text-white p-4 mt-auto">
+        <div className="flex justify-center space-x-4">
+          <a href="https://github.com/TheDarkEyezor" target="_blank" rel="noopener noreferrer">
+            <Github className="w-6 h-6 hover:text-[#FF6B6B]" />
+          </a>
+          <a href="https://www.linkedin.com/in/adiprabs/" target="_blank" rel="noopener noreferrer">
+            <Linkedin className="w-6 h-6 hover:text-[#FF6B6B]" />
+          </a>
+          <a href="mailto:aditya.prabakaran@gmail.com">
+            <Mail className="w-6 h-6 hover:text-[#FF6B6B]" />
+          </a>
+          <a href="https://www.instagram.com/adiprabs/" target="_blank" rel="noopener noreferrer">
+            <Instagram className="w-6 h-6 hover:text-[#FF6B6B]" />
+          </a>
+        </div>
+      </footer>
+      <AnimatePresence>
+        {isProjectsExpanded && projectCardBounds && (
+          <motion.div
+            className="fixed inset-0 z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="absolute bg-[#FF6B6B] rounded-lg overflow-hidden"
+              initial={{
+                left: projectCardBounds.left,
+                top: projectCardBounds.top,
+                width: projectCardBounds.width,
+                height: projectCardBounds.height,
+              }}
+              animate={{
+                left: 0,
+                top: 0,
+                width: '100vw',
+                height: '100vh',
+                transition: { duration: 0.3, ease: 'easeInOut' },
+              }}
+              exit={{
+                left: projectCardBounds.left,
+                top: projectCardBounds.top,
+                width: projectCardBounds.width,
+                height: projectCardBounds.height,
+                transition: { duration: 0.3, ease: 'easeInOut' },
+              }}
+            >
+              <Projects onClose={() => setIsProjectsExpanded(false)} />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {isTimelineExpanded && timelineCardBounds && (
+          <motion.div
+            className="fixed inset-0 z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <motion.div
+              className="absolute bg-[#FEC601] rounded-lg overflow-hidden"
+              initial={{
+                left: timelineCardBounds.left,
+                top: timelineCardBounds.top,
+                width: timelineCardBounds.width,
+                height: timelineCardBounds.height,
+              }}
+              animate={{
+                left: 0,
+                top: 0,
+                width: '100vw',
+                height: '100vh',
+                transition: { duration: 0.3, ease: 'easeInOut' },
+              }}
+              exit={{
+                left: timelineCardBounds.left,
+                top: timelineCardBounds.top,
+                width: timelineCardBounds.width,
+                height: timelineCardBounds.height,
+                transition: { duration: 0.3, ease: 'easeInOut' },
+              }}
+            >
+              <Timeline onClose={() => setIsTimelineExpanded(false)} />
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {isBooklistExpanded && (
+          <motion.div
+            className="fixed inset-0 bg-[#52B788] text-white overflow-auto z-50"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <Booklist onClose={() => setIsBooklistExpanded(false)} />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {isContactExpanded && (
+          <motion.div
+            className="fixed inset-0 z-50" // Add z-index here
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <Contact onClose={() => setIsContactExpanded(false)} />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 };
 
