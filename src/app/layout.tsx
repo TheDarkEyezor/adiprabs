@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import TransitionProvider from "@/components/TransitionProvider"; // Import the provider
 import "./globals.css";
 
 const geistSans = localFont({
@@ -29,7 +30,8 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
         style={{ backgroundColor: '#33658A', margin: 0, padding: 0 }}
       >
-        {children}
+        {/* Wrap children with the TransitionProvider */}
+        <TransitionProvider>{children}</TransitionProvider>
       </body>
     </html>
   );
