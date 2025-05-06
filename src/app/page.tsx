@@ -35,6 +35,7 @@ const skills = [
 ];
 
 const HomePage: React.FC = () => {
+  const [hasMounted, setHasMounted] = useState(false); // Track if the component has mounted
   const [, setMousePosition] = useState({ x: 0, y: 0 });
   const [heroMousePosition, setHeroMousePosition] = useState({ x: 0, y: 0 });
   const [isBooklistExpanded, setIsBooklistExpanded] = useState(false);
@@ -125,20 +126,28 @@ const HomePage: React.FC = () => {
     }
   }, []);
 
-  const gradientStyle = {
-    background: mouseTrailRef.current.length > 0 
-      ? `
-        ${mouseTrailRef.current.map((pos, index) => 
-          `radial-gradient(circle at ${pos.x}px ${pos.y}px, rgba(82, 183, 136, ${0.2 * (index + 1) / mouseTrailRef.current.length}), transparent ${50 * (index + 1)}px)`
-        ).join(', ')},
-        #33658A
-      `
-      : '#33658A', // Fallback solid color when no mouse positions are available
-  };
+  useEffect(() => {
+    setHasMounted(true); // Set the flag to true after the component has mounted
+  }, []);
 
-  const heroGradientStyle = {
-    background: `radial-gradient(circle at ${100 - heroMousePosition.x}% ${100 - heroMousePosition.y}%, #FF6B6B, #FEC601)`,
-  };
+  const gradientStyle = hasMounted
+    ? {
+        background: mouseTrailRef.current.length > 0 
+          ? `
+            ${mouseTrailRef.current.map((pos, index) => 
+              `radial-gradient(circle at ${pos.x}px ${pos.y}px, rgba(82, 183, 136, ${0.2 * (index + 1) / mouseTrailRef.current.length}), transparent ${50 * (index + 1)}px)`
+            ).join(', ')},
+            #33658A
+          `
+          : '#33658A', // Fallback solid color when no mouse positions are available
+      }
+    : {}; // Empty style during SSR to avoid mismatch
+
+  const heroGradientStyle = hasMounted
+    ? {
+        background: `radial-gradient(circle at ${100 - heroMousePosition.x}% ${100 - heroMousePosition.y}%, #FF6B6B, #FEC601)`,
+      }
+    : {}; // Empty style during SSR to avoid mismatch
 
   const handleHeroMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -197,6 +206,20 @@ const HomePage: React.FC = () => {
 
     return controls.stop
   }, [xTranslation, width, duration, rerender, mustFinish]);
+
+  useEffect(() => {
+    const body = document.body;
+
+    if (isProjectsExpanded || isTimelineExpanded || isBooklistExpanded || isContactExpanded) {
+      body.classList.add('overflow-hidden'); // Disable scrolling
+    } else {
+      body.classList.remove('overflow-hidden'); // Enable scrolling
+    }
+
+    return () => {
+      body.classList.remove('overflow-hidden'); // Cleanup on unmount
+    };
+  }, [isProjectsExpanded, isTimelineExpanded, isBooklistExpanded, isContactExpanded]);
 
   return (
     <motion.div
@@ -332,13 +355,13 @@ const HomePage: React.FC = () => {
       <AnimatePresence>
         {isProjectsExpanded && projectCardBounds && (
           <motion.div
-            className="fixed inset-0 z-50"
+            className="fixed inset-0 z-[100]" // Ensure it covers the entire viewport and has a high z-index
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
             <motion.div
-              className="absolute bg-[#FF6B6B] rounded-lg overflow-hidden"
+              className="absolute bg-[#FF6B6B] rounded-lg overflow-auto" // Enable scrolling within the card
               initial={{
                 left: projectCardBounds.left,
                 top: projectCardBounds.top,
@@ -368,7 +391,7 @@ const HomePage: React.FC = () => {
       <AnimatePresence>
         {isTimelineExpanded && timelineCardBounds && (
           <motion.div
-            className="fixed inset-0 z-50"
+            className="fixed inset-0 z-[100]" // Ensure it covers the entire viewport and has a high z-index
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}

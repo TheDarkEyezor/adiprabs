@@ -84,6 +84,96 @@ export const projectsData: Project[] = [
     date: "May 2020 - June 2020",
     longDescription: "This project not only showcased my coding skills but also allowed me to create a unique and engaging experience..."
   },
+  {
+    slug: "day-trading-algorithm",
+    title: "Day Trading Algorithm",
+    description: "Quantitative analysis techniques, risk assessment using volatility indicators, and references to quantitative finance resources.",
+    tags: ["Python", "QuantConnect", "Finance"],
+    techStack: ["Python", "QuantConnect"],
+    link: "https://github.com/TheDarkEyezor/Day-Trading-Algorithm",
+    date: "Ongoing",
+    longDescription: "Actively learning and upskilling through online courses and resources, focusing on quantitative analysis, risk assessment, and financial modeling."
+  },
+  {
+    slug: "calculus-differentiation",
+    title: "Calculus Differentiation Program",
+    description: "A functional programming project in Haskell for symbolic differentiation.",
+    tags: ["Haskell", "Functional Programming"],
+    techStack: ["Haskell"],
+    link: "https://github.com/TheDarkEyezor/Calculus-Differentiation",
+    date: "Completed",
+    longDescription: "Developed a program to perform symbolic differentiation using functional programming principles in Haskell."
+  },
+  {
+    slug: "music-file-sorter",
+    title: "Music File Sorter",
+    description: "A Kotlin and Java-based program for organizing music files using OOP principles.",
+    tags: ["Kotlin", "Java", "OOP"],
+    techStack: ["Kotlin", "Java"],
+    link: "https://github.com/TheDarkEyezor/Music-File-Sorter",
+    date: "Completed",
+    longDescription: "Created a program to sort and organize music files efficiently using object-oriented programming."
+  },
+  {
+    slug: "wacc-compiler",
+    title: "WACC Language Compiler",
+    description: "A compiler project using Scala, GitLab runners, Docker, and LLVM for production-level applications.",
+    tags: ["Scala", "Docker", "LLVM", "Compiler"],
+    techStack: ["Scala", "Docker", "LLVM"],
+    link: "https://github.com/TheDarkEyezor/WACC-Compiler",
+    date: "Completed",
+    longDescription: "Built a compiler for the WACC language, gaining experience in abstraction, technical concepts, and production-level tools."
+  },
+  {
+    slug: "adipedia-discord-bot",
+    title: "AdiPedia Discord Bot",
+    description: "A Discord bot with custom replies, virtual currency-based games, and embeds using DiscordJS API.",
+    tags: ["JavaScript", "DiscordJS", "Bot Development"],
+    techStack: ["JavaScript", "DiscordJS"],
+    link: "https://github.com/TheDarkEyezor/AdiPedia-Discord-Bot",
+    date: "Completed",
+    longDescription: "Designed and developed a custom Discord bot to enhance community engagement with unique features."
+  },
+  {
+    slug: "swyftgesture",
+    title: "SwyftGesture",
+    description: "A Python app to control the computer’s mouse and volume using hand gestures with Mediapipe.",
+    tags: ["Python", "Mediapipe", "Computer Vision"],
+    techStack: ["Python", "Mediapipe"],
+    link: "https://github.com/TheDarkEyezor/SwyftGesture",
+    date: "Completed",
+    longDescription: "Developed an innovative app to enable hands-free control of computer functions using hand gestures."
+  },
+  {
+    slug: "movie-recommendation-system",
+    title: "Movie Recommendation System",
+    description: "A recommendation system using PyTorch, NumPy, and Pandas with the LightFM dataset.",
+    tags: ["Python", "PyTorch", "Recommendation Systems"],
+    techStack: ["Python", "PyTorch", "NumPy", "Pandas"],
+    link: "https://github.com/TheDarkEyezor/Movie-Recommendation-System",
+    date: "Completed",
+    longDescription: "Built a movie recommendation system leveraging machine learning techniques and collaborative filtering."
+  },
+  {
+    slug: "my-webpage",
+    title: "My Webpage",
+    description: "A personal and career profile hosted on Vercel, written in TypeScript using React and NextJS.",
+    tags: ["TypeScript", "React", "NextJS", "Web Development"],
+    techStack: ["TypeScript", "React", "NextJS"],
+    link: "https://github.com/TheDarkEyezor/My-Webpage",
+    date: "Completed",
+    longDescription: "Developed a personal portfolio website to showcase projects and career achievements."
+  },
+  {
+    slug: "dosa-assistant",
+    title: "D.O.S.A.",
+    description: "A local LLM and C++-based assistant for note-taking, timer setting, and online search.",
+    tags: ["C++", "OOP", "Assistant"],
+    techStack: ["C++"],
+    link: "https://github.com/TheDarkEyezor/DOSA-Assistant",
+    date: "Completed",
+    longDescription: "Created a local assistant application to enhance productivity using C++ and object-oriented programming."
+  }
 ];
 
 export const getAllUniqueTags = (projects: Project[]): string[] => {

@@ -96,7 +96,7 @@ const Contact: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
   return (
     <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center p-4 z-50">
-      <AnimatePresence mode="wait">
+      <AnimatePresence>
         {animationPhase === 'form' && (
           <motion.form
             key="form" 
