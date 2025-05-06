@@ -4,12 +4,29 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { usePathname } from 'next/navigation';
 import React, { useState, useEffect } from 'react';
 
+// Define the color palette for transitions
+const transitionColors = [
+  '#33658A', // Original Blue
+  '#52B788', // Green
+  '#FEC601', // Yellow
+  '#FF6B6B', // Red/Pink
+  '#4A90E2', // Lighter Blue
+  '#6A8D92', // Muted Blue/Green
+  '#885A89', // Muted Purple (complementary)
+];
+
 const TransitionProvider = ({ children }: { children: React.ReactNode }) => {
   const pathname = usePathname();
   const [isTransitioning, setIsTransitioning] = useState(false);
+  // State to hold the current transition color
+  const [currentColor, setCurrentColor] = useState(transitionColors[0]);
 
   useEffect(() => {
     setIsTransitioning(true);
+
+    // Select a random color for this transition
+    const randomColor = transitionColors[Math.floor(Math.random() * transitionColors.length)];
+    setCurrentColor(randomColor);
 
     // Reduce timeout duration to match faster animations (e.g., 300ms)
     const timer = setTimeout(() => {
@@ -39,7 +56,8 @@ const TransitionProvider = ({ children }: { children: React.ReactNode }) => {
             style={{
               position: 'fixed',
               inset: 0,
-              backgroundColor: '#33658A',
+              // Use the state variable for the background color
+              backgroundColor: currentColor,
               zIndex: 9999,
               pointerEvents: 'none',
             }}
