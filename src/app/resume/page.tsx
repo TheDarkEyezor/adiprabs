@@ -1,5 +1,5 @@
 "use client";
-import { motion, useMotionValue, useTransform } from 'framer-motion';
+import { motion, useMotionValue, useTransform, MotionValue } from 'framer-motion';
 import Link from 'next/link';
 import React, { useState, MouseEvent } from 'react';
 import ResumeHeader from '../components/resume/ResumeHeader';
@@ -12,6 +12,46 @@ import SkillsSection from '../components/resume/SkillsSection';
 const sectionVariants = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.5 } }
+};
+
+// Bubble component - properly uses hooks at component level
+interface BubbleProps {
+  bubble: {
+    id: number;
+    size: string;
+    left: string;
+    duration: string;
+    delay: string;
+    depth: number;
+  };
+  mouseX: MotionValue<number>;
+  mouseY: MotionValue<number>;
+  isPopped: boolean;
+  onClick: () => void;
+}
+
+// This is a separate component where hooks can be properly used
+const Bubble: React.FC<BubbleProps> = ({ bubble, mouseX, mouseY, isPopped, onClick }) => {
+  // Now these hooks are at the top level of a component
+  const transformX = useTransform(mouseX, (v: number) => v * bubble.depth * 100);
+  const transformY = useTransform(mouseY, (v: number) => v * bubble.depth * 100);
+
+  if (isPopped) return null;
+
+  return (
+    <motion.div
+      key={bubble.id}
+      className={`absolute bottom-[-150px] ${bubble.size} bg-white/10 rounded-full animate-float cursor-pointer pointer-events-auto`}
+      style={{
+        left: bubble.left,
+        animationDuration: bubble.duration,
+        animationDelay: bubble.delay,
+        translateX: transformX,
+        translateY: transformY,
+      }}
+      onClick={onClick}
+    />
+  );
 };
 
 // Increased bubble count and added unique IDs
@@ -37,6 +77,8 @@ export default function Resume() {
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
 
+  // Remove the problematic transformValues map
+  
   // Handle mouse move to update motion values
   const handleMouseMove = (event: MouseEvent<HTMLDivElement>) => {
     const { clientX, clientY, currentTarget } = event;
@@ -49,14 +91,6 @@ export default function Resume() {
   // Handle bubble click
   const handleBubbleClick = (id: number) => {
     setPoppedBubbles(prev => new Set(prev).add(id));
-    // Optional: Remove the bubble from the set after animation duration
-    // setTimeout(() => {
-    //   setPoppedBubbles(prev => {
-    //     const next = new Set(prev);
-    //     next.delete(id);
-    //     return next;
-    //   });
-    // }, 500); // Match animation duration
   };
 
   return (
@@ -66,37 +100,17 @@ export default function Resume() {
     >
       {/* Bubbles Background */}
       <div className="absolute inset-0 pointer-events-none z-0">
-        {initialBubbles.map((bubble) => {
-          // Check if bubble is popped
-          const isPopped = poppedBubbles.has(bubble.id);
-
-          // Transform mouse position into bubble offset based on depth
-          // Bubbles with higher depth move more
-          const transformX = useTransform(mouseX, (v) => v * bubble.depth * 100); // Multiplier adjusts sensitivity
-          const transformY = useTransform(mouseY, (v) => v * bubble.depth * 100);
-
-          // Don't render if popped (or apply pop animation class)
-          if (isPopped) return null; // Simple removal, or add class below
-
-          return (
-            <motion.div
-              key={bubble.id}
-              className={`absolute bottom-[-150px] ${bubble.size} bg-white/10 rounded-full animate-float cursor-pointer pointer-events-auto`} // Added cursor and pointer-events
-              style={{
-                left: bubble.left,
-                animationDuration: bubble.duration,
-                animationDelay: bubble.delay,
-                // Apply the transformed mouse offsets
-                translateX: transformX,
-                translateY: transformY,
-              }}
-              onClick={() => handleBubbleClick(bubble.id)}
-              // Example with pop class instead of removing:
-              // className={`absolute bottom-[-150px] ${bubble.size} bg-white/10 rounded-full ${isPopped ? 'animate-pop' : 'animate-float'} cursor-pointer pointer-events-auto`}
-              // whileTap={{ scale: 0.8 }} // Optional: visual feedback on click
-            />
-          );
-        })}
+        {initialBubbles.map((bubble) => (
+          // Use the Bubble component for each item
+          <Bubble
+            key={bubble.id}
+            bubble={bubble}
+            mouseX={mouseX}
+            mouseY={mouseY}
+            isPopped={poppedBubbles.has(bubble.id)}
+            onClick={() => handleBubbleClick(bubble.id)}
+          />
+        ))}
       </div>
 
       {/* Content */}
