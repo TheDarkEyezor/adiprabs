@@ -2,7 +2,7 @@
 
 import { AnimatePresence, motion } from 'framer-motion';
 import { usePathname } from 'next/navigation';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 
 // Define the color palette for transitions
 const transitionColors = [
@@ -20,8 +20,15 @@ const TransitionProvider = ({ children }: { children: React.ReactNode }) => {
   const [isTransitioning, setIsTransitioning] = useState(false);
   // State to hold the current transition color
   const [currentColor, setCurrentColor] = useState(transitionColors[0]);
+  const isFirstMount = useRef(true);
 
   useEffect(() => {
+    // Skip transition on initial mount
+    if (isFirstMount.current) {
+      isFirstMount.current = false;
+      return;
+    }
+    
     setIsTransitioning(true);
 
     // Select a random color for this transition
