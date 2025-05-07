@@ -34,7 +34,8 @@ const EducationSection: React.FC = () => {
             className="bg-white bg-opacity-10 rounded-lg p-6 backdrop-filter backdrop-blur-sm"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.2 }}
+            whileHover={{ scale: 1.03 }} 
+            transition={{ type: "spring", stiffness: 300 }}
           >
             <div className="flex flex-col md:flex-row justify-between mb-2">
               <h3 className="text-2xl font-bold">{edu.school}</h3>

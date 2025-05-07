@@ -7,6 +7,7 @@ import ExperienceCard from '../components/resume/ExperienceCard';
 import EducationSection from '../components/resume/EducationSection';
 import ProjectsGrid from '../components/resume/ProjectsGrid';
 import SkillsSection from '../components/resume/SkillsSection';
+import { TransitionLink } from '../components/TransitionLink';
 
 // Animation variants for sections
 const sectionVariants = {
@@ -120,9 +121,11 @@ export default function Resume() {
         transition={{ duration: 0.5 }}
         className="container mx-auto px-4 py-12 relative z-10" // Ensure content is above bubbles
       >
-        <Link href="/" className="text-blue-300 hover:text-blue-100 hover:underline mb-6 inline-block transition-colors duration-300">
-          &larr; Back to Home
-        </Link>
+        <div className="text-blue-300 hover:text-blue-100 hover:underline mb-6 inline-block transition-colors duration-300">
+          <TransitionLink href="/">
+            &larr; Back to Home
+          </TransitionLink>
+        </div>
 
         <ResumeHeader />
 
@@ -175,7 +178,7 @@ export default function Resume() {
           </div>
         </motion.section>
 
-        <motion.div variants={sectionVariants} initial="hidden" animate="visible">
+        <motion.div  variants={sectionVariants} initial="hidden" animate="visible">
           <EducationSection />
         </motion.div>
 

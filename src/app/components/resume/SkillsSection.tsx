@@ -33,7 +33,8 @@ const SkillsSection: React.FC = () => {
             className="bg-white bg-opacity-10 rounded-lg p-6 backdrop-filter backdrop-blur-sm"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
+            whileHover={{ scale: 1.03 }} 
+            transition={{ type: "spring", stiffness: 300 }}
           >
             <h3 className="text-xl font-bold mb-4">{category.title}</h3>
             

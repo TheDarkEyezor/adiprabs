@@ -13,6 +13,7 @@ import Image from 'next/image';
 import Contact from './components/Contact';
 import Card from './components/Card';
 import useMeasure from "react-use-measure"
+import { TransitionLink } from './components/TransitionLink';
 
 
 interface Bounds {
@@ -305,12 +306,14 @@ const HomePage: React.FC = () => {
           // Remove onClick handler
           transition={{ type: 'spring', stiffness: 300, damping: 20 }}
         >
-          <a href="/resume" className="block w-full h-full"> {/* Add anchor tag for navigation */}
-            <h2 className="text-2xl font-bold mb-4">Resume</h2>
-            <p className="text-lg">
-              View my professional resume detailing my experience, skills, and education.
-            </p>
-          </a>
+          <TransitionLink href='/resume'>
+            <div className="block w-full h-full">
+              <h2 className="text-2xl font-bold mb-4">Resume</h2>
+              <p className="text-lg">
+                View my professional resume detailing my experience, skills, and education.
+              </p>
+            </div>
+          </TransitionLink>
         </motion.div>
 
         <motion.div
