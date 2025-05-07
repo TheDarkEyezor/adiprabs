@@ -39,7 +39,7 @@ const HomePage: React.FC = () => {
   const [hasMounted, setHasMounted] = useState(false); // Track if the component has mounted
   const [, setMousePosition] = useState({ x: 0, y: 0 });
   const [heroMousePosition, setHeroMousePosition] = useState({ x: 0, y: 0 });
-  const [isBooklistExpanded, setIsBooklistExpanded] = useState(false);
+  const [isBooklistExpanded, ] = useState(false);
   const [isContactExpanded, setIsContactExpanded] = useState(false);
   const [isProjectsExpanded, setIsProjectsExpanded] = useState(false);
   const mouseTrailRef = useRef<{ x: number; y: number }[]>(
@@ -79,32 +79,6 @@ const HomePage: React.FC = () => {
       });
     }
   }, []);
-
-  const handleExpandProjects = () => {
-    if (projectCardRef.current) {
-      const rect = projectCardRef.current.getBoundingClientRect();
-      setProjectCardBounds({
-        left: rect.left,
-        top: rect.top,
-        width: rect.width,
-        height: rect.height,
-      });
-    }
-    setIsProjectsExpanded(true);
-  };
-
-  const handleExpandTimeline = () => {
-    if (timelineCardRef.current) {
-      const rect = timelineCardRef.current.getBoundingClientRect();
-      setTimelineCardBounds({
-        left: rect.left,
-        top: rect.top,
-        width: rect.width,
-        height: rect.height,
-      });
-    }
-    setIsTimelineExpanded(true);
-  };
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -450,7 +424,7 @@ const HomePage: React.FC = () => {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <Booklist onClose={() => setIsBooklistExpanded(false)} />
+            <Booklist/>
           </motion.div>
         )}
       </AnimatePresence>

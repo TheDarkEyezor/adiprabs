@@ -40,7 +40,6 @@ function sleep(ms: number): Promise<void> {
 export const TransitionLink: React.FC<TransitionLinkProps> = ({
   children,
   href,
-  className,
   ...props
 }) => {
   const router = useRouter();

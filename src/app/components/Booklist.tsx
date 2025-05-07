@@ -49,7 +49,7 @@ const books: Book[] = [
   },
 ];
 
-const Booklist: React.FC<{ onClose: () => void }> = ({ onClose }) => {
+const Booklist: React.FC = () => {
   const [, setHoveredBook] = useState<number | null>(null);
   const cardVariants = {
     hidden: { rotateY: 180, opacity: 0 },

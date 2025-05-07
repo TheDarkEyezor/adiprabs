@@ -1,6 +1,5 @@
 "use client";
 import { motion, useMotionValue, useTransform, MotionValue } from 'framer-motion';
-import Link from 'next/link';
 import React, { useState, MouseEvent } from 'react';
 import ResumeHeader from '../components/resume/ResumeHeader';
 import ExperienceCard from '../components/resume/ExperienceCard';
