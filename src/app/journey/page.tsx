@@ -4,7 +4,6 @@ import { motion, useMotionValue, useTransform, useMotionValueEvent, AnimatePrese
 import { ArrowLeft } from 'lucide-react';
 import Image from 'next/image';
 import { TransitionLink } from '../components/TransitionLink';
-import { useRouter } from 'next/navigation';
 
 const timelineData = [
   {
@@ -130,7 +129,6 @@ const timelineData = [
 ];
 
 const Page: React.FC = () => {
-  const router = useRouter();
   const constraintsRef = useRef<HTMLDivElement | null>(null);
   const y = useMotionValue(0);
   const [isScrolling, setIsScrolling] = useState(false);
@@ -215,7 +213,6 @@ const Page: React.FC = () => {
       <TransitionLink href='/'>
         <motion.button
           className="mb-6 flex items-center text-xl font-bold"
-          onClick={() => router.back()}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
