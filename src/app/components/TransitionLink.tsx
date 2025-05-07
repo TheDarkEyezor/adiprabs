@@ -8,6 +8,17 @@ interface TransitionLinkProps extends LinkProps {
   href: string;
 }
 
+// Define color palette to choose from
+const transitionColors = [
+  '#3B82F6', // blue
+  '#10B981', // green
+  '#8B5CF6', // purple
+  '#F59E0B', // amber
+  '#6366F1', // indigo
+  '#EC4899', // pink
+  '#808080', // gray (original color)
+];
+
 function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -24,6 +35,12 @@ export const TransitionLink: React.FC<TransitionLinkProps> = ({
   ) => {
     e.preventDefault();
     const body = document.querySelector("body");
+    
+    // Select a random color from our palette
+    const randomColor = transitionColors[Math.floor(Math.random() * transitionColors.length)];
+    
+    // Apply the random color to the pseudo-element
+    document.documentElement.style.setProperty('--transition-color', randomColor);
 
     body?.classList.add("page-transition");
 
