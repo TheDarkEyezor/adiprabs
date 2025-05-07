@@ -1,23 +1,34 @@
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, X } from 'lucide-react';
-// Import uniqueTags as well
+import { useSearchParams } from 'next/navigation';
 import { projectsData, Project, uniqueTags } from '../data/projectsData';
 import { TransitionLink } from '../components/TransitionLink';
 
-interface ProjectsProps {
-  onClose: () => void;
-  initialProjectSlug?: string | null;
+export default function ProjectsClientContent() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <ProjectsContent />
+    </Suspense>
+  );
 }
 
-const Projects: React.FC<ProjectsProps> = ({ onClose, initialProjectSlug }) => {
+function ProjectsContent() {
+  const searchParams = useSearchParams();
+  const initialProjectSlug = searchParams.get('project');
+  
   const [expandedProject, setExpandedProject] = useState<Project | null>(null);
-  const [selectedTag, setSelectedTag] = useState<string>("All"); // State for filter
+  const [selectedTag, setSelectedTag] = useState<string>("All");
 
-  // Effect to handle initial project expansion (keep existing)
+  // ...rest of your component implementation remains the same
   useEffect(() => {
-    // ... existing useEffect code ...
+    if (initialProjectSlug) {
+      const project = projectsData.find(p => p.slug === initialProjectSlug);
+      if (project) {
+        setExpandedProject(project);
+      }
+    }
   }, [initialProjectSlug]);
 
   const handleExpandProject = (project: Project) => {
@@ -39,10 +50,10 @@ const Projects: React.FC<ProjectsProps> = ({ onClose, initialProjectSlug }) => {
 
   return (
     <div className="min-h-screen bg-[#FF6B6B] text-white p-8 overflow-auto relative">
+      {/* Your existing JSX remains the same */}
       <TransitionLink href='/'>
         <motion.button
           className="mb-6 flex items-center text-xl font-bold sticky top-8 z-10 bg-[#FF6B6B] p-2 rounded-md"
-          onClick={onClose}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
         >
@@ -171,6 +182,4 @@ const Projects: React.FC<ProjectsProps> = ({ onClose, initialProjectSlug }) => {
       </AnimatePresence>
     </div>
   );
-};
-
-export default Projects;
+}
