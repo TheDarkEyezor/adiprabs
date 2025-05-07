@@ -50,6 +50,7 @@ const Bubble: React.FC<BubbleProps> = ({ bubble, mouseX, mouseY, isPopped, onCli
         translateX: transformX,
         translateY: transformY,
       }}
+      whileHover={{ scale: 1.2, backgroundColor: "#FF6B6B" }}
       onClick={onClick}
     />
   );
@@ -135,9 +136,14 @@ export default function Resume() {
           initial="hidden"
           animate="visible"
         >
-          <h2 className="text-3xl font-bold mb-8 text-yellow-300">Work Experience</h2>
+          <motion.h2
+            className="text-3xl font-bold mb-8 text-yellow-300"
+            whileHover={{ color: "#FEC601" }}
+          >
+            Work Experience
+          </motion.h2>
           <div className="space-y-8">
-            <motion.div whileHover={{ scale: 1.03 }} transition={{ type: "spring", stiffness: 300 }}>
+            <motion.div whileHover={{ scale: 1.03, backgroundColor: "#FF6B6B" }} transition={{ type: "spring", stiffness: 300 }}>
               <ExperienceCard
                 title="CTO"
                 company="StealthAI"
@@ -150,7 +156,7 @@ export default function Resume() {
                 ]}
               />
             </motion.div>
-            <motion.div whileHover={{ scale: 1.03 }} transition={{ type: "spring", stiffness: 300 }}>
+            <motion.div whileHover={{ scale: 1.03, backgroundColor: "#FF6B6B" }} transition={{ type: "spring", stiffness: 300 }}>
               <ExperienceCard
                 title="Machine Learning Developer"
                 company="Trajex"
@@ -163,7 +169,7 @@ export default function Resume() {
                 ]}
               />
             </motion.div>
-            <motion.div whileHover={{ scale: 1.03 }} transition={{ type: "spring", stiffness: 300 }}>
+            <motion.div whileHover={{ scale: 1.03, backgroundColor: "#FF6B6B" }} transition={{ type: "spring", stiffness: 300 }}>
               <ExperienceCard
                 title="Machine Learning Engineer (Contractor)"
                 company="Altus Reach"
@@ -178,7 +184,7 @@ export default function Resume() {
           </div>
         </motion.section>
 
-        <motion.div  variants={sectionVariants} initial="hidden" animate="visible">
+        <motion.div variants={sectionVariants} initial="hidden" animate="visible">
           <EducationSection />
         </motion.div>
 

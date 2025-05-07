@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
+import { TransitionLink } from './TransitionLink';
 
 interface Book {
   id: number;
@@ -118,12 +119,13 @@ const Booklist: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           </motion.div>
         ))}
       </div>
-      <button
-        className="fixed top-4 right-4 bg-white text-black rounded-full w-10 h-10 flex items-center justify-center text-2xl"
-        onClick={onClose}
-      >
-        &times;
-      </button>
+      <TransitionLink href='/'>
+        <button
+          className="fixed top-4 right-4 bg-white text-black rounded-full w-10 h-10 flex items-center justify-center text-2xl"
+        >
+          &times;
+        </button>
+      </TransitionLink>
     </div>
   );
 };

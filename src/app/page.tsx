@@ -276,32 +276,44 @@ const HomePage: React.FC = () => {
         </div>
 
         <div className="flex flex-col md:flex-row justify-between m-8 space-y-8 md:space-y-0 md:space-x-8">
-          <motion.div
-            ref={projectCardRef}
-            className="projects-card bg-[#FF6B6B] text-white p-8 rounded-lg shadow-lg cursor-pointer flex-1"
-            whileHover={{ scale: 1.05 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-            onClick={handleExpandProjects}
-          >
-            <h2 className="text-2xl font-bold mb-4">Projects</h2>
-            <p className="text-lg">Explore my portfolio of projects, showcasing my skills in web development, data analysis, and more.</p>
-          </motion.div>
+          {/* Projects Card */}
+          <div className="flex-1">
+            <motion.div
+              ref={projectCardRef}
+              className="projects-card bg-[#FF6B6B] text-white p-8 rounded-lg shadow-lg cursor-pointer h-full"
+              whileHover={{ scale: 1.05 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+            >
+              <TransitionLink href='/projects'>
+                <div className="block w-full h-full">
+                  <h2 className="text-2xl font-bold mb-4">Projects</h2>
+                  <p className="text-lg">Explore my portfolio of projects, showcasing my skills in web development, data analysis, and more.</p>
+                </div>
+              </TransitionLink>
+            </motion.div>
+          </div>
 
-          <motion.div
-            ref={timelineCardRef}
-            className="timeline-card bg-[#FEC601] text-gray-800 p-8 rounded-lg shadow-lg cursor-pointer flex-1"
-            whileHover={{ scale: 1.05 }}
-            transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-            onClick={handleExpandTimeline}
-          >
-            <h2 className="text-2xl font-bold mb-4">My Journey</h2>
-            <p className="text-lg">Discover my professional timeline and key milestones in my career.</p>
-          </motion.div>
+          {/* Timeline Card */}
+          <div className="flex-1">
+            <motion.div
+              ref={timelineCardRef}
+              className="timeline-card bg-[#FEC601] text-gray-800 p-8 rounded-lg shadow-lg cursor-pointer h-full"
+              whileHover={{ scale: 1.05 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 20 }}
+            >
+              <TransitionLink href='/journey'>
+                <div className="block w-full h-full">
+                  <h2 className="text-2xl font-bold mb-4">My Journey</h2>
+                  <p className="text-lg">Discover my professional timeline and key milestones in my career.</p>
+                </div>
+              </TransitionLink>
+            </motion.div>
+          </div>
         </div>
 
         {/* Update Resume Card to be a link */}
         <motion.div
-          className="resume-card bg-[#6A8D92] text-white p-8 rounded-lg shadow-lg m-8 cursor-pointer" // Example color
+          className="resume-card bg-purple-800 text-white p-8 rounded-lg shadow-lg m-8 cursor-pointer" // Example color
           whileHover={{ scale: 1.05 }}
           // Remove onClick handler
           transition={{ type: 'spring', stiffness: 300, damping: 20 }}
@@ -319,12 +331,15 @@ const HomePage: React.FC = () => {
         <motion.div
           className="booklist-card bg-[#52B788] text-white p-8 rounded-lg shadow-lg m-8 cursor-pointer"
           whileHover={{ scale: 1.05 }}
-          onClick={() => setIsBooklistExpanded(true)}
         >
-          <h2 className="text-2xl font-bold mb-4">Booklist</h2>
-          <p className="text-lg">
-            Explore my curated booklist, featuring my favorite reads and recommendations across various genres and topics.
-          </p>
+          <TransitionLink href='/booklist'>
+            <div className="block w-full h-full">
+              <h2 className="text-2xl font-bold mb-4">Booklist</h2>
+              <p className="text-lg">
+                Explore my curated booklist, featuring my favorite reads and recommendations across various genres and topics.
+              </p>
+            </div>
+          </TransitionLink>
         </motion.div>
 
         <motion.div
