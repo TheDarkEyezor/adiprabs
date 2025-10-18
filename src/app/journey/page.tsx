@@ -1,279 +1,290 @@
-"use client";
-import React, { useRef, useState, useEffect } from 'react';
-import { motion, useMotionValue, useTransform, useMotionValueEvent, AnimatePresence } from 'framer-motion';
-import { ArrowLeft } from 'lucide-react';
-import Image from 'next/image';
-import { TransitionLink } from '../components/TransitionLink';
+'use client';
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowLeft, Sparkles, Briefcase, GraduationCap, Users, Trophy } from 'lucide-react';
+import { TransitionLink } from '../components/transitions/TransitionLink';
+import Navbar from '../components/Navbar';
+import ParticleField from '../components/effects/ParticleField';
+import SectionHeading from '../components/common/SectionHeading';
+import GlassCard from '../components/common/GlassCard';
+import { staggerContainer, staggerItem } from '@/utils/animations';
 
-const timelineData = [
+interface TimelineEvent {
+  date: string;
+  title: string;
+  description: string;
+  category: 'work' | 'education' | 'leadership' | 'achievement';
+  icon: typeof Briefcase;
+  color: string;
+}
+
+const timelineData: TimelineEvent[] = [
   {
-    date: "Jan 2011 - Jan 2021",
-    title: "NPS International School",
-    description: "IGCSE and IB, Grade 12.",
-    image: ""
+    date: "Jun 2025 - Present",
+    title: "VaNI MedTech - Full-stack & AI/ML Developer",
+    description: "Building AI-powered healthcare platform with 120ms latency, 99.9% uptime. React, TypeScript, Next.js, FastAPI, AWS, Kubernetes. Reduced bugs by 76%.",
+    category: 'work',
+    icon: Briefcase,
+    color: 'from-[#FF6B6B] to-[#FEC601]'
+  },
+  {
+    date: "Oct 2024 - Present",
+    title: "Trajex - Machine Learning Developer",
+    description: "Deployed LLama3.2 models for K3 Capital client. 20% cost reduction, 12% faster processing vs OpenAI. Core product development and investor pitching.",
+    category: 'work',
+    icon: Briefcase,
+    color: 'from-[#FEC601] to-[#52B788]'
+  },
+  {
+    date: "Jan 2024 - Oct 2024",
+    title: "Altus Reach - ML Engineer (Contractor)",
+    description: "19% accuracy improvement in video saliency detection. Full-stack: JS, TS, React, NextJS. Azure cloud infrastructure. Team of 3 developers.",
+    category: 'work',
+    icon: Briefcase,
+    color: 'from-[#52B788] to-[#4A90E2]'
+  },
+  {
+    date: "Oct 2023 - Present",
+    title: "Imperial College London - Computing",
+    description: "Currently pursuing BSc in Computing with focus on AI/ML, Systems Programming, and Software Engineering. Expected graduation: July 2027.",
+    category: 'education',
+    icon: GraduationCap,
+    color: 'from-[#4A90E2] to-[#8B5CF6]'
   },
   {
     date: "Sep 2019 - Mar 2021",
     title: "#8235 Beyond the Flames - FRC Team Leader",
-    description: "Coordinated a 20-student robotics team for FIRST Robotics Competition. Oversaw design and creation of the robot using Fusion 360. Wrote Java/Python code for autonomous and control. Helped secure wins in international FRC challenges and earned a Dean's List nomination.",
-    image: ""
+    description: "Led 20-student robotics team for FIRST Robotics Competition. Designed robots with Fusion 360, coded autonomous control in Java/Python. Won international challenges and earned Dean's List nomination.",
+    category: 'leadership',
+    icon: Users,
+    color: 'from-[#8B5CF6] to-[#FF10F0]'
   },
   {
     date: "Feb 2021 - Mar 2023",
     title: "HelpIGCSE - Head of Marketing",
-    description: "Led marketing for a non-profit helping students with IGCSE and SAT exams. Increased blog engagement by 25% in 6 months. Achieved a 200% boost in Instagram engagement. Oversaw growth to 12,750+ students worldwide, driving an 80% user increase.",
-    image: ""
+    description: "Led marketing for non-profit helping students with IGCSE/SAT exams. 25% blog engagement increase, 200% Instagram boost. Grew to 12,750+ students (80% increase).",
+    category: 'leadership',
+    icon: Users,
+    color: 'from-[#FF10F0] to-[#00F5FF]'
   },
   {
     date: "Jul 2020 - Mar 2023",
-    title: "DamnIQ Bionics and Prosthetics - Co-Founder",
-    description: "Co-founded a startup focused on affordable prosthetics using 3D printing technology. Tackled complex legal, health, and logistical challenges. Developed adaptability, creative thinking, and project management skills.",
-    image: ""
+    title: "DamnIQ Bionics - Co-Founder",
+    description: "Co-founded startup focused on affordable prosthetics using 3D printing. Tackled legal, health, and logistical challenges. Developed adaptability and project management skills.",
+    category: 'leadership',
+    icon: Users,
+    color: 'from-[#00F5FF] to-[#52B788]'
   },
   {
     date: "Jun 2022 - Jun 2023",
     title: "Robotics Club at NPSI - Founder",
-    description: "Founded a robotics club to inspire students in STEM, sparked by FIRST Robotics competitions. Established frameworks for participating in international competitions. Secured resources and support from school staff and alumni. Encouraged collaboration and innovation among multiple teams.",
-    image: ""
-  },
-  {
-    date: "Sep 2022 - Sep 2023",
-    title: "Interact Club: Chapter of Rotary Club - Vice President",
-    description: "Led community service initiatives, collaborating on projects that benefited local communities. Planned and executed service projects, refining leadership and organizational skills. Fostered teamwork and community engagement. Gained skills in public speaking and presentations.",
-    image: ""
-  },
-  {
-    date: "Jun 2022 - Feb 2023",
-    title: "Chlorophyll Club - Founder and President",
-    description: "Launched a student-led initiative promoting environmental awareness. Organized quizzes, workshops, and events. Wrote articles on sustainability and climate change. Led community outreach for recycling and conservation.",
-    image: ""
+    description: "Founded robotics club to inspire STEM students. Established frameworks for international competitions. Secured resources from school staff and alumni.",
+    category: 'leadership',
+    icon: Users,
+    color: 'from-[#52B788] to-[#FEC601]'
   },
   {
     date: "May 2022 - Aug 2022",
     title: "HCIS - Intern",
-    description: "Contributed to a healthcare tech project focused on elderly fall-detection. Helped develop infrared-based solutions, emphasizing data privacy. Drafted a grant proposal for government funding.",
-    image: ""
+    description: "Healthcare tech project for elderly fall-detection. Developed infrared-based solutions emphasizing data privacy. Drafted government grant proposal.",
+    category: 'work',
+    icon: Briefcase,
+    color: 'from-[#FEC601] to-[#FF6B6B]'
   },
   {
-    date: "Aug 2022 - Aug 2022",
-    title: "Model Environmental Summit by Chlorophyll Club - Secretary General and Lead Organizer",
-    description: "Organized a student-led conference spotlighting environmental issues. Managed logistics, funding, and team collaboration. Led keynote speeches, workshops, and panel discussions.",
-    image: ""
-  },
-  {
-    date: "Aug 2020 - Apr 2022",
-    title: "Aerodynamics Club - Co-founder and Head of Academics",
-    description: "Launched a student-led club for STEM and aviation activities at NPSI. Designed a 2-month aerodynamics course. Handled social media and logistics.",
-    image: ""
-  },
-  {
-    date: "Aug 2021 - Mar 2022",
-    title: "NPS International School - Editor in Chief",
-    description: "Led the yearbook team to produce a comprehensive annual publication. Oversaw content planning and design. Interviewed administration, faculty, and student leaders.",
-    image: ""
-  },
-  {
-    date: "Jul 2021 - Dec 2021",
-    title: "TheOpenCode Foundation - Intern",
-    description: "Developed and delivered coding workshops to promote tech literacy. Managed logistics for educational programs. Helped design curriculum and coordinate events.",
-    image: ""
-  },
-  {
-    date: "Jul 2021 - Dec 2021",
-    title: "TheOpenCode - Intern",
-    description: "Created and delivered coding workshops, fostering a learning community. Organized program logistics. Contributed to workshop design and tech literacy promotion.",
-    image: ""
-  },
-  {
-    date: "Dec 2023 - Oct 2024",
-    title: "Altus Reach - Machine Learning Engineer",
-    description: "Drove innovation in AI model development to enhance product performance and customer satisfaction. Improved predictive accuracy by 30% in video saliency detection. Contributed to robust, scalable cloud architecture. Focused on modernizing the company website’s front and back end.",
-    image: ""
-  },
-  {
-    date: "Jan 2024",
-    title: "Joined Altus Reach, a tech startup",
-    description: "I finally got an amazing opportunity to work as an ML engineer and full-stack developer at Altus reach. The dynamic startup environment, exciting nature of the role and fantastic exposure to Cloud Computing helped develop my skills to become a better employee in the tech sector.",
-    image: ""
-  },
-  {
-    date: "Sept 2024",
-    title: "Now this website",
-    description: "I'm determined to put myself on the map now, showcasing my skills and passions in every possible way. Here's to hoping for more milestones in the future.",
-    image: ""
-  },
-  {
-    date: "Oct 2023 - Jul 2027",
-    title: "Imperial College London",
-    description: "MEng in Computing (Computer Science) with specializations in Artificial Intelligence and Computer Science.",
-    image: ""
-  },
-  {
-    date: "Nov 2023 - Present",
-    title: "Imperial College London - Wellbeing Representative",
-    description: "Served as Computing Wellbeing Representative, first for the year, then department representative, driving initiatives to promote student mental wellbeing and campus comfort. Proposed and organized activities to educate students about mental wellbeing and university life. Collaborated with faculty and student society to ensure inclusive events, fostering a sense of belonging. Oversaw installations of additional watercoolers and extra equipment to improve student wellbeing.",
-    image: ""
-  },
-  {
-    date: "Jul 2024 - Present",
-    title: "DoCSoc - Treasurer",
-    description: "Currently serving as Treasurer for the DoCSoc society, managing finances and sponsorships. Oversee contracts and sponsorship agreements. Develop and manage budgets. Secured over £98,000 in funding through coding automation for logistical tasks.",
-    image: ""
-  },
-  {
-    date: "Oct 2024 - Present",
-    title: "Trajex - ML and AI developer",
-    description: "Integrating the latest open-source research to improve AI systems using a Knowledge Augmented Generation approach.",
-    image: ""
+    date: "Jan 2011 - Jan 2021",
+    title: "NPS International School",
+    description: "Completed IGCSE and IB Diploma Programme. Built foundation in STEM, leadership, and international collaboration.",
+    category: 'education',
+    icon: GraduationCap,
+    color: 'from-[#FF6B6B] to-[#4A90E2]'
   },
 ];
 
-const Page: React.FC = () => {
-  const constraintsRef = useRef<HTMLDivElement | null>(null);
-  const y = useMotionValue(0);
-  const [isScrolling, setIsScrolling] = useState(false);
-  const scrollSpeed = useRef(0);
-  const lastScrollTime = useRef(0);
+export default function JourneyPage() {
+  const [selectedCategory, setSelectedCategory] = useState<string>('all');
 
-  const background = useTransform(
-    y,
-    [-300, 0, 300],
-    ['#FEC601', '#FEC601', '#FEC601']
-  );
+  const categories = [
+    { value: 'all', label: 'All', icon: Sparkles },
+    { value: 'work', label: 'Work', icon: Briefcase },
+    { value: 'education', label: 'Education', icon: GraduationCap },
+    { value: 'leadership', label: 'Leadership', icon: Users },
+    { value: 'achievement', label: 'Achievements', icon: Trophy },
+  ];
 
-  const [backgroundStyle, setBackgroundStyle] = useState<string>('');
-
-  useMotionValueEvent(background, "change", (latest) => {
-    setBackgroundStyle(latest);
-  });
-
-  const handleWheel = (event: React.WheelEvent) => {
-    event.preventDefault();
-
-    const container = constraintsRef.current;
-    if (!container) return;
-
-    const contentHeight = container.scrollHeight;
-    const viewportHeight = container.clientHeight;
-
-    const maxScroll = contentHeight - viewportHeight;
-    const newY = y.get() - event.deltaY;
-
-    if (newY > 0) {
-      y.set(0);
-    } else if (Math.abs(newY) > maxScroll) {
-      y.set(-maxScroll);
-    } else {
-      y.set(newY);
-    }
-
-    // Calculate scroll speed
-    const currentTime = Date.now();
-    const timeDiff = currentTime - lastScrollTime.current;
-    scrollSpeed.current = event.deltaY / timeDiff;
-    lastScrollTime.current = currentTime;
-
-    setIsScrolling(true);
-
-    // Debounce the isScrolling state
-    setTimeout(() => {
-      setIsScrolling(false);
-    }, 100);
-  };
-
-  const speedLineVariants = {
-    initial: {
-      opacity: 0,
-      x: scrollSpeed.current > 0 ? -50 : 50,
-    },
-    animate: {
-      opacity: 0.5,
-      x: 0,
-      transition: {
-        duration: 0.2,
-        ease: "easeInOut",
-      },
-    },
-    exit: {
-      opacity: 0,
-      x: scrollSpeed.current > 0 ? 50 : -50,
-      transition: {
-        duration: 0.2,
-        ease: "easeInOut",
-      },
-    },
-  };
-
-  useEffect(() => {
-    lastScrollTime.current = Date.now();
-  }, []);
+  const filteredEvents = selectedCategory === 'all'
+    ? timelineData
+    : timelineData.filter(event => event.category === selectedCategory);
 
   return (
-    <div className="min-h-screen bg-[#FEC601] text-gray-800 p-8 overflow-hidden" style={{ background: backgroundStyle }}>
-      <TransitionLink href='/'>
-        <motion.button
-          className="mb-6 flex items-center text-xl font-bold"
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-        >
-          <ArrowLeft className="mr-2" /> Back to Home
-        </motion.button>
-      </TransitionLink>
+    <div className="min-h-screen bg-gradient-to-br from-[#1a1a2e] via-[#16213e] to-[#0f3460] text-white overflow-x-hidden">
+      <ParticleField count={40} />
+      
+      {/* Fixed gradient orbs */}
+      <motion.div
+        className="fixed top-20 -left-40 w-96 h-96 bg-gradient-to-br from-[#FEC601]/30 to-[#52B788]/30 rounded-full blur-3xl pointer-events-none"
+        animate={{
+          scale: [1, 1.2, 1],
+          opacity: [0.3, 0.5, 0.3],
+        }}
+        transition={{
+          duration: 8,
+          repeat: Infinity,
+        }}
+      />
+      <motion.div
+        className="fixed bottom-20 -right-40 w-96 h-96 bg-gradient-to-br from-[#8B5CF6]/30 to-[#FF10F0]/30 rounded-full blur-3xl pointer-events-none"
+        animate={{
+          scale: [1.2, 1, 1.2],
+          opacity: [0.3, 0.5, 0.3],
+        }}
+        transition={{
+          duration: 8,
+          repeat: Infinity,
+          delay: 4,
+        }}
+      />
 
-      <h1 className="text-4xl font-bold mb-8">My Journey</h1>
+      <Navbar />
 
-      <div
-        className="relative h-[calc(100vh-200px)] overflow-hidden"
-        ref={constraintsRef}
-        onWheel={handleWheel}
-      >
-        <div className="absolute left-1/2 top-0 bottom-0 w-1 bg-gray-800 transform -translate-x-1/2"></div>
+      <div className="relative z-10 px-8 py-12 max-w-6xl mx-auto">
+        {/* Header */}
         <motion.div
-          className="absolute top-0 left-0 right-0"
-          style={{ y }}
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-12"
         >
-          {timelineData.map((item, index) => (
+          <TransitionLink href="/">
+            <motion.button
+              className="mb-8 flex items-center text-white/80 hover:text-white transition-colors glass-card px-4 py-2 rounded-lg"
+              whileHover={{ scale: 1.05, x: -5 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <ArrowLeft className="mr-2" size={20} /> Back to Home
+            </motion.button>
+          </TransitionLink>
+
+          <SectionHeading 
+            align="left" 
+            gradient
+            subtitle="From robotics competitions to AI/ML development - a journey of continuous learning and innovation"
+          >
+            My Journey
+          </SectionHeading>
+
+          {/* Category Filter */}
+          <div className="mt-8 flex flex-wrap gap-3">
+            {categories.map(category => (
+              <motion.button
+                key={category.value}
+                onClick={() => setSelectedCategory(category.value)}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${
+                  selectedCategory === category.value
+                    ? 'bg-gradient-to-r from-[#FF6B6B] to-[#FEC601] text-white'
+                    : 'glass-card text-white/80 hover:text-white hover:bg-white/10'
+                }`}
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <category.icon size={18} className="mr-2" />
+                {category.label}
+              </motion.button>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Timeline */}
+        <div className="relative">
+          {/* Vertical line */}
+          <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[#FF6B6B] via-[#FEC601] via-[#52B788] via-[#4A90E2] to-[#8B5CF6]" />
+
+          <motion.div
+            className="space-y-12"
+            variants={staggerContainer}
+            initial="initial"
+            animate="animate"
+          >
+            <AnimatePresence mode="popLayout">
+              {filteredEvents.map((event, index) => {
+                const Icon = event.icon;
+                return (
+                  <motion.div
+                    key={`${event.date}-${event.title}`}
+                    variants={staggerItem}
+                    layout
+                    initial={{ opacity: 0, x: -50 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 50, transition: { duration: 0.2 } }}
+                    transition={{ delay: index * 0.05 }}
+                    className="relative flex gap-8 items-start"
+                  >
+                    {/* Icon */}
+                    <motion.div
+                      className={`relative z-10 w-16 h-16 rounded-full bg-gradient-to-br ${event.color} flex items-center justify-center flex-shrink-0`}
+                      whileHover={{ scale: 1.1, rotate: 5 }}
+                    >
+                      <Icon className="text-white" size={28} />
+                    </motion.div>
+
+                    {/* Content */}
+                    <GlassCard
+                      variant="interactive"
+                      hoverEffect
+                      className="flex-1 overflow-hidden group"
+                    >
+                      <div className={`absolute top-0 left-0 right-0 h-1 bg-gradient-to-r ${event.color} rounded-t-2xl`} />
+                      
+                      <div className="relative p-6 pt-8">
+                        <div className="text-sm text-white/60 mb-2 font-mono">
+                          {event.date}
+                        </div>
+                        <h3 className="text-2xl font-bold mb-3 text-white group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-[#FF6B6B] group-hover:to-[#FEC601] transition-all">
+                          {event.title}
+                        </h3>
+                        <p className="text-white/80 leading-relaxed">
+                          {event.description}
+                        </p>
+                      </div>
+                    </GlassCard>
+                  </motion.div>
+                );
+              })}
+            </AnimatePresence>
+          </motion.div>
+        </div>
+
+        {/* Stats */}
+        <motion.div
+          className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-6"
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+        >
+          {[
+            { label: 'Years Experience', value: '3+', gradient: 'from-[#FF6B6B] to-[#FEC601]' },
+            { label: 'Projects', value: '15+', gradient: 'from-[#FEC601] to-[#52B788]' },
+            { label: 'Leadership Roles', value: '10+', gradient: 'from-[#52B788] to-[#4A90E2]' },
+            { label: 'Students Impacted', value: '12K+', gradient: 'from-[#4A90E2] to-[#8B5CF6]' },
+          ].map((stat, index) => (
             <motion.div
-              key={index}
-              className={`flex items-center mb-16 ${
-                index % 2 === 0 ? 'flex-row' : 'flex-row-reverse'
-              }`}
-              initial={{ opacity: 0, y: 50 }}
-              animate={{ opacity: 1, y: 0 }}
-              whileHover={{ scale: 1.05, backgroundColor: "#FEC601" }}
+              key={stat.label}
+              initial={{ opacity: 0, scale: 0.8 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
             >
-              <motion.div
-                className={`w-1/2 ${index % 2 === 0 ? 'pr-8 text-right' : 'pl-8'}`}
-                whileHover={{ scale: 1.1 }}
-              >
-                <div className="bg-white p-6 rounded-lg shadow-lg inline-block">
-                  <h3 className="text-2xl font-bold mb-2">{item.date}</h3>
-                  <h4 className="text-xl font-semibold mb-2">{item.title}</h4>
-                  <p className="mb-4">{item.description}</p>
-                  {item.image && (
-                    <Image src={item.image} alt={item.title} className="w-full h-48 object-cover rounded-lg" width={200} height={200} />
-                  )}
+              <GlassCard className="p-6 text-center">
+                <div className={`text-4xl font-bold mb-2 bg-gradient-to-r ${stat.gradient} bg-clip-text text-transparent`}>
+                  {stat.value}
                 </div>
-              </motion.div>
-              <div className="w-4 h-4 bg-gray-800 rounded-full absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2"></div>
+                <div className="text-sm text-white/60">
+                  {stat.label}
+                </div>
+              </GlassCard>
             </motion.div>
           ))}
         </motion.div>
       </div>
-      <AnimatePresence>
-        {isScrolling && (
-          <motion.div
-            className="fixed top-0 left-0 w-full h-full pointer-events-none bg-black/20 backdrop-blur-sm z-50"
-            variants={speedLineVariants}
-            initial="initial"
-            animate="animate"
-            exit="exit"
-          />
-        )}
-      </AnimatePresence>
     </div>
   );
-};
-
-export default Page;
+}

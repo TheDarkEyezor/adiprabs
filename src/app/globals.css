@@ -198,7 +198,7 @@ body::after {
 body.page-transition::after {
   visibility: visible;
   pointer-events: auto;
-  animation: var(--transition-animation) 780ms ease-in-out forwards; /* Slowed down by 30% (from 600ms to 780ms) */
+  animation: var(--transition-animation) 600ms ease-in-out forwards;
 }
 
 /* Remove the existing page-transition styles that we're replacing */
@@ -319,4 +319,35 @@ body.page-transition::after {
 .transition-logo.active .logo-circle circle {
   animation: drawCircle 1s forwards;
   animation-play-state: running;
+}
+
+/* Glassmorphic styles */
+.glass {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glass-dark {
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.glass-card {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+/* View Transitions API support */
+@supports (view-transition-name: none) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 0.3s;
+  }
 }

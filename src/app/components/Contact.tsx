@@ -95,83 +95,104 @@ const Contact: React.FC<{ onClose: () => void }> = ({ onClose }) => {
 
 
   return (
-    <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex items-center justify-center p-4 z-50">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50">
       <AnimatePresence>
         {animationPhase === 'form' && (
           <motion.form
             key="form" 
-            className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full relative overflow-hidden" // Added overflow-hidden here too for initial state
+            className="glass-card p-8 rounded-2xl shadow-2xl max-w-md w-full relative overflow-hidden border-2 border-white/20"
             onSubmit={handleSubmit}
             variants={formVariants}
             initial="hidden"
             animate="visible"
-            exit="fold" // This will now use the updated fold variant
-            style={{ transformOrigin: 'top' }} // Set origin for height collapse
+            exit="fold"
+            style={{ transformOrigin: 'top' }}
           >
-            <h2 className="text-2xl font-bold mb-4 text-gray-800">Contact Me</h2>
-            <div className="mb-4">
-              <label htmlFor="name" className="block text-gray-700 font-bold mb-2">Name</label>
-              <input
-                type="text"
-                id="name"
-                name="name"
-                value={formData.name}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
-                required
-              />
+            {/* Animated gradient background */}
+            <div className="absolute inset-0 bg-gradient-to-br from-[#4A90E2]/30 via-[#52B788]/30 to-[#FEC601]/30 opacity-50" />
+            
+            {/* Shimmer effect */}
+            <div className="absolute inset-0 shimmer opacity-20 pointer-events-none" />
+            
+            <div className="relative z-10">
+              <h2 className="text-3xl font-bold mb-6 text-white bg-gradient-to-r from-[#4A90E2] to-[#52B788] bg-clip-text text-transparent">Contact Me</h2>
+              <div className="mb-4">
+                <label htmlFor="name" className="block text-white font-bold mb-2">Name</label>
+                <input
+                  type="text"
+                  id="name"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 rounded-lg glass-card border border-white/30 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[#52B788] focus:border-transparent transition-all"
+                  placeholder="Your name"
+                  required
+                />
+              </div>
+              <div className="mb-4">
+                <label htmlFor="email" className="block text-white font-bold mb-2">Email</label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 rounded-lg glass-card border border-white/30 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[#52B788] focus:border-transparent transition-all"
+                  placeholder="your.email@example.com"
+                  required
+                />
+              </div>
+              <div className="mb-6">
+                <label htmlFor="message" className="block text-white font-bold mb-2">Message</label>
+                <textarea
+                  id="message"
+                  name="message"
+                  value={formData.message}
+                  onChange={handleChange}
+                  className="w-full px-4 py-3 rounded-lg glass-card border border-white/30 text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-[#52B788] focus:border-transparent transition-all resize-none"
+                  placeholder="Your message..."
+                  rows={4}
+                  required
+                ></textarea>
+              </div>
+              <motion.button
+                type="submit"
+                className="w-full bg-gradient-to-r from-[#4A90E2] to-[#52B788] text-white font-bold py-3 px-4 rounded-lg hover:shadow-lg transition duration-300 relative overflow-hidden"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                <span className="relative z-10">Send Message</span>
+                <motion.div 
+                  className="absolute inset-0 bg-white/20"
+                  initial={{ x: '-100%' }}
+                  whileHover={{ x: '100%' }}
+                  transition={{ duration: 0.5 }}
+                />
+              </motion.button>
+               {/* Close button inside the form container */}
+               <motion.button
+                type="button" 
+                className="absolute top-4 right-4 glass-card text-white rounded-full w-10 h-10 flex items-center justify-center text-xl hover:bg-white/20 z-20 border border-white/30"
+                onClick={onClose}
+                aria-label="Close contact form"
+                whileHover={{ scale: 1.1, rotate: 90 }}
+                whileTap={{ scale: 0.9 }}
+              >
+                &times;
+              </motion.button>
             </div>
-            <div className="mb-4">
-              <label htmlFor="email" className="block text-gray-700 font-bold mb-2">Email</label>
-              <input
-                type="email"
-                id="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
-                required
-              />
-            </div>
-            <div className="mb-4">
-              <label htmlFor="message" className="block text-gray-700 font-bold mb-2">Message</label>
-              <textarea
-                id="message"
-                name="message"
-                value={formData.message}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-gray-700"
-                rows={4}
-                required
-              ></textarea>
-            </div>
-            <button
-              type="submit"
-              className="w-full bg-blue-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-600 transition duration-300"
-            >
-              Send Message
-            </button>
-             {/* Close button inside the form container */}
-             <button
-              type="button" 
-              className="absolute top-4 right-4 bg-gray-200 text-gray-800 rounded-full w-8 h-8 flex items-center justify-center text-xl hover:bg-gray-300 z-10" // Ensure button stays above content
-              onClick={onClose}
-              aria-label="Close contact form"
-            >
-              &times;
-            </button>
           </motion.form>
         )}
 
         {animationPhase === 'flying' && (
           <motion.div
-            key="airplane" // Key is important for AnimatePresence
-            className="text-white text-6xl" // Style your airplane icon
+            key="airplane"
+            className="text-white text-6xl filter drop-shadow-[0_0_30px_rgba(82,183,136,0.8)]"
             variants={getAirplaneVariants()}
             initial="initial"
             animate="loopAndFly"
           >
-            ✈️ {/* Or use an SVG/Image component */}
+            ✈️
           </motion.div>
         )}
       </AnimatePresence>
