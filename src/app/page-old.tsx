@@ -257,7 +257,7 @@ const HomePage: React.FC = () => {
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: 0.3 }}
             >
-              My name is Aditya Prabakaran, but I often go by Adi. I&apos;m studying CS at Imperial College London. I&apos;m always looking for an exciting new project to dip my feet into because, as they often say with coding, projects are the best way to learn! Below, you can find more information on my skills, the projects I&apos;ve participated in, my journey in STEM and my current leading in. <br/> (This website is being actively developed, so if you spot any bugs, please do drop me a message using the contact button below)
+              My name is Adi Prabs, but I often go by Adi. I&apos;m studying CS at Imperial College London. I&apos;m always looking for an exciting new project to dip my feet into because, as they often say with coding, projects are the best way to learn! Below, you can find more information on my skills, the projects I&apos;ve participated in, my journey in STEM and my current leading in. <br/> (This website is being actively developed, so if you spot any bugs, please do drop me a message using the contact button below)
             </motion.p>
           </div>
           <motion.div 
@@ -499,7 +499,7 @@ const HomePage: React.FC = () => {
             <Linkedin className="w-6 h-6 hover:text-[#4A90E2] transition-colors" />
           </motion.a>
           <motion.a 
-            href="mailto:aditya.prabakaran@gmail.com"
+            href="mailto:Adi.Prabs@gmail.com"
             whileHover={{ 
               scale: 1.2, 
               rotate: 5,

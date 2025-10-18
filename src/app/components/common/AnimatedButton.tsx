@@ -59,7 +59,7 @@ const AnimatedButton: React.FC<AnimatedButtonProps> = ({
       type={props.type}
       onClick={props.onClick}
       form={props.form}
-      formAction={props.formAction as any}
+      formAction={props.formAction as ((formData: FormData) => void) | undefined}
     >
       {/* Ripple effect overlay */}
       <motion.div

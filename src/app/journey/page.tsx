@@ -196,7 +196,7 @@ export default function JourneyPage() {
         {/* Timeline */}
         <div className="relative">
           {/* Vertical line */}
-          <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[#FF6B6B] via-[#FEC601] via-[#52B788] via-[#4A90E2] to-[#8B5CF6]" />
+          <div className="absolute left-8 top-0 bottom-0 w-0.5 bg-gradient-to-b from-[#FF6B6B] via-[#52B788] to-[#8B5CF6]" />
 
           <motion.div
             className="space-y-12"

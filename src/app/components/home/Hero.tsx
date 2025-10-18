@@ -28,10 +28,10 @@ const Hero: React.FC = () => {
           >
             <h1 className="text-6xl md:text-7xl lg:text-8xl font-bold mb-6 leading-tight">
               <span className="block bg-gradient-to-r from-[#FF6B6B] via-[#FEC601] to-[#52B788] bg-clip-text text-transparent animate-gradient">
-                Aditya
+                Adi
               </span>
               <span className="block bg-gradient-to-r from-[#52B788] via-[#4A90E2] to-[#8B5CF6] bg-clip-text text-transparent animate-gradient">
-                Prabakaran
+                Prabs
               </span>
             </h1>
           </motion.div>
@@ -100,7 +100,7 @@ const Hero: React.FC = () => {
               <div className="relative w-full aspect-square rounded-2xl overflow-hidden">
                 <Image
                   src="/picc.jpg"
-                  alt="Aditya Prabakaran"
+                  alt="Adi Prabs"
                   fill
                   className="object-cover"
                   priority

@@ -5,6 +5,7 @@ import { ArrowLeft, X, ExternalLink, Github } from 'lucide-react';
 import { useSearchParams } from 'next/navigation';
 import { projectsData, Project, uniqueTags } from '../data/projectsData';
 import { TransitionLink } from '../components/transitions/TransitionLink';
+import TiltCard from '../components/effects/TiltCard';
 import Navbar from '../components/Navbar';
 import ParticleField from '../components/effects/ParticleField';
 import SectionHeading from '../components/common/SectionHeading';
@@ -160,12 +161,13 @@ function ProjectsContent() {
                 exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.2 } }}
                 transition={{ delay: index * 0.05 }}
               >
-                <GlassCard
-                  variant="interactive"
-                  hoverEffect
-                  className="h-full cursor-pointer group overflow-hidden"
-                  onClick={() => setExpandedProject(project)}
-                >
+                <TiltCard intensity={0.5}>
+                  <GlassCard
+                    variant="interactive"
+                    hoverEffect
+                    className="h-full cursor-pointer group overflow-hidden"
+                    onClick={() => setExpandedProject(project)}
+                  >
                   {/* Gradient accent */}
                   <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#FF6B6B] via-[#FEC601] to-[#52B788] rounded-t-2xl" />
                   
@@ -200,7 +202,8 @@ function ProjectsContent() {
                       </motion.span>
                     </div>
                   </div>
-                </GlassCard>
+                  </GlassCard>
+                </TiltCard>
               </motion.div>
             ))}
           </AnimatePresence>

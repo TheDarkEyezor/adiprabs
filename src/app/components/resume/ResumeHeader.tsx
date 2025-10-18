@@ -14,7 +14,7 @@ const ResumeHeader: React.FC = () => {
       <div className="w-40 h-40 rounded-full overflow-hidden border-4 border-white shadow-lg">
         <Image 
           src="/picc.jpg" 
-          alt="Aditya Prabakaran" 
+          alt="Adi Prabs" 
           width={160} 
           height={160} 
           className="object-cover"
@@ -22,11 +22,11 @@ const ResumeHeader: React.FC = () => {
       </div>
       
       <div className="text-center md:text-left">
-        <h1 className="text-4xl md:text-5xl font-bold mb-2">Aditya Prabakaran</h1>
+        <h1 className="text-4xl md:text-5xl font-bold mb-2">Adi Prabs</h1>
         <p className="text-xl text-yellow-200 mb-4">Software Engineer & CS Student</p>
         
         <div className="mb-6">
-          <p className="mb-1">aditya.prabakaran@gmail.com</p>
+          <p className="mb-1">Adi.Prabs@gmail.com</p>
           <p className="mb-1">London, UK</p>
           <div className="flex gap-4 justify-center md:justify-start mt-2">
             <a href="https://github.com/TheDarkEyezor" className="text-white hover:text-yellow-300">GitHub</a>

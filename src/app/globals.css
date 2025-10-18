@@ -25,6 +25,74 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Light mode styles */
+html.light {
+  --bg-primary: #f8f9fa;
+  --bg-secondary: #e9ecef;
+  --bg-tertiary: #dee2e6;
+  --text-primary: #212529;
+  --text-secondary: #495057;
+  --glass-bg: rgba(255, 255, 255, 0.8);
+}
+
+/* Light mode backgrounds */
+html.light body {
+  background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 50%, #bcccdc 100%) !important;
+}
+
+html.light .bg-gradient-to-br {
+  background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 50%, #bcccdc 100%) !important;
+}
+
+/* Light mode glass cards */
+html.light .glass-card {
+  background: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(16px) !important;
+  border-color: rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* Light mode text colors */
+html.light .text-white,
+html.light h1, html.light h2, html.light h3, html.light h4, html.light h5, html.light h6 {
+  color: #1a202c !important;
+}
+
+html.light .text-white\/90 {
+  color: rgba(26, 32, 44, 0.9) !important;
+}
+
+html.light .text-white\/80 {
+  color: rgba(26, 32, 44, 0.8) !important;
+}
+
+html.light .text-white\/60 {
+  color: rgba(26, 32, 44, 0.6) !important;
+}
+
+/* Light mode borders */
+html.light .border-white\/20 {
+  border-color: rgba(0, 0, 0, 0.15) !important;
+}
+
+html.light .border-white\/30 {
+  border-color: rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Light mode backgrounds for specific elements */
+html.light .bg-white\/10 {
+  background-color: rgba(0, 0, 0, 0.05) !important;
+}
+
+html.light .bg-white\/20 {
+  background-color: rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Light mode particle colors - make them darker for visibility */
+html.light [class*="particle"] {
+  opacity: 0.4 !important;
+}
+
 @keyframes blink {
   0% {
     opacity: 0;

@@ -9,6 +9,7 @@ import LatestWork from './components/home/LatestWork';
 import Contact from './components/Contact';
 import ParticleField from './components/effects/ParticleField';
 import ScrollProgress from './components/effects/ScrollProgress';
+import RevealText from './components/effects/RevealText';
 import { Github, Linkedin, Mail, Instagram } from 'lucide-react';
 
 const HomePage: React.FC = () => {
@@ -58,13 +59,19 @@ const HomePage: React.FC = () => {
           <Hero />
 
           {/* Current Roles */}
-          <CurrentRoles />
+          <RevealText animationType="slide" delay={0.2}>
+            <CurrentRoles />
+          </RevealText>
 
           {/* Skills Showcase */}
-          <SkillsShowcase />
+          <RevealText animationType="fade" delay={0.3}>
+            <SkillsShowcase />
+          </RevealText>
 
           {/* Latest Work */}
-          <LatestWork />
+          <RevealText animationType="slide" delay={0.2}>
+            <LatestWork />
+          </RevealText>
 
           {/* Contact CTA */}
           <section className="py-20 px-8">
@@ -153,7 +160,7 @@ const HomePage: React.FC = () => {
               <Linkedin className="w-6 h-6 hover:text-[#4A90E2] transition-colors" />
             </motion.a>
             <motion.a 
-              href="mailto:aditya.prabakaran@gmail.com"
+              href="mailto:Adi.Prabs@gmail.com"
               whileHover={{ 
                 scale: 1.2, 
                 rotate: 5,
@@ -178,7 +185,7 @@ const HomePage: React.FC = () => {
             </motion.a>
           </motion.div>
           <div className="text-center mt-4 text-white/60 text-sm">
-            © 2025 Aditya Prabakaran. Built with Next.js, TypeScript & Framer Motion.
+            © 2025 Adi Prabs. Built with Next.js, TypeScript & Framer Motion.
           </div>
         </footer>
 

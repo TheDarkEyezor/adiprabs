@@ -59,7 +59,7 @@ function Navbar() {
         })}
         
         <a 
-          href="https://substack.com/@adityaprabakaran" 
+          href="https://substack.com/@AdiPrabs" 
           target="_blank"
           rel="noopener noreferrer"
         >
