@@ -12,7 +12,8 @@ function Navbar() {
     { href: '/projects', label: 'Projects', gradient: 'from-[#FEC601] to-[#52B788]' },
     { href: '/resume', label: 'Resume', gradient: 'from-[#52B788] to-[#4A90E2]' },
     { href: '/journey', label: 'Journey', gradient: 'from-[#4A90E2] to-[#8B5CF6]' },
-    { href: '/booklist', label: 'Booklist', gradient: 'from-[#8B5CF6] to-[#FF6B6B]' },
+    { href: '/blog', label: 'Blog', gradient: 'from-[#8B5CF6] to-[#00F5FF]' },
+    { href: '/booklist', label: 'Booklist', gradient: 'from-[#00F5FF] to-[#FF6B6B]' },
   ];
 
   return (
@@ -58,29 +59,7 @@ function Navbar() {
           );
         })}
         
-        <a 
-          href="https://substack.com/@AdiPrabs" 
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <motion.div 
-            className="relative group px-3 py-2 rounded-lg transition-all cursor-pointer"
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-          >
-            <span className="relative z-10 text-sm md:text-base flex items-center gap-1">
-              Blog
-              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-              </svg>
-            </span>
-            <motion.div 
-              className="absolute inset-0 bg-gradient-to-r from-[#00F5FF] to-[#FF10F0] rounded-lg opacity-0 group-hover:opacity-70 blur-sm transition-opacity"
-              initial={{ opacity: 0 }}
-              whileHover={{ opacity: 0.7 }}
-            />
-          </motion.div>
-        </a>
+
       </div>
     </motion.nav>
   );
