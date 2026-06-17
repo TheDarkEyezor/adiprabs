@@ -1,68 +1,79 @@
 'use client';
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { TransitionLink } from './transitions/TransitionLink';
 
-function Navbar() {
+const navItems = [
+  { href: '/', label: 'Index', num: '00' },
+  { href: '/projects', label: 'Work', num: '01' },
+  { href: '/resume', label: 'CV', num: '02' },
+  { href: '/blog', label: 'Writing', num: '03' },
+  { href: '/journey', label: 'Journey', num: '04' },
+  { href: '/booklist', label: 'Reading', num: '05' },
+];
+
+export default function Navbar() {
   const pathname = usePathname();
+  const [scrolled, setScrolled] = useState(false);
 
-  const navItems = [
-    { href: '/', label: 'Home', gradient: 'from-[#FF6B6B] to-[#FEC601]' },
-    { href: '/projects', label: 'Projects', gradient: 'from-[#FEC601] to-[#52B788]' },
-    { href: '/resume', label: 'Resume', gradient: 'from-[#52B788] to-[#4A90E2]' },
-    { href: '/journey', label: 'Journey', gradient: 'from-[#4A90E2] to-[#8B5CF6]' },
-    { href: '/blog', label: 'Blog', gradient: 'from-[#8B5CF6] to-[#00F5FF]' },
-    { href: '/booklist', label: 'Booklist', gradient: 'from-[#00F5FF] to-[#FF6B6B]' },
-  ];
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 4);
+    onScroll();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   return (
-    <motion.nav 
-      className="glass-dark text-white p-4 flex justify-between items-center sticky top-0 z-50 border-b border-white/10"
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ type: "spring", stiffness: 100 }}
+    <nav
+      className={`sticky top-0 z-40 transition-colors duration-200 ${
+        scrolled ? 'bg-ink-bg/85 backdrop-blur-md border-b border-ink-line' : 'bg-transparent border-b border-transparent'
+      }`}
     >
-      <TransitionLink href="/">
-        <motion.div 
-          className="text-2xl font-bold bg-gradient-to-r from-[#FF6B6B] via-[#FEC601] to-[#52B788] bg-clip-text text-transparent cursor-pointer"
-          whileHover={{ scale: 1.05 }}
-          transition={{ type: "spring", stiffness: 400 }}
-        >
-          AdiPrabs
-        </motion.div>
-      </TransitionLink>
-      
-      <div className="space-x-2 md:space-x-4 flex items-center">
-        {navItems.map((item) => {
-          const isActive = pathname === item.href;
-          
-          return (
-            <TransitionLink key={item.href} href={item.href}>
-              <motion.div 
-                className="relative group px-3 py-2 rounded-lg transition-all cursor-pointer"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
+      <div className="mx-auto w-full max-w-6xl px-6 md:px-10 h-14 flex items-center justify-between">
+        <Link href="/" className="group flex items-center gap-2">
+          <span className="font-mono text-mono-sm text-teal">~/</span>
+          <span className="font-sans font-medium tracking-snug text-ink-fg group-hover:text-teal transition-colors">
+            adi prabs
+          </span>
+        </Link>
+
+        <div className="hidden md:flex items-center gap-1">
+          {navItems.map((item) => {
+            const active =
+              item.href === '/' ? pathname === '/' : pathname.startsWith(item.href);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="group relative px-3 py-2 font-mono text-mono-sm"
               >
-                <span className={`relative z-10 text-sm md:text-base ${isActive ? 'font-bold' : ''}`}>
+                <span className={`mr-2 ${active ? 'text-teal' : 'text-ink-muted'}`}>
+                  {item.num}
+                </span>
+                <span
+                  className={`${
+                    active ? 'text-ink-fg' : 'text-ink-fg2 group-hover:text-ink-fg'
+                  } transition-colors`}
+                >
                   {item.label}
                 </span>
-                <motion.div 
-                  className={`absolute inset-0 bg-gradient-to-r ${item.gradient} rounded-lg blur-sm transition-opacity ${
-                    isActive ? 'opacity-70' : 'opacity-0 group-hover:opacity-70'
-                  }`}
-                  initial={{ opacity: isActive ? 0.7 : 0 }}
-                  whileHover={{ opacity: 0.7 }}
-                />
-              </motion.div>
-            </TransitionLink>
-          );
-        })}
-        
+                {active && (
+                  <span className="absolute left-3 right-3 -bottom-px h-px bg-teal" />
+                )}
+              </Link>
+            );
+          })}
+        </div>
 
+        <div className="md:hidden">
+          <Link
+            href="/projects"
+            className="font-mono text-mono-sm text-teal border border-ink-line px-3 py-1.5 rounded-sm hover:border-teal-dim transition-colors"
+          >
+            menu →
+          </Link>
+        </div>
       </div>
-    </motion.nav>
+    </nav>
   );
 }
-
-export default Navbar;
