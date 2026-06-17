@@ -28,16 +28,22 @@ export default function BlogPage() {
 
 function BlogLoadingSkeleton() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#1a1a2e] via-[#16213e] to-[#0f3460]">
-      <div className="max-w-6xl mx-auto px-6 py-20">
-        <div className="animate-pulse">
-          <div className="h-12 bg-white/10 rounded w-48 mb-4" />
-          <div className="h-6 bg-white/5 rounded w-96 mb-12" />
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[...Array(6)].map((_, i) => (
-              <div key={i} className="rounded-2xl bg-white/5 h-80" />
-            ))}
-          </div>
+    <div className="min-h-screen bg-ink-bg">
+      <div className="max-w-6xl mx-auto px-6 py-20 animate-pulse">
+        <div className="h-4 bg-ink-surface2 rounded-sm w-28 mb-6" />
+        <div className="h-12 bg-ink-surface2 rounded-sm w-48 mb-4" />
+        <div className="h-5 bg-ink-surface rounded-sm w-80 mb-12" />
+        <div className="space-y-8">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="border-t border-ink-line pt-7 grid grid-cols-12 gap-6">
+              <div className="col-span-3 h-4 bg-ink-surface2 rounded-sm" />
+              <div className="col-span-9 space-y-3">
+                <div className="h-6 bg-ink-surface2 rounded-sm w-3/4" />
+                <div className="h-4 bg-ink-surface rounded-sm w-full" />
+                <div className="h-4 bg-ink-surface rounded-sm w-2/3" />
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>

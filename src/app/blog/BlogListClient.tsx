@@ -1,13 +1,12 @@
 'use client';
 
 import React, { useState, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Search, Tag, X } from 'lucide-react';
+import { Search, X } from 'lucide-react';
+import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import Navbar from '../components/Navbar';
-import ParticleField from '../components/effects/ParticleField';
-import SectionHeading from '../components/common/SectionHeading';
-import BlogCard from './components/BlogCard';
+import Footer from '../components/Footer';
+import { Container, Label, Tag } from '../components/ui/primitives';
 import type { BlogPostMeta } from '@/lib/blog';
 
 interface BlogListClientProps {
@@ -19,28 +18,24 @@ export default function BlogListClient({ initialPosts, allTags }: BlogListClient
   const router = useRouter();
   const searchParams = useSearchParams();
   const tagFromUrl = searchParams.get('tag');
-  
+
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedTag, setSelectedTag] = useState<string | null>(tagFromUrl);
 
   const filteredPosts = useMemo(() => {
     let posts = initialPosts;
-
-    // Filter by tag
     if (selectedTag) {
-      posts = posts.filter(post => post.tags.includes(selectedTag));
+      posts = posts.filter((post) => post.tags.includes(selectedTag));
     }
-
-    // Filter by search query
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
-      posts = posts.filter(post =>
-        post.title.toLowerCase().includes(query) ||
-        post.description.toLowerCase().includes(query) ||
-        post.tags.some(tag => tag.toLowerCase().includes(query))
+      posts = posts.filter(
+        (post) =>
+          post.title.toLowerCase().includes(query) ||
+          post.description.toLowerCase().includes(query) ||
+          post.tags.some((tag) => tag.toLowerCase().includes(query))
       );
     }
-
     return posts;
   }, [initialPosts, selectedTag, searchQuery]);
 
@@ -53,140 +48,148 @@ export default function BlogListClient({ initialPosts, allTags }: BlogListClient
     }
   };
 
+  const clearFilters = () => {
+    setSelectedTag(null);
+    setSearchQuery('');
+    router.push('/blog', { scroll: false });
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#1a1a2e] via-[#16213e] to-[#0f3460] text-white">
-      <ParticleField count={30} />
+    <>
       <Navbar />
-
-      {/* Gradient orbs */}
-      <motion.div
-        className="fixed top-40 -left-40 w-80 h-80 bg-gradient-to-br from-[#4A90E2]/20 to-[#8B5CF6]/20 rounded-full blur-3xl pointer-events-none"
-        animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
-        transition={{ duration: 8, repeat: Infinity }}
-      />
-      <motion.div
-        className="fixed bottom-40 -right-40 w-80 h-80 bg-gradient-to-br from-[#FF6B6B]/20 to-[#FEC601]/20 rounded-full blur-3xl pointer-events-none"
-        animate={{ scale: [1.2, 1, 1.2], opacity: [0.3, 0.5, 0.3] }}
-        transition={{ duration: 8, repeat: Infinity, delay: 4 }}
-      />
-
-      <main className="max-w-6xl mx-auto px-6 py-12 relative z-10">
+      <main className="relative z-10">
         {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-12"
-        >
-          <SectionHeading subtitle="Thoughts, tutorials, and insights on technology, AI, and more." gradient>
-            Blog
-          </SectionHeading>
-        </motion.div>
+        <section className="relative">
+          <Container className="pt-16 md:pt-24 pb-10">
+            <Label number="03">writing</Label>
+            <h1 className="mt-6 text-5xl md:text-7xl tracking-tightest font-medium text-ink-fg">
+              Writing
+            </h1>
+            <p className="mt-4 max-w-reading text-xl text-ink-fg2 leading-snug">
+              Notes on building systems, AI, and whatever I'm thinking about.
+            </p>
 
-        {/* Search and Filters */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="mb-8 space-y-4"
-        >
-          {/* Search bar */}
-          <div className="relative max-w-md">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/40" size={18} />
-            <input
-              type="text"
-              placeholder="Search articles..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-12 pr-4 py-3 rounded-xl bg-white/5 border border-white/10 focus:border-[#4A90E2]/50 focus:outline-none focus:ring-2 focus:ring-[#4A90E2]/20 text-white placeholder-white/40 transition-all"
-            />
-          </div>
+            {/* Search */}
+            <div className="mt-10 relative max-w-sm">
+              <Search
+                className="absolute left-0 top-1/2 -translate-y-1/2 text-ink-muted"
+                size={16}
+              />
+              <input
+                type="text"
+                placeholder="search articles..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full pl-7 pr-4 py-2 bg-transparent border-b border-ink-line focus:border-teal-dim focus:outline-none font-mono text-mono-sm text-ink-fg placeholder:text-ink-muted transition-colors"
+              />
+            </div>
 
-          {/* Tags */}
-          {allTags.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              <button
-                onClick={() => handleTagClick(null)}
-                className={`px-3 py-1.5 rounded-full text-sm border transition-all ${
-                  !selectedTag
-                    ? 'bg-[#4A90E2] border-[#4A90E2] text-white'
-                    : 'bg-white/5 border-white/10 text-white/60 hover:border-white/30'
-                }`}
-              >
-                All
-              </button>
-              {allTags.map(tag => (
+            {/* Tag filters */}
+            {allTags.length > 0 && (
+              <div className="mt-6 flex flex-wrap gap-2">
                 <button
-                  key={tag}
-                  onClick={() => handleTagClick(tag)}
-                  className={`px-3 py-1.5 rounded-full text-sm border transition-all flex items-center gap-1 ${
-                    selectedTag === tag
-                      ? 'bg-[#4A90E2] border-[#4A90E2] text-white'
-                      : 'bg-white/5 border-white/10 text-white/60 hover:border-white/30'
+                  onClick={() => handleTagClick(null)}
+                  className={`px-3 py-1.5 border rounded-sm font-mono text-mono-sm transition-colors ${
+                    !selectedTag
+                      ? 'border-teal-dim text-teal'
+                      : 'border-ink-line text-ink-fg2 hover:text-ink-fg hover:border-ink-line2'
                   }`}
                 >
-                  <Tag size={12} />
-                  {tag}
+                  all
                 </button>
-              ))}
-            </div>
-          )}
+                {allTags.map((tag) => (
+                  <button
+                    key={tag}
+                    onClick={() => handleTagClick(tag)}
+                    className={`px-3 py-1.5 border rounded-sm font-mono text-mono-sm transition-colors ${
+                      selectedTag === tag
+                        ? 'border-teal-dim text-teal'
+                        : 'border-ink-line text-ink-fg2 hover:text-ink-fg hover:border-ink-line2'
+                    }`}
+                  >
+                    {tag.toLowerCase()}
+                  </button>
+                ))}
+              </div>
+            )}
 
-          {/* Active filter indicator */}
-          {(selectedTag || searchQuery) && (
-            <div className="flex items-center gap-2 text-white/60 text-sm">
-              <span>Showing {filteredPosts.length} article{filteredPosts.length !== 1 ? 's' : ''}</span>
-              {(selectedTag || searchQuery) && (
+            {/* Active filter count */}
+            {(selectedTag || searchQuery) && (
+              <div className="mt-4 flex items-center gap-3">
+                <span className="font-mono text-mono-sm text-ink-muted">
+                  {filteredPosts.length} result{filteredPosts.length !== 1 ? 's' : ''}
+                </span>
                 <button
-                  onClick={() => {
-                    setSelectedTag(null);
-                    setSearchQuery('');
-                    router.push('/blog', { scroll: false });
-                  }}
-                  className="flex items-center gap-1 text-[#FF6B6B] hover:text-[#FF6B6B]/80 transition-colors"
+                  onClick={clearFilters}
+                  className="flex items-center gap-1 font-mono text-mono-sm text-ink-fg2 hover:text-teal transition-colors"
                 >
-                  <X size={14} />
-                  Clear filters
+                  <X size={12} />
+                  clear
                 </button>
-              )}
-            </div>
-          )}
-        </motion.div>
+              </div>
+            )}
+          </Container>
+        </section>
 
-        {/* Posts Grid */}
-        <AnimatePresence mode="wait">
-          {filteredPosts.length > 0 ? (
-            <motion.div
-              key="posts"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
-            >
-              {filteredPosts.map((post, index) => (
-                <BlogCard key={post.slug} post={post} index={index} />
-              ))}
-            </motion.div>
-          ) : (
-            <motion.div
-              key="empty"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0 }}
-              className="text-center py-20"
-            >
-              <div className="text-6xl mb-4">📝</div>
-              <h3 className="text-xl font-semibold text-white mb-2">
-                {initialPosts.length === 0 ? 'No posts yet' : 'No matching posts'}
-              </h3>
-              <p className="text-white/60">
-                {initialPosts.length === 0
-                  ? 'Check back soon for new content!'
-                  : 'Try adjusting your search or filter criteria.'}
-              </p>
-            </motion.div>
-          )}
-        </AnimatePresence>
+        {/* Post list */}
+        <section className="relative">
+          <div className="rule" />
+          <Container className="py-8">
+            {filteredPosts.length > 0 ? (
+              filteredPosts.map((post) => (
+                <Link
+                  key={post.slug}
+                  href={`/blog/${post.slug}`}
+                  className="block border-t border-ink-line py-7 grid grid-cols-12 gap-6 group first:border-t-0"
+                >
+                  {/* Date + reading time */}
+                  <div className="col-span-12 md:col-span-3 font-mono text-mono-sm text-ink-muted leading-loose">
+                    <span>{new Date(post.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+                    <br />
+                    <span>{post.readingTime}</span>
+                  </div>
+
+                  {/* Title, description, tags */}
+                  <div className="col-span-12 md:col-span-9">
+                    <h2 className="text-2xl text-ink-fg tracking-snug group-hover:text-teal transition-colors">
+                      {post.title}
+                    </h2>
+                    {post.description && (
+                      <p className="mt-2 text-ink-fg2 max-w-reading leading-relaxed">
+                        {post.description}
+                      </p>
+                    )}
+                    {post.tags.length > 0 && (
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        {post.tags.map((tag) => (
+                          <Tag key={tag}>{tag}</Tag>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </Link>
+              ))
+            ) : (
+              <div className="py-20">
+                <p className="text-ink-fg2 mb-4">
+                  {initialPosts.length === 0
+                    ? 'No posts yet. Check back soon.'
+                    : 'No matching posts.'}
+                </p>
+                {initialPosts.length > 0 && (
+                  <button
+                    onClick={clearFilters}
+                    className="px-3 py-1.5 border border-ink-line rounded-sm font-mono text-mono-sm text-ink-fg2 hover:border-teal-dim hover:text-teal transition-colors"
+                  >
+                    clear filters
+                  </button>
+                )}
+              </div>
+            )}
+          </Container>
+        </section>
       </main>
-    </div>
+      <Footer />
+    </>
   );
 }

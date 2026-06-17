@@ -96,18 +96,17 @@ export default async function BlogPostPage({ params }: PageProps) {
 
 function BlogPostSkeleton() {
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#1a1a2e] via-[#16213e] to-[#0f3460]">
+    <div className="min-h-screen bg-ink-bg animate-pulse">
       <div className="max-w-3xl mx-auto px-6 py-20">
-        <div className="animate-pulse">
-          <div className="h-4 bg-white/10 rounded w-24 mb-8" />
-          <div className="h-12 bg-white/10 rounded w-3/4 mb-4" />
-          <div className="h-6 bg-white/5 rounded w-1/2 mb-8" />
-          <div className="h-64 bg-white/5 rounded-2xl mb-8" />
-          <div className="space-y-4">
-            <div className="h-4 bg-white/5 rounded w-full" />
-            <div className="h-4 bg-white/5 rounded w-5/6" />
-            <div className="h-4 bg-white/5 rounded w-4/6" />
-          </div>
+        <div className="h-4 bg-ink-surface2 rounded-sm w-24 mb-10" />
+        <div className="h-4 bg-ink-surface2 rounded-sm w-48 mb-6" />
+        <div className="h-10 bg-ink-surface2 rounded-sm w-3/4 mb-4" />
+        <div className="h-5 bg-ink-surface rounded-sm w-1/2 mb-10" />
+        <div className="h-px bg-ink-line mb-10" />
+        <div className="space-y-4">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="h-4 bg-ink-surface rounded-sm" style={{ width: `${70 + (i % 3) * 10}%` }} />
+          ))}
         </div>
       </div>
     </div>

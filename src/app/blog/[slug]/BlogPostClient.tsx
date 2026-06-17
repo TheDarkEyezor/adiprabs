@@ -1,9 +1,10 @@
 'use client';
 
 import React from 'react';
-import { motion } from 'framer-motion';
+import Link from 'next/link';
 import Navbar from '../../components/Navbar';
-import ParticleField from '../../components/effects/ParticleField';
+import Footer from '../../components/Footer';
+import { Container, Tag } from '../../components/ui/primitives';
 import BlogPost from '../components/BlogPost';
 import type { BlogPost as BlogPostType } from '@/lib/blog';
 import type { MDXRemoteSerializeResult } from 'next-mdx-remote';
@@ -14,26 +15,70 @@ interface BlogPostClientProps {
 }
 
 export default function BlogPostClient({ post, mdxSource }: BlogPostClientProps) {
+  const formattedDate = new Date(post.date).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#1a1a2e] via-[#16213e] to-[#0f3460] text-white">
-      <ParticleField count={20} />
+    <>
       <Navbar />
+      <main className="relative z-10">
+        <Container className="pt-12 md:pt-20 pb-24">
+          {/* Back link */}
+          <Link
+            href="/blog"
+            className="font-mono text-mono-sm text-ink-muted hover:text-teal transition-colors inline-block mb-10"
+          >
+            ← writing
+          </Link>
 
-      {/* Gradient orbs */}
-      <motion.div
-        className="fixed top-40 -left-40 w-80 h-80 bg-gradient-to-br from-[#4A90E2]/20 to-[#8B5CF6]/20 rounded-full blur-3xl pointer-events-none"
-        animate={{ scale: [1, 1.2, 1], opacity: [0.2, 0.3, 0.2] }}
-        transition={{ duration: 8, repeat: Infinity }}
-      />
-      <motion.div
-        className="fixed bottom-40 -right-40 w-80 h-80 bg-gradient-to-br from-[#FF6B6B]/20 to-[#FEC601]/20 rounded-full blur-3xl pointer-events-none"
-        animate={{ scale: [1.2, 1, 1.2], opacity: [0.2, 0.3, 0.2] }}
-        transition={{ duration: 8, repeat: Infinity, delay: 4 }}
-      />
+          {/* Post header */}
+          <header className="mb-10">
+            {/* Meta row */}
+            <div className="flex flex-wrap items-center gap-3 mb-4 font-mono text-mono-sm text-ink-muted">
+              <time dateTime={post.date}>{formattedDate}</time>
+              <span className="text-ink-line">·</span>
+              <span>{post.readingTime}</span>
+              {post.tags.length > 0 && (
+                <>
+                  <span className="text-ink-line">·</span>
+                  <div className="flex flex-wrap gap-2">
+                    {post.tags.map((tag) => (
+                      <Link
+                        key={tag}
+                        href={`/blog?tag=${encodeURIComponent(tag)}`}
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <Tag>{tag}</Tag>
+                      </Link>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
 
-      <main className="px-6 py-12 relative z-10">
-        <BlogPost post={post} mdxSource={mdxSource} />
+            <h1 className="text-4xl md:text-5xl font-medium tracking-snug text-ink-fg leading-tight">
+              {post.title}
+            </h1>
+
+            {post.description && (
+              <p className="mt-4 text-xl text-ink-fg2 max-w-reading leading-relaxed">
+                {post.description}
+              </p>
+            )}
+          </header>
+
+          <div className="rule" />
+
+          {/* Content */}
+          <div className="mt-10">
+            <BlogPost post={post} mdxSource={mdxSource} />
+          </div>
+        </Container>
       </main>
-    </div>
+      <Footer />
+    </>
   );
 }
