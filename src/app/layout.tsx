@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import SmoothScrollProvider from "./components/SmoothScrollProvider";
+import ScrollProgressBar from "./components/ScrollProgressBar";
+import TransitionProvider from "./components/TransitionProvider";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -43,7 +46,12 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${jetbrains.variable}`}>
       <body className="font-sans bg-ink-bg text-ink-fg antialiased grain">
-        {children}
+        <SmoothScrollProvider>
+          <TransitionProvider>
+            <ScrollProgressBar />
+            {children}
+          </TransitionProvider>
+        </SmoothScrollProvider>
       </body>
     </html>
   );

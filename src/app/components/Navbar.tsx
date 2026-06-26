@@ -1,7 +1,7 @@
 'use client';
 import React, { useEffect, useState } from 'react';
-import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import TransitionLink from './utils/TransitionLink';
 
 const navItems = [
   { href: '/', label: 'Index', num: '00' },
@@ -30,19 +30,19 @@ export default function Navbar() {
       }`}
     >
       <div className="mx-auto w-full max-w-6xl px-6 md:px-10 h-14 flex items-center justify-between">
-        <Link href="/" className="group flex items-center gap-2">
+        <TransitionLink href="/" className="group flex items-center gap-2">
           <span className="font-mono text-mono-sm text-teal">~/</span>
           <span className="font-sans font-medium tracking-snug text-ink-fg group-hover:text-teal transition-colors">
             adi prabs
           </span>
-        </Link>
+        </TransitionLink>
 
         <div className="hidden md:flex items-center gap-1">
           {navItems.map((item) => {
             const active =
               item.href === '/' ? pathname === '/' : pathname.startsWith(item.href);
             return (
-              <Link
+              <TransitionLink
                 key={item.href}
                 href={item.href}
                 className="group relative px-3 py-2 font-mono text-mono-sm"
@@ -60,18 +60,18 @@ export default function Navbar() {
                 {active && (
                   <span className="absolute left-3 right-3 -bottom-px h-px bg-teal" />
                 )}
-              </Link>
+              </TransitionLink>
             );
           })}
         </div>
 
         <div className="md:hidden">
-          <Link
+          <TransitionLink
             href="/projects"
             className="font-mono text-mono-sm text-teal border border-ink-line px-3 py-1.5 rounded-sm hover:border-teal-dim transition-colors"
           >
             menu →
-          </Link>
+          </TransitionLink>
         </div>
       </div>
     </nav>

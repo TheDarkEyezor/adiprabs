@@ -15,13 +15,13 @@ export const profile = {
   resumeUrl: '/AdiPrabs_SWE.pdf',
 
   bio: [
-    "I'm Adi — Computing student at Imperial College London, currently on an SRE placement at Apple.",
+    "I'm Adi — Computing student at Imperial College London, currently SRE on the ML Platforms team at Apple.",
     "On the side, I ship production AI systems for early-stage startups. Past lives: healthcare admin automation (Vani), LLM cost-reduction at Trajex, video saliency ML at Altus Reach.",
     "I like systems that work at small scale and don't fall over at large scale — compilers, infra, agents, and the boring glue that turns demos into products.",
   ],
 
   now: [
-    'Apple — SRE placement.',
+    'Apple — SRE on ML Platforms.',
     'Side work with funded startups (ARR-stage).',
     'Exploring next venture: physical AI / edge AI / hardware-software plays.',
     'Project Nine: a climbing quadruped robot, MuJoCo-first.',
@@ -41,23 +41,47 @@ export type Role = {
 export const roles: Role[] = [
   {
     company: 'Apple',
-    role: 'Site Reliability Engineer (Placement)',
+    role: 'Site Reliability Engineer, ML Platforms',
     period: '2026 — present',
     location: 'London, UK',
     bullets: [
-      'Production reliability for internal services at Apple scale.',
-      'Observability, on-call rotation, incident response, infra automation.',
+      'Built a Kubernetes capacity forensics platform end-to-end (collectors, scanners, delta-query UI) used by 30+ SREs to diagnose EC2 capacity exhaustion, saving up to $3M per AWS availability zone annually.',
+      'Built a cloud-agnostic capacity request and reservation management system — replaced ad-hoc Slack coordination with an auditable workflow handling hundreds of requests monthly.',
+      'Created a Kubernetes manifest validation framework detecting misconfigurations at deploy time; retrospective analysis shows it would have caught 72% of deployment-related incidents over the prior year.',
     ],
-    tech: ['SRE', 'Distributed systems', 'Observability', 'Linux'],
+    tech: ['Kubernetes', 'Go', 'AWS', 'SRE', 'Distributed systems', 'Observability', 'Linux'],
     live: true,
   },
   {
-    company: 'VaNI MedTech',
+    company: '8x',
+    role: 'Full-stack & AI/ML Developer',
+    period: 'Apr 2026 — May 2026',
+    bullets: [
+      'Optimized production analytics from 24s to sub-second via SQL-side aggregation and indexed Postgres RPC rewrites; cut /posts payloads 90%+ (22MB → ~1–2MB).',
+      'Simplified messaging architecture, deleting ~400 lines of legacy API code while enabling a new admin reply UX.',
+      'Resolved 3 critical production vulnerabilities: org takeover, exposed financial Server Actions, and DB search-path injection across 49 functions.',
+    ],
+    tech: ['PostgreSQL', 'Next.js', 'TypeScript', 'Node.js', 'Security'],
+  },
+  {
+    company: 'Canopy Labs',
+    role: 'General Engineer',
+    period: 'Mar 2026 — Apr 2026',
+    bullets: [
+      'Architected, built, and deployed the company\'s flagship full-stack web application, enabling real-time multi-user usage with Docker and Kubernetes orchestration.',
+      'Created agents to enable custom form filling from transcripts, cutting insurance resolution by 15 min per form.',
+      'Optimized backend concurrency and load balancing, reducing latency 500ms → 120ms, supporting 100+ active users.',
+      'Implemented AWS CI/CD pipelines with automated testing, shortening release cadence to 6 hours.',
+    ],
+    tech: ['React', 'TypeScript', 'Next.js', 'FastAPI', 'Redis', 'AWS', 'Kubernetes', 'Docker'],
+  },
+  {
+    company: 'Vani',
     role: 'Full-stack & AI/ML Developer',
     period: '2025 — 2026',
     bullets: [
       'Architected, shipped, and deployed the flagship multi-tenant web app on AWS with Docker + Kubernetes.',
-      'Cut p95 backend latency 500 ms → 120 ms; scaled to 100+ concurrent users.',
+      'Cut p95 backend latency 500ms → 120ms; scaled to 100+ concurrent users.',
       'Stood up CI/CD: release cadence 2 days → 6 hours, production bugs −76%.',
       'Integrated LLM workflows via Model Context Protocol for clinical-admin automation.',
       'Held 99.9% uptime through staged rollouts and load-balanced workers.',
@@ -143,6 +167,18 @@ export const projects: Project[] = [
     status: 'shipped',
   },
   {
+    slug: 'cauchy-capital',
+    title: 'Cauchy Capital',
+    tagline: 'Algorithmic market-making on Polymarket',
+    description:
+      'Developed algorithmic market-making strategies for Imperial\'s first quant society, trading Yes/No options on Polymarket. Multi-language stack — strategies in C++ and Rust, tooling in Python.',
+    year: '2025',
+    category: 'AI/ML',
+    tech: ['C++', 'Rust', 'Python', 'Quant'],
+    featured: true,
+    status: 'wip',
+  },
+  {
     slug: 'swyftgesture',
     title: 'SwyftGesture',
     tagline: 'Hands-free computer control via webcam',
@@ -166,8 +202,18 @@ export const projects: Project[] = [
     category: 'AI/ML',
     tech: ['C++', 'Local LLM', 'KAG'],
     github: 'https://github.com/TheDarkEyezor/DOSA',
-    featured: true,
     status: 'wip',
+  },
+  {
+    slug: 'slopfilter',
+    title: 'SlopFilter',
+    tagline: 'Browser extension that filters AI slop on Twitter',
+    description:
+      'A lightweight browser extension that real-time filters gen-AI content and misinformation from Twitter/X feeds. Pure JS, no dependencies.',
+    year: '2025',
+    category: 'Tools',
+    tech: ['JavaScript', 'Browser Extension'],
+    status: 'shipped',
   },
   {
     slug: 'auto-trade',
@@ -180,6 +226,17 @@ export const projects: Project[] = [
     tech: ['C++', 'QuantConnect', 'Quant'],
     github: 'https://github.com/TheDarkEyezor/AlgoTrading',
     status: 'wip',
+  },
+  {
+    slug: 'virtual-poker',
+    title: 'Virtual Poker',
+    tagline: 'CLI poker engine in Rust',
+    description:
+      'Built to learn Rust — a CLI poker game that switches between different game styles with full chip tracking. Idiomatic Rust, no shortcuts.',
+    year: '2024',
+    category: 'Tools',
+    tech: ['Rust'],
+    status: 'shipped',
   },
   {
     slug: 'task-manager',

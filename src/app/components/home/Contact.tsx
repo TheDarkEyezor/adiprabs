@@ -1,5 +1,8 @@
+'use client';
 import React from 'react';
 import { Container, Label } from '../ui/primitives';
+import RevealHeading from '../ui/RevealHeading';
+import MagneticButton from '../ui/MagneticButton';
 import { profile } from '@/data/profile';
 
 export default function ContactCTA() {
@@ -12,9 +15,11 @@ export default function ContactCTA() {
             <Label number="05">contact</Label>
           </div>
           <div className="col-span-12 md:col-span-9">
-            <h2 className="text-3xl md:text-5xl tracking-snug text-ink-fg max-w-reading leading-[1.05]">
-              Got a hard problem worth solving?
-            </h2>
+            <RevealHeading
+              text="Got a hard problem worth solving?"
+              as="h2"
+              className="text-3xl md:text-5xl tracking-snug text-ink-fg max-w-reading leading-[1.05]"
+            />
             <p className="mt-4 max-w-reading text-ink-fg2 text-lg leading-relaxed">
               I take on a small amount of side work and I&apos;m always interested in
               talking to people building something genuinely difficult — especially in
@@ -22,29 +27,20 @@ export default function ContactCTA() {
             </p>
 
             <div className="mt-8 flex flex-wrap gap-3">
-              <a
+              <MagneticButton
                 href={`mailto:${profile.emailPublic}?subject=Hello%20Adi`}
-                className="group inline-flex items-center gap-2 px-4 py-2.5 border border-teal-dim text-teal hover:bg-teal-dim/10 font-mono text-mono-sm rounded-sm transition-colors"
+                variant="primary"
+                external
               >
                 <span>{profile.emailPublic}</span>
-                <span className="transition-transform group-hover:translate-x-1">→</span>
-              </a>
-              <a
-                href={profile.linkedinUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2.5 border border-ink-line text-ink-fg2 hover:text-ink-fg hover:border-ink-line2 font-mono text-mono-sm rounded-sm transition-colors"
-              >
+                <span>→</span>
+              </MagneticButton>
+              <MagneticButton href={profile.linkedinUrl} variant="secondary" external>
                 linkedin
-              </a>
-              <a
-                href={profile.githubUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2.5 border border-ink-line text-ink-fg2 hover:text-ink-fg hover:border-ink-line2 font-mono text-mono-sm rounded-sm transition-colors"
-              >
+              </MagneticButton>
+              <MagneticButton href={profile.githubUrl} variant="secondary" external>
                 github
-              </a>
+              </MagneticButton>
             </div>
           </div>
         </div>

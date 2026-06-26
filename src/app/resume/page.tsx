@@ -10,14 +10,14 @@ const education = {
   degree: 'MEng in Computing (AI & ML)',
   period: '2023 — 2027 (expected)',
   notes: [
-    'On track for First Class · GPA 4.0',
+    'On track for First Class · GPA 3.8',
     'Coursework: compilers, OS, ML, distributed systems',
     'Hackathons: 1st place — SwyftGesture (hands-free input)',
   ],
 };
 
 const skills: Record<string, string[]> = {
-  Languages: ['TypeScript', 'Python', 'C', 'C++', 'Scala', 'Haskell', 'Kotlin', 'JavaScript'],
+  Languages: ['TypeScript', 'Python', 'C', 'C++', 'Rust', 'Scala', 'Haskell', 'Kotlin', 'JavaScript'],
   Systems: ['Linux', 'Docker', 'Kubernetes', 'CI/CD', 'AWS', 'Azure', 'Vercel'],
   'AI / ML': ['PyTorch', 'LLama 3.2', 'MediaPipe', 'OpenCV', 'MuJoCo', 'MCP', 'Local LLMs'],
   Web: ['Next.js', 'React', 'FastAPI', 'Node.js', 'Tailwind', 'MDX'],
@@ -105,9 +105,9 @@ export default function ResumePage() {
                   </div>
                   <div className="col-span-12 md:col-span-9 max-w-reading space-y-4 text-lg text-ink-fg2 leading-relaxed">
                     <p>
-                      Computing student at Imperial with two years of production-level
-                      development experience across three startups and a current SRE
-                      placement at Apple.
+                      Computing student at Imperial with three years of production-level
+                      development experience across five startups and a current SRE role
+                      on the ML Platforms team at Apple.
                     </p>
                     <p>
                       I&apos;m happiest at the seam between research and production —
