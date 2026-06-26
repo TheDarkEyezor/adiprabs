@@ -2,8 +2,10 @@
 
 import React, { useState, useMemo } from 'react';
 import { Search, X } from 'lucide-react';
-import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
+import { motion, useInView } from 'framer-motion';
+import { useRef } from 'react';
+import TransitionLink from '../components/utils/TransitionLink';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { Container, Label, Tag } from '../components/ui/primitives';
@@ -12,6 +14,44 @@ import type { BlogPostMeta } from '@/lib/blog';
 interface BlogListClientProps {
   initialPosts: BlogPostMeta[];
   allTags: string[];
+}
+
+function PostRow({ post, index }: { post: BlogPostMeta; index: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref as React.RefObject<Element>, { once: true, margin: '-6%' });
+
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 24 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.55, delay: index * 0.07, ease: [0.16, 1, 0.3, 1] }}
+    >
+      <TransitionLink
+        href={`/blog/${post.slug}`}
+        className="block border-t border-ink-line py-7 grid grid-cols-12 gap-6 group first:border-t-0"
+      >
+        <div className="col-span-12 md:col-span-3 font-mono text-mono-sm text-ink-muted leading-loose">
+          <span>{new Date(post.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
+          <br />
+          <span>{post.readingTime}</span>
+        </div>
+        <div className="col-span-12 md:col-span-9">
+          <h2 className="text-2xl text-ink-fg tracking-snug group-hover:text-teal transition-colors">
+            {post.title}
+          </h2>
+          {post.description && (
+            <p className="mt-2 text-ink-fg2 max-w-reading leading-relaxed">{post.description}</p>
+          )}
+          {post.tags.length > 0 && (
+            <div className="mt-4 flex flex-wrap gap-2">
+              {post.tags.map((tag) => (<Tag key={tag}>{tag}</Tag>))}
+            </div>
+          )}
+        </div>
+      </TransitionLink>
+    </motion.div>
+  );
 }
 
 export default function BlogListClient({ initialPosts, allTags }: BlogListClientProps) {
@@ -136,38 +176,8 @@ export default function BlogListClient({ initialPosts, allTags }: BlogListClient
           <div className="rule" />
           <Container className="py-8">
             {filteredPosts.length > 0 ? (
-              filteredPosts.map((post) => (
-                <Link
-                  key={post.slug}
-                  href={`/blog/${post.slug}`}
-                  className="block border-t border-ink-line py-7 grid grid-cols-12 gap-6 group first:border-t-0"
-                >
-                  {/* Date + reading time */}
-                  <div className="col-span-12 md:col-span-3 font-mono text-mono-sm text-ink-muted leading-loose">
-                    <span>{new Date(post.date).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
-                    <br />
-                    <span>{post.readingTime}</span>
-                  </div>
-
-                  {/* Title, description, tags */}
-                  <div className="col-span-12 md:col-span-9">
-                    <h2 className="text-2xl text-ink-fg tracking-snug group-hover:text-teal transition-colors">
-                      {post.title}
-                    </h2>
-                    {post.description && (
-                      <p className="mt-2 text-ink-fg2 max-w-reading leading-relaxed">
-                        {post.description}
-                      </p>
-                    )}
-                    {post.tags.length > 0 && (
-                      <div className="mt-4 flex flex-wrap gap-2">
-                        {post.tags.map((tag) => (
-                          <Tag key={tag}>{tag}</Tag>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </Link>
+              filteredPosts.map((post, i) => (
+                <PostRow key={post.slug} post={post} index={i} />
               ))
             ) : (
               <div className="py-20">

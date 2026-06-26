@@ -1,8 +1,10 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
+import { motion, useInView } from 'framer-motion';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { Container, Label, MetaRow, Tag, LiveDot, A } from '../components/ui/primitives';
+import RevealHeading from '../components/ui/RevealHeading';
 import { profile, roles } from '@/data/profile';
 
 const education = {
@@ -26,11 +28,43 @@ const skills: Record<string, string[]> = {
 
 const languages = [
   { lang: 'English', level: 'Native' },
-  { lang: 'French', level: 'Native' },
-  { lang: 'Tamil', level: 'Native' },
+  { lang: 'French',  level: 'Native' },
+  { lang: 'Tamil',   level: 'Native' },
   { lang: 'Spanish', level: 'Reading & speaking' },
-  { lang: 'Hindi', level: 'Reading & speaking' },
+  { lang: 'Hindi',   level: 'Reading & speaking' },
 ];
+
+// ── Shared animation wrappers ────────────────────────────────────────────────
+function SlideInRow({ children, index }: { children: React.ReactNode; index: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref as React.RefObject<Element>, { once: true, margin: '-8%' });
+  const fromLeft = index % 2 === 0;
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, x: fromLeft ? -60 : 60 }}
+      animate={inView ? { opacity: 1, x: 0 } : {}}
+      transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+    >
+      {children}
+    </motion.div>
+  );
+}
+
+function FadeUp({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref as React.RefObject<Element>, { once: true, margin: '-8%' });
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 16 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.55, delay, ease: [0.16, 1, 0.3, 1] }}
+    >
+      {children}
+    </motion.div>
+  );
+}
 
 export default function ResumePage() {
   const [view, setView] = useState<'long' | 'pdf'>('long');
@@ -76,19 +110,19 @@ export default function ResumePage() {
               </div>
             </div>
 
-            <h1 className="text-5xl md:text-7xl tracking-tightest font-medium text-ink-fg">
-              {profile.name}
-            </h1>
-            <p className="mt-3 text-xl text-ink-fg2 max-w-reading">
-              {profile.tagline}.
-            </p>
+            <RevealHeading
+              text={profile.name}
+              as="h1"
+              className="text-5xl md:text-7xl tracking-tightest font-medium text-ink-fg"
+            />
+            <p className="mt-3 text-xl text-ink-fg2 max-w-reading">{profile.tagline}.</p>
 
             <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 font-mono text-mono-sm text-ink-muted">
               <span>{profile.location}</span>
               <A href={`mailto:${profile.emailPublic}`}>{profile.emailPublic}</A>
               <A href={profile.linkedinUrl} external>linkedin</A>
               <A href={profile.githubUrl} external>github</A>
-              <LiveDot label="apple sre · placement" />
+              <LiveDot label="apple sre · ml platforms" />
             </div>
           </Container>
         </section>
@@ -104,17 +138,21 @@ export default function ResumePage() {
                     <Label>summary</Label>
                   </div>
                   <div className="col-span-12 md:col-span-9 max-w-reading space-y-4 text-lg text-ink-fg2 leading-relaxed">
-                    <p>
-                      Computing student at Imperial with three years of production-level
-                      development experience across five startups and a current SRE role
-                      on the ML Platforms team at Apple.
-                    </p>
-                    <p>
-                      I&apos;m happiest at the seam between research and production —
-                      shipping things that demo well in a notebook and don&apos;t fall
-                      over under real traffic. Compilers, infra, agents, and the boring
-                      glue that turns prototypes into products.
-                    </p>
+                    <FadeUp delay={0}>
+                      <p>
+                        Computing student at Imperial with three years of production-level
+                        development experience across five startups and a current SRE role
+                        on the ML Platforms team at Apple.
+                      </p>
+                    </FadeUp>
+                    <FadeUp delay={0.1}>
+                      <p>
+                        I&apos;m happiest at the seam between research and production —
+                        shipping things that demo well in a notebook and don&apos;t fall
+                        over under real traffic. Compilers, infra, agents, and the boring
+                        glue that turns prototypes into products.
+                      </p>
+                    </FadeUp>
                   </div>
                 </div>
               </Container>
@@ -129,40 +167,39 @@ export default function ResumePage() {
                     <Label>experience</Label>
                   </div>
                   <div className="col-span-12 md:col-span-9">
-                    <h2 className="text-3xl tracking-snug text-ink-fg">Roles</h2>
+                    <RevealHeading text="Roles" as="h2" className="text-3xl tracking-snug text-ink-fg" />
                   </div>
                 </div>
 
-                <div className="divide-y divide-ink-line border-t border-ink-line">
-                  {roles.map((r) => (
-                    <MetaRow
-                      key={`${r.company}-${r.period}`}
-                      meta={
-                        <div className="space-y-1.5">
-                          <div className="text-ink-fg2">{r.period}</div>
-                          {r.location && <div>{r.location}</div>}
-                          {r.live && <LiveDot label="current" />}
+                <div className="divide-y divide-ink-line border-t border-ink-line overflow-hidden">
+                  {roles.map((r, index) => (
+                    <SlideInRow key={`${r.company}-${r.period}`} index={index}>
+                      <MetaRow
+                        meta={
+                          <div className="space-y-1.5">
+                            <div className="text-ink-fg2">{r.period}</div>
+                            {r.location && <div>{r.location}</div>}
+                            {r.live && <LiveDot label="current" />}
+                          </div>
+                        }
+                      >
+                        <div className="flex flex-wrap items-baseline gap-x-3">
+                          <h3 className="text-xl md:text-2xl text-ink-fg tracking-snug">{r.company}</h3>
+                          <span className="font-mono text-mono-sm text-ink-muted">{r.role}</span>
                         </div>
-                      }
-                    >
-                      <div className="flex flex-wrap items-baseline gap-x-3">
-                        <h3 className="text-xl md:text-2xl text-ink-fg tracking-snug">{r.company}</h3>
-                        <span className="font-mono text-mono-sm text-ink-muted">{r.role}</span>
-                      </div>
-                      <ul className="mt-4 space-y-2 max-w-reading">
-                        {r.bullets.map((b) => (
-                          <li key={b} className="flex gap-3 text-ink-fg2 leading-relaxed">
-                            <span className="text-teal/70 mt-2 font-mono shrink-0">—</span>
-                            <span>{b}</span>
-                          </li>
-                        ))}
-                      </ul>
-                      <div className="mt-5 flex flex-wrap gap-2">
-                        {r.tech.map((t) => (
-                          <Tag key={t}>{t}</Tag>
-                        ))}
-                      </div>
-                    </MetaRow>
+                        <ul className="mt-4 space-y-2 max-w-reading">
+                          {r.bullets.map((b) => (
+                            <li key={b} className="flex gap-3 text-ink-fg2 leading-relaxed">
+                              <span className="text-teal/70 mt-2 font-mono shrink-0">—</span>
+                              <span>{b}</span>
+                            </li>
+                          ))}
+                        </ul>
+                        <div className="mt-5 flex flex-wrap gap-2">
+                          {r.tech.map((t) => (<Tag key={t}>{t}</Tag>))}
+                        </div>
+                      </MetaRow>
+                    </SlideInRow>
                   ))}
                 </div>
               </Container>
@@ -172,26 +209,26 @@ export default function ResumePage() {
             <section className="relative">
               <div className="rule" />
               <Container className="py-16">
-                <div className="grid grid-cols-12 gap-6">
-                  <div className="col-span-12 md:col-span-3">
-                    <Label>education</Label>
-                    <div className="mt-2 font-mono text-mono-sm text-ink-muted">
-                      {education.period}
+                <FadeUp>
+                  <div className="grid grid-cols-12 gap-6">
+                    <div className="col-span-12 md:col-span-3">
+                      <Label>education</Label>
+                      <div className="mt-2 font-mono text-mono-sm text-ink-muted">{education.period}</div>
+                    </div>
+                    <div className="col-span-12 md:col-span-9">
+                      <h3 className="text-2xl text-ink-fg tracking-snug">{education.institution}</h3>
+                      <p className="mt-1 font-mono text-mono-sm text-ink-muted">{education.degree}</p>
+                      <ul className="mt-4 space-y-2 max-w-reading">
+                        {education.notes.map((n) => (
+                          <li key={n} className="flex gap-3 text-ink-fg2 leading-relaxed">
+                            <span className="text-teal/70 mt-2 font-mono shrink-0">—</span>
+                            <span>{n}</span>
+                          </li>
+                        ))}
+                      </ul>
                     </div>
                   </div>
-                  <div className="col-span-12 md:col-span-9">
-                    <h3 className="text-2xl text-ink-fg tracking-snug">{education.institution}</h3>
-                    <p className="mt-1 font-mono text-mono-sm text-ink-muted">{education.degree}</p>
-                    <ul className="mt-4 space-y-2 max-w-reading">
-                      {education.notes.map((n) => (
-                        <li key={n} className="flex gap-3 text-ink-fg2 leading-relaxed">
-                          <span className="text-teal/70 mt-2 font-mono shrink-0">—</span>
-                          <span>{n}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
+                </FadeUp>
               </Container>
             </section>
 
@@ -204,20 +241,20 @@ export default function ResumePage() {
                     <Label>stack</Label>
                   </div>
                   <div className="col-span-12 md:col-span-9">
-                    <h2 className="text-3xl tracking-snug text-ink-fg">What I reach for.</h2>
+                    <RevealHeading text="What I reach for." as="h2" className="text-3xl tracking-snug text-ink-fg" />
                   </div>
                 </div>
 
                 <div className="grid grid-cols-12 gap-6">
-                  {Object.entries(skills).map(([cat, items]) => (
-                    <div key={cat} className="col-span-12 md:col-span-6 lg:col-span-4">
-                      <div className="font-mono text-mono-sm text-teal mb-3">{cat}</div>
-                      <div className="flex flex-wrap gap-2">
-                        {items.map((s) => (
-                          <Tag key={s}>{s}</Tag>
-                        ))}
+                  {Object.entries(skills).map(([cat, items], i) => (
+                    <FadeUp key={cat} delay={i * 0.07}>
+                      <div className="col-span-12 md:col-span-6 lg:col-span-4">
+                        <div className="font-mono text-mono-sm text-teal mb-3">{cat}</div>
+                        <div className="flex flex-wrap gap-2">
+                          {items.map((s) => (<Tag key={s}>{s}</Tag>))}
+                        </div>
                       </div>
-                    </div>
+                    </FadeUp>
                   ))}
                 </div>
               </Container>
@@ -233,11 +270,13 @@ export default function ResumePage() {
                   </div>
                   <div className="col-span-12 md:col-span-9">
                     <ul className="divide-y divide-ink-line border-t border-ink-line max-w-reading">
-                      {languages.map((l) => (
-                        <li key={l.lang} className="flex justify-between py-3 text-ink-fg2">
-                          <span>{l.lang}</span>
-                          <span className="font-mono text-mono-sm text-ink-muted">{l.level}</span>
-                        </li>
+                      {languages.map((l, i) => (
+                        <FadeUp key={l.lang} delay={i * 0.06}>
+                          <li className="flex justify-between py-3 text-ink-fg2">
+                            <span>{l.lang}</span>
+                            <span className="font-mono text-mono-sm text-ink-muted">{l.level}</span>
+                          </li>
+                        </FadeUp>
                       ))}
                     </ul>
                   </div>

@@ -1,6 +1,7 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import Image from 'next/image';
+import { motion, useInView, AnimatePresence } from 'framer-motion';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { Container, Label, Tag } from '../components/ui/primitives';
@@ -21,7 +22,7 @@ const books: Book[] = [
     title: 'To Kill a Mockingbird',
     author: 'Harper Lee',
     review:
-      'A classic tale of racial injustice and loss of innocence in the American South. A powerful story about courage, empathy, and standing up for what\'s right.',
+      "A classic tale of racial injustice and loss of innocence in the American South. A powerful story about courage, empathy, and standing up for what's right.",
     coverImage: '/book-covers/mockingbird.jpg',
     rating: 5,
     genre: 'Classic Fiction',
@@ -31,7 +32,7 @@ const books: Book[] = [
     title: '1984',
     author: 'George Orwell',
     review:
-      'A chilling portrayal of a totalitarian future society. Orwell\'s vision remains hauntingly relevant to discussions of surveillance, truth, and freedom.',
+      "A chilling portrayal of a totalitarian future society. Orwell's vision remains hauntingly relevant to discussions of surveillance, truth, and freedom.",
     coverImage: '/book-covers/1984.jpg',
     rating: 5,
     genre: 'Dystopian',
@@ -61,7 +62,7 @@ const books: Book[] = [
     title: 'Steve Jobs',
     author: 'Walter Isaacson',
     review:
-      'An interesting study of what made a generation-defining genius tick. Comprehensive biography of one of tech\'s most influential figures. Uncomfortable in all the right ways.',
+      "An interesting study of what made a generation-defining genius tick. Comprehensive biography of one of tech's most influential figures. Uncomfortable in all the right ways.",
     coverImage: '/book-covers/jobs.jpg',
     rating: 5,
     genre: 'Biography',
@@ -78,18 +79,61 @@ const books: Book[] = [
   },
 ];
 
+function BookRow({ book, index }: { book: Book; index: number }) {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref as React.RefObject<Element>, { once: true, margin: '-6%' });
+
+  return (
+    <motion.div
+      ref={ref}
+      initial={{ opacity: 0, y: 32 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.6, delay: index * 0.06, ease: [0.16, 1, 0.3, 1] }}
+      className="grid grid-cols-12 gap-8 py-10 border-t border-ink-line first:border-t-0"
+    >
+      {/* Cover */}
+      <div className="col-span-12 md:col-span-4">
+        <div className="relative aspect-[3/4] overflow-hidden bg-ink-surface border border-ink-line">
+          <Image
+            src={book.coverImage}
+            alt={book.title}
+            fill
+            className="object-cover"
+            sizes="(max-width: 768px) 100vw, 33vw"
+          />
+        </div>
+      </div>
+
+      {/* Text */}
+      <div className="col-span-12 md:col-span-8 flex flex-col justify-center">
+        <div className="flex items-center gap-3 mb-3 flex-wrap">
+          <Tag>{book.genre}</Tag>
+          <div
+            className="font-mono text-[14px] tracking-widest leading-none"
+            aria-label={`${book.rating} out of 5 stars`}
+          >
+            {[...Array(5)].map((_, i) => (
+              <span key={i} className={i < book.rating ? 'text-teal' : 'text-ink-muted'}>★</span>
+            ))}
+          </div>
+        </div>
+        <h2 className="text-2xl text-ink-fg tracking-snug">{book.title}</h2>
+        <p className="font-mono text-mono-sm text-ink-muted mt-1">by {book.author}</p>
+        <p className="mt-4 text-ink-fg2 leading-relaxed max-w-reading">{book.review}</p>
+      </div>
+    </motion.div>
+  );
+}
+
 export default function BooklistPage() {
   const [selectedGenre, setSelectedGenre] = useState<string>('All');
-
   const genres = ['All', ...Array.from(new Set(books.map((b) => b.genre)))];
-  const filteredBooks =
-    selectedGenre === 'All' ? books : books.filter((b) => b.genre === selectedGenre);
+  const filteredBooks = selectedGenre === 'All' ? books : books.filter((b) => b.genre === selectedGenre);
 
   return (
     <>
       <Navbar />
       <main className="relative z-10">
-        {/* Header */}
         <section className="relative">
           <Container className="pt-16 md:pt-24 pb-10">
             <Label number="05">reading</Label>
@@ -100,7 +144,6 @@ export default function BooklistPage() {
               Books that shaped my thinking. Updated occasionally.
             </p>
 
-            {/* Genre filter */}
             <div className="mt-10 flex flex-wrap gap-2">
               {genres.map((g) => (
                 <button
@@ -119,7 +162,6 @@ export default function BooklistPage() {
           </Container>
         </section>
 
-        {/* Book list */}
         <section className="relative">
           <div className="rule" />
           <Container className="py-8">
@@ -134,53 +176,11 @@ export default function BooklistPage() {
                 </button>
               </div>
             ) : (
-              filteredBooks.map((book) => (
-                <div
-                  key={book.id}
-                  className="grid grid-cols-12 gap-8 py-10 border-t border-ink-line first:border-t-0"
-                >
-                  {/* Cover image */}
-                  <div className="col-span-12 md:col-span-4">
-                    <div className="relative aspect-[3/4] overflow-hidden bg-ink-surface border border-ink-line">
-                      <Image
-                        src={book.coverImage}
-                        alt={book.title}
-                        fill
-                        className="object-cover"
-                        sizes="(max-width: 768px) 100vw, 33vw"
-                      />
-                    </div>
-                  </div>
-
-                  {/* Text */}
-                  <div className="col-span-12 md:col-span-8 flex flex-col justify-center">
-                    <div className="flex items-center gap-3 mb-3 flex-wrap">
-                      <Tag>{book.genre}</Tag>
-                      <div
-                        className="font-mono text-[14px] tracking-widest leading-none"
-                        aria-label={`${book.rating} out of 5 stars`}
-                      >
-                        {[...Array(5)].map((_, i) => (
-                          <span
-                            key={i}
-                            className={i < book.rating ? 'text-teal' : 'text-ink-muted'}
-                          >
-                            ★
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-
-                    <h2 className="text-2xl text-ink-fg tracking-snug">{book.title}</h2>
-                    <p className="font-mono text-mono-sm text-ink-muted mt-1">
-                      by {book.author}
-                    </p>
-                    <p className="mt-4 text-ink-fg2 leading-relaxed max-w-reading">
-                      {book.review}
-                    </p>
-                  </div>
-                </div>
-              ))
+              <AnimatePresence mode="popLayout">
+                {filteredBooks.map((book, i) => (
+                  <BookRow key={book.id} book={book} index={i} />
+                ))}
+              </AnimatePresence>
             )}
           </Container>
         </section>
