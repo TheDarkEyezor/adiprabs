@@ -36,10 +36,6 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-/* Hide native cursor on fine-pointer (desktop) devices */
-@media (pointer: fine) {
-  *, *::before, *::after { cursor: none !important; }
-}
 
 /* Selection */
 ::selection {

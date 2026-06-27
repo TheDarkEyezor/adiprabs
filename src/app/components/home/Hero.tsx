@@ -4,7 +4,7 @@ import Image from 'next/image';
 import {
   motion,
   useScroll, useTransform, useSpring,
-  useInView, useMotionValue, animate,
+  useMotionValue, animate,
 } from 'framer-motion';
 import HeroGrid from '../effects/HeroGrid';
 import { Container, Label, LiveDot } from '../ui/primitives';
@@ -18,58 +18,35 @@ const stats = [
   { k: '30+',  l: 'SREs using my tooling' },
 ];
 
-// ── Clip-path word reveal ────────────────────────────────────────────────────
-function ClipReveal({
-  children,
-  delay,
-  className = '',
+// ── Stat counter — starts only when hero reveal is complete ─────────────────
+function StatCounter({
+  k, l, delay = 0, triggered,
 }: {
-  children: React.ReactNode;
-  delay: number;
-  className?: string;
+  k: string; l: string; delay?: number; triggered: boolean;
 }) {
-  return (
-    <span className={`inline-block overflow-hidden ${className}`}>
-      <motion.span
-        className="inline-block"
-        initial={{ clipPath: 'inset(0 105% 0 0)' }}
-        animate={{ clipPath: 'inset(0 0% 0 0)' }}
-        transition={{ duration: 0.85, delay, ease: [0.16, 1, 0.3, 1] }}
-      >
-        {children}
-      </motion.span>
-    </span>
-  );
-}
-
-// ── Animated stat counter ────────────────────────────────────────────────────
-function StatCounter({ k, l, delay = 0 }: { k: string; l: string; delay?: number }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, margin: '-60px' });
   const motionVal = useMotionValue(0);
-  const [displayed, setDisplayed] = useState('0');
+  const [displayed, setDisplayed] = useState('—');
 
   useEffect(() => {
-    if (!isInView) return;
+    if (!triggered) return;
     const match = k.match(/^([^0-9]*)(\d+)(.*)$/);
     if (!match) { setDisplayed(k); return; }
     const [, pre, num, suf] = match;
     const target = parseInt(num, 10);
     const controls = animate(motionVal, target, {
-      duration: 1.4,
+      duration: 1.5,
       delay,
       ease: [0.16, 1, 0.3, 1],
       onUpdate: (v) => setDisplayed(`${pre}${Math.round(v)}${suf}`),
     });
     return controls.stop;
-  }, [isInView, k, delay, motionVal]);
+  }, [triggered, k, delay, motionVal]);
 
   return (
     <motion.div
-      ref={ref}
-      initial={{ opacity: 0, y: 10 }}
-      animate={isInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.5, delay, ease: [0.16, 1, 0.3, 1] }}
+      initial={{ opacity: 0 }}
+      animate={triggered ? { opacity: 1 } : {}}
+      transition={{ duration: 0.4, delay }}
     >
       <div className="font-mono text-2xl md:text-3xl text-teal tracking-snug">{displayed}</div>
       <div className="mt-1 font-mono text-mono-sm text-ink-muted">{l}</div>
@@ -79,12 +56,21 @@ function StatCounter({ k, l, delay = 0 }: { k: string; l: string; delay?: number
 
 // ── Hero ─────────────────────────────────────────────────────────────────────
 export default function Hero() {
+  const [revealed, setRevealed] = useState(false);
+
   const { scrollY } = useScroll();
-  const portraitY = useTransform(scrollY, [0, 600], [0, -50]);
-  const smoothPortraitY = useSpring(portraitY, { stiffness: 80, damping: 20 });
+  const portraitY     = useTransform(scrollY, [0, 600], [0, -50]);
+  const smoothPortrait = useSpring(portraitY, { stiffness: 80, damping: 20 });
 
   return (
-    <section className="relative min-h-[88vh] flex items-center overflow-hidden bg-ink-bg">
+    // Clip-path sweeps left → right over the entire section (grid + content)
+    <motion.section
+      className="relative min-h-[88vh] flex items-center overflow-hidden bg-ink-bg"
+      initial={{ clipPath: 'inset(0 100% 0 0)' }}
+      animate={{ clipPath: 'inset(0 0% 0 0)' }}
+      transition={{ duration: 1.1, ease: [0.76, 0, 0.24, 1] }}
+      onAnimationComplete={() => setRevealed(true)}
+    >
       <HeroGrid />
 
       <Container className="relative z-10 py-16 md:py-32">
@@ -93,22 +79,17 @@ export default function Hero() {
           {/* ── Left: text ── */}
           <div className="col-span-12 md:col-span-7">
 
-            {/* Label + status row */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.4 }}
-              className="flex items-center justify-between mb-8"
-            >
+            {/* Label + status */}
+            <div className="flex items-center justify-between mb-8">
               <Label number="00">index</Label>
               <div className="hidden md:flex items-center gap-4 font-mono text-mono-sm text-ink-muted">
                 <span>{profile.location}</span>
                 <span>·</span>
                 <LiveDot label="apple sre · ml platforms" />
               </div>
-            </motion.div>
+            </div>
 
-            {/* Mobile portrait — shown only below md */}
+            {/* Mobile portrait */}
             <div className="flex justify-center mb-8 md:hidden">
               <div className="relative w-52 h-64 select-none">
                 <Image
@@ -122,37 +103,19 @@ export default function Hero() {
               </div>
             </div>
 
-            {/* Name — clip-path reveal, word by word */}
+            {/* Name */}
             <h1 className="text-[clamp(2.5rem,7vw,5.5rem)] leading-[0.95] tracking-tightest font-medium text-ink-fg">
-              <ClipReveal delay={0.15}>Adi&nbsp;</ClipReveal>
-              <ClipReveal delay={0.3}>Prabs</ClipReveal>
-              <motion.span
-                className="caret"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ delay: 1.0 }}
-                aria-hidden
-              />
+              Adi&nbsp;Prabs<span className="caret" aria-hidden />
             </h1>
 
             {/* Description */}
-            <motion.p
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.55, ease: [0.16, 1, 0.3, 1] }}
-              className="mt-6 max-w-xl text-xl md:text-2xl text-ink-fg2 leading-snug tracking-snug"
-            >
+            <p className="mt-6 max-w-xl text-xl md:text-2xl text-ink-fg2 leading-snug tracking-snug">
               Computing @ Imperial. SRE @ Apple. I build production AI systems on the side —
               compilers, infra, agents, and the boring glue that turns demos into products.
-            </motion.p>
+            </p>
 
             {/* CTAs */}
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.7, ease: [0.16, 1, 0.3, 1] }}
-              className="mt-10 flex flex-wrap items-center gap-3"
-            >
+            <div className="mt-10 flex flex-wrap items-center gap-3">
               <MagneticButton href="/projects" variant="primary">
                 <span>selected work</span>
                 <span>→</span>
@@ -168,19 +131,25 @@ export default function Hero() {
               >
                 ↓ resume.pdf
               </a>
-            </motion.div>
+            </div>
 
-            {/* Stats strip */}
+            {/* Stats — trigger after clip-path reveal completes */}
             <div className="mt-16 pt-8 border-t border-ink-line grid grid-cols-2 md:grid-cols-4 gap-8">
               {stats.map((s, i) => (
-                <StatCounter key={s.l} k={s.k} l={s.l} delay={i * 0.1} />
+                <StatCounter
+                  key={s.l}
+                  k={s.k}
+                  l={s.l}
+                  delay={i * 0.12}
+                  triggered={revealed}
+                />
               ))}
             </div>
           </div>
 
-          {/* ── Right: portrait (desktop only) ── */}
+          {/* ── Right: portrait (desktop) ── */}
           <div className="hidden md:flex col-span-5 justify-center items-end relative">
-            <motion.div style={{ y: smoothPortraitY }} className="relative w-full flex justify-center">
+            <motion.div style={{ y: smoothPortrait }} className="relative w-full flex justify-center">
               <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-72 h-48 bg-teal/8 blur-3xl rounded-full pointer-events-none" />
               <div className="absolute bottom-8 left-1/2 -translate-x-1/2 w-40 h-24 bg-teal/12 blur-2xl rounded-full pointer-events-none" />
               <motion.div
@@ -203,6 +172,6 @@ export default function Hero() {
 
         </div>
       </Container>
-    </section>
+    </motion.section>
   );
 }
