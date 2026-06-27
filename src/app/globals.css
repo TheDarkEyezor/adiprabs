@@ -36,6 +36,11 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+/* Hide native cursor on fine-pointer (desktop) devices */
+@media (pointer: fine) {
+  *, *::before, *::after { cursor: none !important; }
+}
+
 /* Selection */
 ::selection {
   background: rgba(94, 234, 212, 0.25);

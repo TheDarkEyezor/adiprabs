@@ -4,6 +4,7 @@ import "./globals.css";
 import SmoothScrollProvider from "./components/SmoothScrollProvider";
 import ScrollProgressBar from "./components/ScrollProgressBar";
 import TransitionProvider from "./components/TransitionProvider";
+import CustomCursor from "./components/CustomCursor";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -47,6 +48,7 @@ export default function RootLayout({
     <html lang="en" className={`${inter.variable} ${jetbrains.variable}`}>
       <body className="font-sans bg-ink-bg text-ink-fg antialiased grain">
         <SmoothScrollProvider>
+          <CustomCursor />
           <TransitionProvider>
             <ScrollProgressBar />
             {children}
