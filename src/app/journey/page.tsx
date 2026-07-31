@@ -68,12 +68,18 @@ const allEvents: TimelineEvent[] = [
   extraEvents[2], // FRC
 ];
 
-const CATEGORIES: { value: Category; label: string }[] = [
-  { value: 'all',        label: 'all' },
+const ALL_CATEGORIES: { value: Exclude<Category, 'all'>; label: string }[] = [
   { value: 'work',       label: 'work' },
   { value: 'education',  label: 'education' },
   { value: 'leadership', label: 'leadership' },
   { value: 'award',      label: 'award' },
+];
+
+// Only surface a filter tag if at least one event actually falls under it —
+// an empty filter button is a dead end, not a filter.
+const CATEGORIES: { value: Category; label: string }[] = [
+  { value: 'all', label: 'all' },
+  ...ALL_CATEGORIES.filter((c) => allEvents.some((e) => e.category === c.value)),
 ];
 
 function TimelineRow({ event, index }: { event: TimelineEvent; index: number }) {

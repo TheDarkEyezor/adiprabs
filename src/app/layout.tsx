@@ -21,12 +21,13 @@ export const metadata: Metadata = {
   title: "Adi Prabs — Computing @ Imperial · SRE @ Apple",
   description:
     "Adi Prabs — Computing student at Imperial College London, SRE at Apple, building production AI systems on the side. Selected work, writing, and a long-form CV.",
-  metadataBase: new URL("https://adiprabs.com"),
+  // TODO(domain-swap): flip back to https://adiprabs.com once the domain is bought and DNS is live.
+  metadataBase: new URL("https://adiprabs.vercel.app"),
   openGraph: {
     title: "Adi Prabs",
     description:
       "Computing @ Imperial · SRE @ Apple. Building production AI systems.",
-    url: "https://adiprabs.com",
+    url: "https://adiprabs.vercel.app",
     siteName: "Adi Prabs",
     type: "website",
   },

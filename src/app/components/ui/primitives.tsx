@@ -1,6 +1,22 @@
 import React from "react";
 import Link from "next/link";
 
+/**
+ * Renders `**marked**` substrings in teal — color only, no bold. Used to let
+ * the one real number in a bullet/description read as the anchor of the
+ * sentence without shouting the whole phrase.
+ */
+export function withMetrics(text: string): React.ReactNode {
+  return text.split(/(\*\*[^*]+\*\*)/g).map((part, i) => {
+    const match = part.match(/^\*\*([^*]+)\*\*$/);
+    return match ? (
+      <span key={i} className="text-teal">{match[1]}</span>
+    ) : (
+      part
+    );
+  });
+}
+
 /** Editorial container: 12-col grid, max width, balanced padding. */
 export function Container({
   children,

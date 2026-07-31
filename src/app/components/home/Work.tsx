@@ -1,7 +1,7 @@
 'use client';
 import React, { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
-import { Container, Label, MetaRow, Tag, LiveDot } from '../ui/primitives';
+import { Container, Label, MetaRow, Tag, LiveDot, withMetrics } from '../ui/primitives';
 import RevealHeading from '../ui/RevealHeading';
 import { roles } from '@/data/profile';
 
@@ -39,14 +39,15 @@ export default function Work() {
           </div>
           <div className="col-span-12 md:col-span-9">
             <RevealHeading
-              text="Where I've shipped."
+              text="Six places, one thread."
               as="h2"
               className="text-3xl md:text-4xl tracking-snug text-ink-fg"
             />
             <p className="mt-3 max-w-reading text-ink-fg2">
-              Six companies, three years. Each one taught me something specific
-              about turning research into production — latency, cost, reliability,
-              security, or all at once.
+              Apple placement now, and before that: a healthcare startup I founded
+              (Vani), plus contract engagements with early-stage AI teams (8x, Canopy,
+              Trajex, Altus). Each one landed a specific dent — latency, cost, security,
+              or shipping something that didn&apos;t exist before.
             </p>
           </div>
         </div>
@@ -59,6 +60,7 @@ export default function Work() {
                   <div className="space-y-1.5">
                     <div className="text-ink-fg2">{r.period}</div>
                     {r.location && <div>{r.location}</div>}
+                    <Tag>{r.tag}</Tag>
                     {r.live && <LiveDot label="current" />}
                   </div>
                 }
@@ -72,7 +74,7 @@ export default function Work() {
                   {r.bullets.map((b) => (
                     <li key={b} className="flex gap-3 text-ink-fg2 leading-relaxed">
                       <span className="text-teal/70 mt-2 font-mono shrink-0">—</span>
-                      <span>{b}</span>
+                      <span>{withMetrics(b)}</span>
                     </li>
                   ))}
                 </ul>

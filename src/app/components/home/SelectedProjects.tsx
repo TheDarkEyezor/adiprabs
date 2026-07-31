@@ -2,7 +2,7 @@
 import React, { useRef } from 'react';
 import Link from 'next/link';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
-import { Container, Label, Tag } from '../ui/primitives';
+import { Container, Label, Tag, withMetrics } from '../ui/primitives';
 import { featuredProjects, type Project } from '@/data/profile';
 
 function TiltCard({ project }: { project: Project }) {
@@ -57,7 +57,7 @@ function TiltCard({ project }: { project: Project }) {
           {p.title}
         </h3>
         <p className="mt-2 text-ink-fg2 italic">{p.tagline}</p>
-        <p className="mt-4 text-ink-fg2/90 leading-relaxed">{p.description}</p>
+        <p className="mt-4 text-ink-fg2/90 leading-relaxed">{withMetrics(p.description)}</p>
 
         <div className="mt-6 flex flex-wrap gap-2">
           {p.tech.slice(0, 6).map((t) => (
@@ -84,7 +84,7 @@ export default function SelectedProjects() {
           </div>
           <div className="col-span-12 md:col-span-9 flex flex-wrap items-end justify-between gap-4">
             <h2 className="text-3xl md:text-4xl tracking-snug text-ink-fg">
-              Things I&apos;ve built.
+              Selected work
             </h2>
             <Link
               href="/projects"

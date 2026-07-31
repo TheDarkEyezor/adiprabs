@@ -3,10 +3,18 @@ import React, { useState, useMemo, useRef } from 'react';
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform, useInView } from 'framer-motion';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { Container, Label, Tag } from '../components/ui/primitives';
+import { Container, Label, Tag, withMetrics } from '../components/ui/primitives';
 import { projects, type Project } from '@/data/profile';
 
-const categories = ['All', 'AI/ML', 'Systems', 'Tools', 'Web', 'Hardware'] as const;
+const ALL_CATEGORIES = ['AI/ML', 'Systems', 'Tools', 'Web', 'Hardware'] as const;
+
+// Only surface a filter tag if at least one project actually falls under it —
+// an empty filter button is a dead end, not a filter.
+const categoryCounts = ALL_CATEGORIES.reduce<Record<string, number>>((acc, c) => {
+  acc[c] = projects.filter((p) => p.category === c).length;
+  return acc;
+}, {});
+const categories = ['All', ...ALL_CATEGORIES.filter((c) => categoryCounts[c] > 0)];
 
 function TiltCard({ p, index }: { p: Project; index: number }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -48,7 +56,7 @@ function TiltCard({ p, index }: { p: Project; index: number }) {
         {p.title}
       </h3>
       <p className="mt-1.5 text-ink-fg2 italic">{p.tagline}</p>
-      <p className="mt-4 text-ink-fg2/90 leading-relaxed">{p.description}</p>
+      <p className="mt-4 text-ink-fg2/90 leading-relaxed">{withMetrics(p.description)}</p>
 
       <div className="mt-5 flex flex-wrap gap-2">
         {p.tech.map((t) => (
@@ -107,7 +115,7 @@ export default function ProjectsPage() {
           <Container className="pt-16 md:pt-24 pb-10">
             <Label number="01">work</Label>
             <h1 className="mt-6 text-5xl md:text-7xl tracking-tightest font-medium text-ink-fg">
-              Projects
+              Personal Projects
             </h1>
             <p className="mt-4 max-w-reading text-xl text-ink-fg2 leading-snug">
               Compilers, agents, robots, trading bots, gesture interfaces. Some shipped,
@@ -119,11 +127,10 @@ export default function ProjectsPage() {
                 <button
                   key={c}
                   onClick={() => setCat(c)}
-                  className={`px-3 py-1.5 border rounded-sm font-mono text-mono-sm transition-colors ${
-                    cat === c
-                      ? 'border-teal-dim text-teal'
-                      : 'border-ink-line text-ink-fg2 hover:text-ink-fg hover:border-ink-line2'
-                  }`}
+                  className={`px-3 py-1.5 border rounded-sm font-mono text-mono-sm transition-colors ${cat === c
+                    ? 'border-teal-dim text-teal'
+                    : 'border-ink-line text-ink-fg2 hover:text-ink-fg hover:border-ink-line2'
+                    }`}
                 >
                   {c.toLowerCase()}
                 </button>

@@ -3,7 +3,7 @@ import React, { useRef, useState } from 'react';
 import { motion, useInView } from 'framer-motion';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { Container, Label, MetaRow, Tag, LiveDot, A } from '../components/ui/primitives';
+import { Container, Label, MetaRow, Tag, LiveDot, A, withMetrics } from '../components/ui/primitives';
 import RevealHeading from '../components/ui/RevealHeading';
 import { profile, roles } from '@/data/profile';
 
@@ -24,6 +24,7 @@ const skills: Record<string, string[]> = {
   'AI / ML': ['PyTorch', 'LLama 3.2', 'MediaPipe', 'OpenCV', 'MuJoCo', 'MCP', 'Local LLMs'],
   Web: ['Next.js', 'React', 'FastAPI', 'Node.js', 'Tailwind', 'MDX'],
   Reliability: ['Observability', 'Incident response', 'Load testing', 'Distributed tracing'],
+  'AI Tools': ['Claude Code', 'Codex CLI', 'Ollama', 'CLIP', 'OpenAI API', 'MCP'],
 };
 
 const languages = [
@@ -51,12 +52,17 @@ function SlideInRow({ children, index }: { children: React.ReactNode; index: num
   );
 }
 
-function FadeUp({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
+function FadeUp({
+  children, delay = 0, className = '',
+}: {
+  children: React.ReactNode; delay?: number; className?: string;
+}) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref as React.RefObject<Element>, { once: true, margin: '-8%' });
   return (
     <motion.div
       ref={ref}
+      className={className}
       initial={{ opacity: 0, y: 16 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
       transition={{ duration: 0.55, delay, ease: [0.16, 1, 0.3, 1] }}
@@ -149,8 +155,8 @@ export default function ResumePage() {
                       <p>
                         I&apos;m happiest at the seam between research and production —
                         shipping things that demo well in a notebook and don&apos;t fall
-                        over under real traffic. Compilers, infra, agents, and the boring
-                        glue that turns prototypes into products.
+                        over under real traffic. Compilers, infra, agents, and the
+                        unglamorous work of keeping them running.
                       </p>
                     </FadeUp>
                   </div>
@@ -191,7 +197,7 @@ export default function ResumePage() {
                           {r.bullets.map((b) => (
                             <li key={b} className="flex gap-3 text-ink-fg2 leading-relaxed">
                               <span className="text-teal/70 mt-2 font-mono shrink-0">—</span>
-                              <span>{b}</span>
+                              <span>{withMetrics(b)}</span>
                             </li>
                           ))}
                         </ul>
@@ -245,14 +251,12 @@ export default function ResumePage() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-12 gap-6">
+                <div className="grid grid-cols-12 gap-y-14 gap-x-[clamp(2rem,6vw,6rem)]">
                   {Object.entries(skills).map(([cat, items], i) => (
-                    <FadeUp key={cat} delay={i * 0.07}>
-                      <div className="col-span-12 md:col-span-6 lg:col-span-4">
-                        <div className="font-mono text-mono-sm text-teal mb-3">{cat}</div>
-                        <div className="flex flex-wrap gap-2">
-                          {items.map((s) => (<Tag key={s}>{s}</Tag>))}
-                        </div>
+                    <FadeUp key={cat} delay={i * 0.07} className="col-span-12 md:col-span-6">
+                      <div className="font-mono text-mono-sm text-teal mb-4">{cat}</div>
+                      <div className="flex flex-wrap gap-2.5">
+                        {items.map((s) => (<Tag key={s}>{s}</Tag>))}
                       </div>
                     </FadeUp>
                   ))}

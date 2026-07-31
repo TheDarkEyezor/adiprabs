@@ -1,0 +1,58 @@
+---
+title: "CLIP thinks a coffee mug is more interesting than Iceland"
+date: "2026-07-26"
+description: "CLIP was answering the wrong question — how distance-from-home and message volume ended up doing more work than a 512-dim embedding."
+tags: ["AI", "ML", "computer vision", "CLIP"]
+author: "AdiPrabs"
+devto: true
+devto_published: false
+---
+
+The first version of Istoria's novelty score put a macro shot of a coffee mug above a week in Iceland.
+
+I was building a pipeline that takes a month of photos, texts and calendar events and picks the moments worth keeping — the ones you'd actually want to see again a year later. The scoring model was going to lean on CLIP: embed everything into `openai/clip-vit-base-patch32`, take each event's pooled embedding, measure its distance from the month's centroid, and treat "far from the centroid" as "novel." Simple, cheap, no training run.
+
+I ran it on a real batch. Seven ground-truth events, eight baseline photos. The mug beat Iceland. A close-up of a book beat a friend's birthday. A macro of some plant sat comfortably above the day I flew back from a trip.
+
+## What CLIP was actually measuring
+
+Nothing in the model was broken. CLIP was doing what CLIP does — clustering images by visual content. The problem was my definition of "novel." A macro shot has strong background blur, tight framing, a single dominant object; a wide landscape has small figures, distant horizon, a lot of texture spread across the frame. Those are far apart in image space. The mug photo was, in composition terms, genuinely unusual relative to my average phone photo. CLIP wasn't confused. It was answering a different question.
+
+Personal novelty is not visual novelty. If you take one macro shot a month, it will land far from your visual centroid every time — regardless of whether the mug is any different from last month's mug. What people mean by "moments worth keeping" is closer to *situation* novelty: were you somewhere you don't usually go, doing something you don't usually do, talking to people you don't usually talk to?
+
+CLIP has none of that. It has pixels.
+
+## The two signals that actually separate real events from noise
+
+The moments I wanted to rank highly had two things in common, and neither of them showed up in the embedding.
+
+The first was **distance from home**. Every ground-truth event happened at least a few kilometres from where I live. Every baseline photo was within a few hundred metres. Even before scoring, plotting distance on a log axis put the two populations in different rooms.
+
+The second was **message volume**. Real events generate texts — before ("what time are you getting there"), during ("we're upstairs"), after ("that was great"). A tuesday coffee generates none. Message count in the ±2h window around a photo turned out to be one of the cleanest boundary signals I had.
+
+Neither is subtle. Both are trivially cheap. Together they carried most of the discrimination CLIP was failing to provide.
+
+## Reweighting, not replacing
+
+The fix wasn't to throw CLIP out. It was to demote it.
+
+Final blend, tuned on the same batch:
+
+- Log-scaled distance from home — **45%**
+- Message-count buzz — **25%**
+- Photo count in the event — **18%**
+- CLIP centroid distance — **12%**
+
+Under that weighting, all seven ground-truth events ranked above all eight baseline photos, with a clean gap: the lowest real event scored 0.37, the highest baseline scored 0.12. No overlap. On a batch this small that's more of an existence proof than a benchmark, but it's a very different picture from the mug-beats-Iceland original.
+
+The 12% is deliberate, not vestigial. CLIP still earns its keep in one specific place: the redundancy-merge step. When you have eight photos of the same event, you don't want eight slides — you want one, with the best two or three underneath. CLIP is genuinely good at that. The question "are these two images of the same scene" is exactly the question the model was trained on. Where it fell down was answering "is this scene important" — which nothing in CLIP's training set was ever asked to know.
+
+## What I actually learned
+
+Two things worth writing down.
+
+First — a model can be technically correct and still the wrong tool. CLIP wasn't miscalibrated, wasn't undertrained, wasn't fed bad data. It was answering a real question, just not mine. That's a harder failure to catch than a bug, because everything about the pipeline works: distances compute, scores rank, the top-K comes out sorted. It only looks wrong when you know what the answer should be.
+
+Second — the boring features often win. Distance from home is a scalar. Message count is a scalar. Between them they did more work than a 512-dimensional embedding, and they did it because they were closer to the thing I actually cared about. The embedding stayed in the pipeline, but as a tiebreaker, not the referee.
+
+Full pipeline notes, weights, and the segmentation/merge fixes are in `pipeline/README.md` on the [Istoria repo](https://github.com/TheDarkEyezor/istoria).

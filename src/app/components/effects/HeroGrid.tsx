@@ -30,6 +30,7 @@ export default function HeroGrid() {
     if (window.matchMedia('(hover: none)').matches) return;
 
     const ctx = canvas.getContext('2d')!;
+    const section = (canvas.closest('section') as HTMLElement | null) ?? canvas.parentElement!;
 
     type Pt = { bx: number; by: number; x: number; y: number; vx: number; vy: number };
     let pts: Pt[]         = [];
@@ -48,8 +49,9 @@ export default function HeroGrid() {
     // ── Init / resize ────────────────────────────────────────────────────────
     const init = () => {
       const dpr = window.devicePixelRatio || 1;
-      W = canvas.offsetWidth  || window.innerWidth;
-      H = canvas.offsetHeight || 500;
+      const rect = section.getBoundingClientRect();
+      W = rect.width  || window.innerWidth;
+      H = rect.height || 500;
       canvas.width  = Math.round(W * dpr);
       canvas.height = Math.round(H * dpr);
       canvas.style.width  = `${W}px`;
@@ -167,8 +169,6 @@ export default function HeroGrid() {
     };
 
     // ── Events ───────────────────────────────────────────────────────────────
-    const section = (canvas.closest('section') as HTMLElement | null) ?? canvas.parentElement!;
-
     const onMove = (e: MouseEvent) => {
       const rect = canvas.getBoundingClientRect();
       mx = e.clientX - rect.left;
