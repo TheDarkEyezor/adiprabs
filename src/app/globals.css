@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 /* =========================================================
-   Engineer/system design system — Adi Prabs
+   Engineer/system design system, Adi Prabs
    Deep petrol bg, teal accent, warm off-white text.
    ========================================================= */
 
@@ -43,7 +43,7 @@ body {
   color: var(--fg);
 }
 
-/* Subtle grain overlay — adds film/print feel without noise */
+/* Subtle grain overlay: adds film/print feel without noise */
 .grain::before {
   content: "";
   position: fixed;
@@ -55,7 +55,7 @@ body {
   background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.6'/></svg>");
 }
 
-/* Grid showcase background — for hero */
+/* Grid showcase background, for hero */
 .grid-bg {
   background-image:
     linear-gradient(to right, rgba(94, 234, 212, 0.05) 1px, transparent 1px),
@@ -71,7 +71,7 @@ body {
   background: var(--line);
 }
 
-/* Mono label — small caps tracking */
+/* Mono label, small caps tracking */
 .label {
   font-family: var(--font-jetbrains), ui-monospace, SFMono-Regular, monospace;
   font-size: 11px;

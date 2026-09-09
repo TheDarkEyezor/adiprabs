@@ -28,7 +28,7 @@ const workEvents: TimelineEvent[] = roles.map((r) => ({
 
 const extraEvents: TimelineEvent[] = [
   {
-    date: '2023 — present',
+    date: '2023–present',
     title: 'MEng Computing (AI & ML)',
     org: 'Imperial College London',
     category: 'education',
@@ -38,15 +38,15 @@ const extraEvents: TimelineEvent[] = [
   },
   {
     date: '2022',
-    title: 'SwyftGesture — 1st Place',
+    title: 'SwyftGesture (1st Place)',
     org: 'Hackathon',
     category: 'award',
     description:
-      'Hands-free computer control via webcam — mouse, scroll, and volume gestures using MediaPipe and OpenCV. Won 1st place against 40+ teams.',
+      'Hands-free computer control via webcam: mouse, scroll, and volume gestures using MediaPipe and OpenCV. Won 1st place against 40+ teams.',
     tags: ['Python', 'MediaPipe', 'OpenCV'],
   },
   {
-    date: '2019 — 2021',
+    date: '2019–2021',
     title: 'FRC Team Leader',
     org: '#8235 Beyond the Flames',
     category: 'leadership',
@@ -75,7 +75,7 @@ const ALL_CATEGORIES: { value: Exclude<Category, 'all'>; label: string }[] = [
   { value: 'award',      label: 'award' },
 ];
 
-// Only surface a filter tag if at least one event actually falls under it —
+// Only surface a filter tag if at least one event actually falls under it;
 // an empty filter button is a dead end, not a filter.
 const CATEGORIES: { value: Category; label: string }[] = [
   { value: 'all', label: 'all' },
@@ -143,7 +143,7 @@ export default function JourneyPage() {
               Journey
             </h1>
             <p className="mt-4 max-w-reading text-xl text-ink-fg2 leading-snug">
-              Work, study, and building — in rough reverse-chronological order.
+              Work, study, and building, in rough reverse-chronological order.
             </p>
 
             <div className="mt-10 flex flex-wrap gap-2">

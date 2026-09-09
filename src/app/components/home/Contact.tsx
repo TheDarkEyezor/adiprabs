@@ -22,7 +22,7 @@ export default function ContactCTA() {
             />
             <p className="mt-4 max-w-reading text-ink-fg2 text-lg leading-relaxed">
               I take on a small amount of side work and I&apos;m always interested in
-              talking to people building something genuinely difficult — especially in
+              talking to people building something genuinely difficult, especially in
               physical AI, dev infra, or edge inference.
             </p>
 

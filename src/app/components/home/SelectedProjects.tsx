@@ -25,25 +25,18 @@ function TiltCard({ project }: { project: Project }) {
 
   const p = project;
 
-  return (
-    <motion.div
-      ref={ref}
-      onMouseMove={onMove}
-      onMouseLeave={onLeave}
-      style={{ rotateX: rotX, rotateY: rotY, transformPerspective: 1000 }}
-      className="col-span-12 md:col-span-6"
-    >
-      <a
-        href={p.github || p.link || `/projects#${p.slug}`}
-        target={p.github || p.link ? '_blank' : undefined}
-        rel="noopener noreferrer"
-        className="card card-accent p-7 group block h-full"
-      >
+  // A project with a demo sends you to the demo, not to the repo. The repo
+  // link is still one click away on the projects page card.
+  const cardInner = (
+    <>
         <div className="flex items-center justify-between mb-5">
           <span className="font-mono text-mono-sm text-ink-muted">
             {p.year} · {p.category}
           </span>
           <div className="flex items-center gap-2">
+            {p.demo && (
+              <span className="font-mono text-[10px] tracking-wide2 uppercase text-teal/70">demo</span>
+            )}
             {p.status === 'wip' && (
               <span className="font-mono text-[10px] tracking-wide2 uppercase text-amber-live">wip</span>
             )}
@@ -66,9 +59,35 @@ function TiltCard({ project }: { project: Project }) {
         </div>
 
         <div className="mt-6 font-mono text-mono-sm text-ink-muted group-hover:text-teal transition-colors">
-          {p.github ? 'github →' : 'read more →'}
+          {p.demo ? 'run the demo →' : p.github ? 'github →' : 'read more →'}
         </div>
-      </a>
+    </>
+  );
+
+  const className = 'card card-accent p-7 group block h-full';
+
+  return (
+    <motion.div
+      ref={ref}
+      onMouseMove={onMove}
+      onMouseLeave={onLeave}
+      style={{ rotateX: rotX, rotateY: rotY, transformPerspective: 1000 }}
+      className="col-span-12 md:col-span-6"
+    >
+      {p.demo ? (
+        <Link href={`/projects#${p.slug}`} className={className}>
+          {cardInner}
+        </Link>
+      ) : (
+        <a
+          href={p.github || p.link || `/projects#${p.slug}`}
+          target={p.github || p.link ? '_blank' : undefined}
+          rel="noopener noreferrer"
+          className={className}
+        >
+          {cardInner}
+        </a>
+      )}
     </motion.div>
   );
 }

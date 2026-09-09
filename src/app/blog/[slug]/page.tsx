@@ -1,10 +1,11 @@
 import { Suspense } from 'react';
 import React from 'react';
 import { notFound } from 'next/navigation';
-import { serialize } from 'next-mdx-remote/serialize';
+import { MDXRemote } from 'next-mdx-remote/rsc';
 import rehypeHighlight from 'rehype-highlight';
 import rehypeSlug from 'rehype-slug';
 import { getPostBySlug, getAllPosts } from '@/lib/blog';
+import { mdxComponents } from '../components/MDXComponents';
 import BlogPostClient from './BlogPostClient';
 
 export const revalidate = 60;
@@ -57,31 +58,35 @@ async function BlogPostContent({ slug }: { slug: string }) {
     notFound();
   }
 
-  // Serialize MDX content with error recovery
-  let mdxSource;
+  // MDX is compiled and rendered here, on the server. The previous version
+  // serialized it and handed the result to next-mdx-remote's client MDXRemote,
+  // which threw "Invalid hook call" during the SSR pass and made React fall
+  // back to client rendering, so no post body ever reached the HTML.
+  let body: React.ReactNode;
   try {
-    mdxSource = await serialize(post.content, {
-      mdxOptions: {
-        rehypePlugins: [rehypeHighlight, rehypeSlug],
-        remarkPlugins: [],
-      },
-      parseFrontmatter: false,
-    });
+    body = (
+      <MDXRemote
+        source={post.content}
+        components={mdxComponents}
+        options={{
+          parseFrontmatter: false,
+          mdxOptions: {
+            rehypePlugins: [rehypeHighlight, rehypeSlug],
+            remarkPlugins: [],
+          },
+        }}
+      />
+    );
   } catch (error) {
-    console.error(`Error serializing MDX for post "${slug}":`, error);
-    
-    // Return a fallback with a simple string output
-    // This avoids component reference issues during SSR
-    mdxSource = {
-      compiledSource: `export default function MDXContent() { 
-        return 'Content unavailable'; 
-      }`,
-      frontmatter: {},
-      scope: {},
-    } as any;
+    console.error(`Error rendering MDX for post "${slug}":`, error);
+    body = (
+      <div className="border border-ink-line p-4 font-mono text-mono-sm text-ink-muted">
+        Content unavailable.
+      </div>
+    );
   }
 
-  return <BlogPostClient post={post} mdxSource={mdxSource} />;
+  return <BlogPostClient post={post}>{body}</BlogPostClient>;
 }
 
 export default async function BlogPostPage({ params }: PageProps) {

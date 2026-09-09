@@ -35,7 +35,7 @@ export default function About() {
 
   const allParas = [
     ...profile.bio,
-    `Reachable at __email__ — most useful when there's a concrete problem attached.`,
+    `Reachable at __email__. Most useful when there's a concrete problem attached.`,
   ];
 
   return (
@@ -71,8 +71,8 @@ export default function About() {
                 }}
               >
                 Reachable at{' '}
-                <A href={`mailto:${profile.emailPublic}`}>{profile.emailPublic}</A>{' '}
-                — most useful when there&apos;s a concrete problem attached.
+                <A href={`mailto:${profile.emailPublic}`}>{profile.emailPublic}</A>
+                . Most useful when there&apos;s a concrete problem attached.
               </motion.p>
             </div>
           </div>

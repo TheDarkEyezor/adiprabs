@@ -5,8 +5,8 @@ export const TILE_COLS     = 10;
 export const TILE_ROWS     = 6;
 export const TILE_STAGGER  = 0.26;   // diagonal spread (s)
 export const TILE_DUR      = 0.38;   // per-tile slide duration (s)
-export const NAVIGATE_AT   = TILE_STAGGER + TILE_DUR + 0.04; // 0.68s — all tiles covering
-export const EXIT_TOTAL    = TILE_STAGGER + TILE_DUR + 0.06; // 0.70s — all tiles revealed
+export const NAVIGATE_AT   = TILE_STAGGER + TILE_DUR + 0.04; // 0.68s, all tiles covering
+export const EXIT_TOTAL    = TILE_STAGGER + TILE_DUR + 0.06; // 0.70s, all tiles revealed
 
 export type TilePhase = 'in' | 'out' | 'idle';
 

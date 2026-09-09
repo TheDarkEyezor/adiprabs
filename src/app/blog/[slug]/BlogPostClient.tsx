@@ -7,14 +7,14 @@ import Footer from '../../components/Footer';
 import { Container, Tag } from '../../components/ui/primitives';
 import BlogPost from '../components/BlogPost';
 import type { BlogPost as BlogPostType } from '@/lib/blog';
-import type { MDXRemoteSerializeResult } from 'next-mdx-remote';
 
 interface BlogPostClientProps {
   post: BlogPostType;
-  mdxSource: MDXRemoteSerializeResult;
+  /** The post body, already rendered on the server. */
+  children: React.ReactNode;
 }
 
-export default function BlogPostClient({ post, mdxSource }: BlogPostClientProps) {
+export default function BlogPostClient({ post, children }: BlogPostClientProps) {
   const formattedDate = new Date(post.date).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'short',
@@ -74,7 +74,7 @@ export default function BlogPostClient({ post, mdxSource }: BlogPostClientProps)
 
           {/* Content */}
           <div className="mt-10">
-            <BlogPost post={post} mdxSource={mdxSource} />
+            <BlogPost post={post}>{children}</BlogPost>
           </div>
         </Container>
       </main>

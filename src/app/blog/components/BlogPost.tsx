@@ -1,13 +1,12 @@
 'use client';
 
 import React from 'react';
-import { MDXRemote, MDXRemoteSerializeResult } from 'next-mdx-remote';
-import { mdxComponents } from './MDXComponents';
 import type { BlogPost as BlogPostType } from '@/lib/blog';
 
 interface BlogPostProps {
   post: BlogPostType;
-  mdxSource: MDXRemoteSerializeResult;
+  /** Post body, rendered on the server by next-mdx-remote/rsc. */
+  children: React.ReactNode;
 }
 
 class MDXErrorBoundary extends React.Component<
@@ -35,17 +34,7 @@ class MDXErrorBoundary extends React.Component<
   }
 }
 
-export default function BlogPost({ post, mdxSource }: BlogPostProps) {
-  if (!mdxSource || typeof mdxSource !== 'object') {
-    return (
-      <article className="prose prose-invert max-w-reading">
-        <div className="border border-ink-line p-4 font-mono text-mono-sm text-ink-muted">
-          Error rendering post: Invalid MDX source
-        </div>
-      </article>
-    );
-  }
-
+export default function BlogPost({ post, children }: BlogPostProps) {
   return (
     <>
       {post.coverImage && (
@@ -65,7 +54,7 @@ export default function BlogPost({ post, mdxSource }: BlogPostProps) {
             </div>
           }
         >
-          <MDXRemote {...mdxSource} components={mdxComponents} />
+          {children}
         </MDXErrorBoundary>
       </article>
     </>

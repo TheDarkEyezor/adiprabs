@@ -42,7 +42,7 @@ const books: Book[] = [
     title: 'Outliers',
     author: 'Malcolm Gladwell',
     review:
-      'An interesting study on how the best of humanity got their start. Explores the hidden factors behind extraordinary success — culture, timing, opportunity.',
+      'An interesting study on how the best of humanity got their start. Explores the hidden factors behind extraordinary success: culture, timing, opportunity.',
     coverImage: '/book-covers/outliers.jpg',
     rating: 4,
     genre: 'Non-fiction',

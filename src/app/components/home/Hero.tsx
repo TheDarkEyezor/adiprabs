@@ -63,7 +63,7 @@ export default function Hero() {
 
             {/* Description */}
             <p className="mt-6 max-w-xl text-xl md:text-2xl text-ink-fg2 leading-snug tracking-snug">
-              Computing @ Imperial. SRE @ Apple. I build production AI systems on the side —
+              Computing @ Imperial. SRE @ Apple. I build production AI systems on the side:
               compilers, infra, agents, and the unglamorous work of keeping them running.
             </p>
 

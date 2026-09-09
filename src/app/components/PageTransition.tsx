@@ -10,12 +10,12 @@ const MAX_DIAG = (ROWS - 1) + (COLS - 1); // 13
 const STAGGER   = 0.26;   // total diagonal spread (s)
 const TILE_DUR  = 0.38;   // per-tile slide duration (s)
 // Last tile finishes at: STAGGER + TILE_DUR = 0.64s
-const NAVIGATE_AT  = STAGGER + TILE_DUR + 0.04; // 0.68s — navigate while fully covered
+const NAVIGATE_AT  = STAGGER + TILE_DUR + 0.04; // 0.68s, navigate while fully covered
 const EXIT_TOTAL   = STAGGER + TILE_DUR;         // 0.64s to fully reveal new page
 
 type Phase = 'idle' | 'in' | 'out';
 
-// ─── Tile — uses translateY so no sub-pixel gaps ever ───────────────────────
+// ─── Tile, uses translateY so no sub-pixel gaps ever ───────────────────────
 function Tile({ row, col, phase }: { row: number; col: number; phase: 'in' | 'out' }) {
   const diag  = row + col;
   const delay = (diag / MAX_DIAG) * STAGGER;
@@ -112,7 +112,7 @@ export default function PageTransition() {
       startTransition(href);
     };
 
-    // capture: true — fires before any element's own handlers
+    // capture: true, fires before any element's own handlers
     document.addEventListener('click', onClick, true);
     return () => document.removeEventListener('click', onClick, true);
   }, [startTransition]);

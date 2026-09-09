@@ -25,7 +25,7 @@ function Tile({ row, col, phase }: { row: number; col: number; phase: 'in' | 'ou
       }}
       className="bg-ink-bg"
       // scaleX 1.02 + scaleY 1.02 at full coverage ensures a 2% physical
-      // overlap on every edge — eliminates sub-pixel gaps at all screen sizes.
+      // overlap on every edge, eliminating sub-pixel gaps at all screen sizes.
       initial={{ scaleY: isIn ? 0 : 1.02, scaleX: 1.02 }}
       animate={{ scaleY: isIn ? 1.02 : 0, scaleX: 1.02 }}
       transition={{ duration: TILE_DUR, delay, ease: [0.76, 0, 0.24, 1] }}

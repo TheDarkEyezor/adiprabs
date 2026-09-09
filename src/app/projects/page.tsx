@@ -1,6 +1,7 @@
 'use client';
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform, useInView } from 'framer-motion';
+import ProjectDemoPanel from '../components/demos/ProjectDemoPanel';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { Container, Label, Tag, withMetrics } from '../components/ui/primitives';
@@ -8,7 +9,7 @@ import { projects, type Project } from '@/data/profile';
 
 const ALL_CATEGORIES = ['AI/ML', 'Systems', 'Tools', 'Web', 'Hardware'] as const;
 
-// Only surface a filter tag if at least one project actually falls under it —
+// Only surface a filter tag if at least one project actually falls under it;
 // an empty filter button is a dead end, not a filter.
 const categoryCounts = ALL_CATEGORIES.reduce<Record<string, number>>((acc, c) => {
   acc[c] = projects.filter((p) => p.category === c).length;
@@ -16,7 +17,17 @@ const categoryCounts = ALL_CATEGORIES.reduce<Record<string, number>>((acc, c) =>
 }, {});
 const categories = ['All', ...ALL_CATEGORIES.filter((c) => categoryCounts[c] > 0)];
 
-function TiltCard({ p, index }: { p: Project; index: number }) {
+function TiltCard({
+  p,
+  index,
+  open,
+  onToggle,
+}: {
+  p: Project;
+  index: number;
+  open: boolean;
+  onToggle: () => void;
+}) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref as React.RefObject<Element>, { once: true, margin: '-5%' });
 
@@ -27,13 +38,15 @@ function TiltCard({ p, index }: { p: Project; index: number }) {
   const rotY = useSpring(useTransform(x, [-0.5, 0.5], [-5, 5]), spring);
 
   const onMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!ref.current) return;
+    // Tilting a card you are trying to drag a slider inside of is hostile.
+    if (!ref.current || open) return;
     const r = ref.current.getBoundingClientRect();
     x.set((e.clientX - r.left) / r.width - 0.5);
     y.set((e.clientY - r.top) / r.height - 0.5);
   };
 
   const onLeave = () => { x.set(0); y.set(0); };
+  useEffect(() => { if (open) { x.set(0); y.set(0); } }, [open, x, y]);
 
   const href = p.github || p.link;
   const inner = (
@@ -43,6 +56,9 @@ function TiltCard({ p, index }: { p: Project; index: number }) {
           {p.year} · {p.category}
         </span>
         <div className="flex items-center gap-2">
+          {p.demo && (
+            <span className="font-mono text-[10px] tracking-wide2 uppercase text-teal/70">demo</span>
+          )}
           {p.status === 'wip' && (
             <span className="font-mono text-[10px] tracking-wide2 uppercase text-amber-live">wip</span>
           )}
@@ -64,12 +80,83 @@ function TiltCard({ p, index }: { p: Project; index: number }) {
         ))}
       </div>
 
-      {href && (
+      {href && !p.demo && (
         <div className="mt-6 font-mono text-mono-sm text-ink-muted group-hover:text-teal transition-colors">
           {p.github ? 'github →' : 'visit →'}
         </div>
       )}
     </>
+  );
+
+  // Cards with a demo cannot wrap the whole body in an anchor: the demo has
+  // its own controls. They get an explicit footer row instead.
+  const body = p.demo ? (
+    <div id={p.slug} className="card card-accent p-7 group h-full scroll-mt-24">
+      {inner}
+
+      <p className="mt-6 text-[13px] text-ink-fg2/70 leading-relaxed">{p.demo.blurb}</p>
+
+      <div className="mt-4 flex flex-wrap items-center gap-3">
+        <button
+          type="button"
+          onClick={onToggle}
+          aria-expanded={open}
+          className={`inline-flex items-center gap-2 px-4 py-2 rounded-sm border font-mono text-mono-sm tracking-wide2 uppercase transition-colors ${
+            open
+              ? 'border-ink-line2 text-ink-fg2 hover:text-ink-fg hover:border-teal-dim'
+              : 'border-teal-dim bg-teal/10 text-teal hover:bg-teal/20'
+          }`}
+        >
+          <span
+            aria-hidden
+            className={`inline-block h-1.5 w-1.5 rounded-full ${open ? 'bg-ink-muted' : 'bg-teal animate-shimmer-line'}`}
+          />
+          {open ? 'close demo' : 'run demo'}
+          <span aria-hidden>{open ? '↑' : '↓'}</span>
+        </button>
+        {href && (
+          <a
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="px-3 py-2 font-mono text-mono-sm text-ink-muted hover:text-teal transition-colors"
+          >
+            {p.github ? 'github →' : 'visit →'}
+          </a>
+        )}
+      </div>
+
+      <AnimatePresence initial={false}>
+        {open && (
+          <motion.div
+            key="demo"
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+            className="overflow-hidden"
+          >
+            <div className="pt-6">
+              <ProjectDemoPanel demo={p.demo!} />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  ) : href ? (
+    <a
+      id={p.slug}
+      href={href}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="card card-accent p-7 group block h-full scroll-mt-24"
+    >
+      {inner}
+    </a>
+  ) : (
+    <div id={p.slug} className="card card-accent p-7 group block h-full scroll-mt-24">
+      {inner}
+    </div>
   );
 
   return (
@@ -84,23 +171,22 @@ function TiltCard({ p, index }: { p: Project; index: number }) {
       exit={{ opacity: 0, y: -16, transition: { duration: 0.2 } }}
       transition={{ duration: 0.5, delay: (index % 6) * 0.06, ease: [0.16, 1, 0.3, 1] }}
       style={{ rotateX: rotX, rotateY: rotY, transformPerspective: 1000 }}
-      className="col-span-12 md:col-span-6 lg:col-span-4"
+      className={open ? 'col-span-12' : 'col-span-12 md:col-span-6 lg:col-span-4'}
     >
-      {href ? (
-        <a href={href} target="_blank" rel="noopener noreferrer" className="card card-accent p-7 group block h-full">
-          {inner}
-        </a>
-      ) : (
-        <div id={p.slug} className="card card-accent p-7 group block h-full">
-          {inner}
-        </div>
-      )}
+      {body}
     </motion.div>
   );
 }
 
 export default function ProjectsPage() {
   const [cat, setCat] = useState<(typeof categories)[number]>('All');
+  const [openSlug, setOpenSlug] = useState<string | null>(null);
+
+  // A link to /projects#slopfilter should land with the demo already running.
+  useEffect(() => {
+    const slug = window.location.hash.slice(1);
+    if (slug && projects.some((p) => p.slug === slug && p.demo)) setOpenSlug(slug);
+  }, []);
 
   const filtered = useMemo(() => {
     if (cat === 'All') return projects;
@@ -156,7 +242,13 @@ export default function ProjectsPage() {
             >
               <AnimatePresence mode="popLayout">
                 {filtered.map((p, i) => (
-                  <TiltCard key={p.slug} p={p} index={i} />
+                  <TiltCard
+                    key={p.slug}
+                    p={p}
+                    index={i}
+                    open={openSlug === p.slug}
+                    onToggle={() => setOpenSlug(openSlug === p.slug ? null : p.slug)}
+                  />
                 ))}
               </AnimatePresence>
             </div>

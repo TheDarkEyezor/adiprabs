@@ -31,7 +31,7 @@ export default function Now() {
                   transition={{ duration: 0.5, delay: i * 0.1, ease: [0.16, 1, 0.3, 1] }}
                   className="flex gap-3 text-lg leading-relaxed text-ink-fg2"
                 >
-                  <span className="text-teal/70 mt-2 font-mono shrink-0">—</span>
+                  <span className="text-teal/70 mt-2 font-mono shrink-0">/</span>
                   <span>{item}</span>
                 </motion.li>
               ))}

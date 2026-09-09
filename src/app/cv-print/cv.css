@@ -1,0 +1,113 @@
+/* Print stylesheet for the CV. Light, serif-free, A4, one document. */
+
+.cv-root {
+  background: #ffffff;
+  color: #14201e;
+  min-height: 100vh;
+  padding: 24px;
+}
+
+.cv {
+  max-width: 190mm;
+  margin: 0 auto;
+  background: #ffffff;
+  /* System stack on purpose: embedding the site's variable font pushed the
+     generated PDF past 9MB. Helvetica/Arial keep it in the tens of KB. */
+  font-family: Helvetica, Arial, sans-serif;
+  font-size: 9.1pt;
+  line-height: 1.36;
+  letter-spacing: -0.004em;
+}
+
+.cv a { color: #0d7d70; text-decoration: none; }
+
+.cv h1 {
+  font-size: 20pt;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  margin: 0 0 3px;
+}
+
+.cv .contact {
+  font-size: 8.6pt;
+  color: #4a5a56;
+  margin: 0 0 8px;
+}
+
+.cv .summary {
+  margin: 0 0 4px;
+  max-width: 62em;
+}
+
+.cv h2 {
+  font-size: 8pt;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: #0d7d70;
+  margin: 10px 0 4px;
+  padding-bottom: 2px;
+  border-bottom: 0.6pt solid #c9d6d3;
+}
+
+.cv .entry { margin-bottom: 6px; break-inside: avoid; }
+
+.cv .entry-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+.cv .entry-head .lhs { font-size: 9.5pt; }
+.cv .entry-head .rhs {
+  font-size: 8.4pt;
+  color: #4a5a56;
+  white-space: nowrap;
+}
+
+.cv ul { margin: 3px 0 0; padding-left: 14px; }
+.cv li { margin-bottom: 1.5px; }
+.cv ul.projects { margin-top: 2px; }
+.cv ul.projects li { margin-bottom: 3px; }
+
+.cv .tech {
+  margin: 3px 0 0;
+  font-size: 8.2pt;
+  color: #5c6b67;
+}
+
+.cv .two-up {
+  display: grid;
+  grid-template-columns: 2.15fr 1fr;
+  gap: 20px;
+  break-inside: avoid;
+}
+.cv .two-up h2 { margin-top: 10px; }
+
+.cv .skill-row { margin: 0 0 2px; font-size: 8.8pt; }
+
+/* Full-bleed page with the inset applied as padding on .cv-root instead of an
+   @page margin. Chrome's preferCSSPageSize honours the size but not the
+   margin, and setting margins in both CSS and the PDF generator clipped the
+   right-hand dates. One definition, in CSS, is unambiguous. */
+@page {
+  size: A4;
+  margin: 0;
+}
+
+@media print {
+  .cv-root { padding: 11mm 12mm; min-height: 0; }
+  .cv { max-width: none; width: 100%; }
+  .cv section { break-inside: avoid-page; }
+}
+
+/* This route renders inside the root layout, which paints a dark background
+   and a full-viewport fractal-noise grain overlay. Rasterised into a PDF with
+   printBackground, that grain alone was ~6MB. Neutralise both here. */
+/* Scoped with :has so a client-side navigation away from /cv-print cannot
+   leave the site painted white; these only bite while .cv-root is mounted. */
+body:has(.cv-root)::before { content: none !important; }
+html:has(.cv-root), body:has(.cv-root) {
+  background: #ffffff !important;
+  color: #14201e !important;
+}

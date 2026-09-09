@@ -5,17 +5,17 @@ import { useEffect, useRef } from 'react';
 const COLS       = 22;    // grid columns
 const ROWS       = 13;    // grid rows
 const PUSH_R     = 230;   // cursor influence radius (px)
-const PUSH_F     = 38;    // base max displacement (px) — scaled by cursor speed
-const K_SPRING   = 0.035; // pull-to-base spring — lower lets waves travel further
-const K_NEIGHBOR = 0.10;  // neighbor coupling — THIS is what propagates the wave
-const K_DAMP     = 0.86;  // velocity damping — lower = waves travel more cells
+const PUSH_F     = 38;    // base max displacement (px), scaled by cursor speed
+const K_SPRING   = 0.035; // pull-to-base spring, lower lets waves travel further
+const K_NEIGHBOR = 0.10;  // neighbor coupling, THIS is what propagates the wave
+const K_DAMP     = 0.86;  // velocity damping, lower = waves travel more cells
 const LINE_A     = 0.11;  // base grid line opacity
 
 // How it works:
 // 1. Cursor pushes nearby grid points away from their base positions.
 // 2. Each point is also coupled to its 4 neighbours (up/down/left/right).
 //    If a neighbour is displaced more than me, it "pulls" me toward its
-//    displacement — spreading the disturbance across the mesh.
+//    displacement, spreading the disturbance across the mesh.
 // 3. K_SPRING pulls every point back to rest; K_DAMP bleeds energy each frame.
 // 4. Cursor velocity is tracked so a fast swipe creates a proportionally
 //    larger impulse, sending a more visible wave a few rows/columns away.
@@ -35,7 +35,7 @@ export default function HeroGrid() {
     type Pt = { bx: number; by: number; x: number; y: number; vx: number; vy: number };
     let pts: Pt[]         = [];
     let nbrs: number[][]  = [];   // pre-computed neighbour indices
-    let fx: Float32Array;         // force accumulators — reused every frame (no GC)
+    let fx: Float32Array;         // force accumulators, reused every frame (no GC)
     let fy: Float32Array;
     let W = 0, H = 0;
 
@@ -110,7 +110,7 @@ export default function HeroGrid() {
         fy[i] += (p.by - p.y) * K_SPRING;
 
         // Neighbour coupling: if a neighbour is displaced more than me,
-        // it pulls me toward its displacement — propagating the wave.
+        // it pulls me toward its displacement, propagating the wave.
         const pDispX = p.x - p.bx;
         const pDispY = p.y - p.by;
         for (const ni of nbrs[i]) {
@@ -145,7 +145,7 @@ export default function HeroGrid() {
       ctx.lineWidth   = 1;
       ctx.strokeStyle = `rgba(94,234,212,${LINE_A})`;
 
-      // Horizontal — one polyline path per row
+      // Horizontal: one polyline path per row
       for (let r = 0; r <= ROWS; r++) {
         ctx.beginPath();
         for (let c = 0; c <= COLS; c++) {
@@ -155,7 +155,7 @@ export default function HeroGrid() {
         ctx.stroke();
       }
 
-      // Vertical — one polyline path per column
+      // Vertical: one polyline path per column
       for (let c = 0; c <= COLS; c++) {
         ctx.beginPath();
         for (let r = 0; r <= ROWS; r++) {

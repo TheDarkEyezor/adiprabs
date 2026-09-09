@@ -6,34 +6,7 @@ import Footer from '../components/Footer';
 import { Container, Label, MetaRow, Tag, LiveDot, A, withMetrics } from '../components/ui/primitives';
 import RevealHeading from '../components/ui/RevealHeading';
 import { profile, roles } from '@/data/profile';
-
-const education = {
-  institution: 'Imperial College London',
-  degree: 'MEng in Computing (AI & ML)',
-  period: '2023 — 2027 (expected)',
-  notes: [
-    'On track for First Class · GPA 3.8',
-    'Coursework: compilers, OS, ML, distributed systems',
-    'Hackathons: 1st place — SwyftGesture (hands-free input)',
-  ],
-};
-
-const skills: Record<string, string[]> = {
-  Languages: ['TypeScript', 'Python', 'C', 'C++', 'Rust', 'Scala', 'Haskell', 'Kotlin', 'JavaScript'],
-  Systems: ['Linux', 'Docker', 'Kubernetes', 'CI/CD', 'AWS', 'Azure', 'Vercel'],
-  'AI / ML': ['PyTorch', 'LLama 3.2', 'MediaPipe', 'OpenCV', 'MuJoCo', 'MCP', 'Local LLMs'],
-  Web: ['Next.js', 'React', 'FastAPI', 'Node.js', 'Tailwind', 'MDX'],
-  Reliability: ['Observability', 'Incident response', 'Load testing', 'Distributed tracing'],
-  'AI Tools': ['Claude Code', 'Codex CLI', 'Ollama', 'CLIP', 'OpenAI API', 'MCP'],
-};
-
-const languages = [
-  { lang: 'English', level: 'Native' },
-  { lang: 'French',  level: 'Native' },
-  { lang: 'Tamil',   level: 'Native' },
-  { lang: 'Spanish', level: 'Reading & speaking' },
-  { lang: 'Hindi',   level: 'Reading & speaking' },
-];
+import { education, skills, languages } from '@/data/cv';
 
 // ── Shared animation wrappers ────────────────────────────────────────────────
 function SlideInRow({ children, index }: { children: React.ReactNode; index: number }) {
@@ -153,7 +126,7 @@ export default function ResumePage() {
                     </FadeUp>
                     <FadeUp delay={0.1}>
                       <p>
-                        I&apos;m happiest at the seam between research and production —
+                        I&apos;m happiest at the seam between research and production,
                         shipping things that demo well in a notebook and don&apos;t fall
                         over under real traffic. Compilers, infra, agents, and the
                         unglamorous work of keeping them running.
@@ -196,7 +169,7 @@ export default function ResumePage() {
                         <ul className="mt-4 space-y-2 max-w-reading">
                           {r.bullets.map((b) => (
                             <li key={b} className="flex gap-3 text-ink-fg2 leading-relaxed">
-                              <span className="text-teal/70 mt-2 font-mono shrink-0">—</span>
+                              <span className="text-teal/70 mt-2 font-mono shrink-0">/</span>
                               <span>{withMetrics(b)}</span>
                             </li>
                           ))}
@@ -227,7 +200,7 @@ export default function ResumePage() {
                       <ul className="mt-4 space-y-2 max-w-reading">
                         {education.notes.map((n) => (
                           <li key={n} className="flex gap-3 text-ink-fg2 leading-relaxed">
-                            <span className="text-teal/70 mt-2 font-mono shrink-0">—</span>
+                            <span className="text-teal/70 mt-2 font-mono shrink-0">/</span>
                             <span>{n}</span>
                           </li>
                         ))}

@@ -37,19 +37,6 @@ export default function Work() {
           <div className="col-span-12 md:col-span-3">
             <Label number="02">work</Label>
           </div>
-          <div className="col-span-12 md:col-span-9">
-            <RevealHeading
-              text="Six places, one thread."
-              as="h2"
-              className="text-3xl md:text-4xl tracking-snug text-ink-fg"
-            />
-            <p className="mt-3 max-w-reading text-ink-fg2">
-              Apple placement now, and before that: a healthcare startup I founded
-              (Vani), plus contract engagements with early-stage AI teams (8x, Canopy,
-              Trajex, Altus). Each one landed a specific dent — latency, cost, security,
-              or shipping something that didn&apos;t exist before.
-            </p>
-          </div>
         </div>
 
         <div className="divide-y divide-ink-line border-t border-ink-line overflow-hidden">
@@ -73,7 +60,7 @@ export default function Work() {
                 <ul className="mt-4 space-y-2 max-w-reading">
                   {r.bullets.map((b) => (
                     <li key={b} className="flex gap-3 text-ink-fg2 leading-relaxed">
-                      <span className="text-teal/70 mt-2 font-mono shrink-0">—</span>
+                      <span className="text-teal/70 mt-2 font-mono shrink-0">/</span>
                       <span>{withMetrics(b)}</span>
                     </li>
                   ))}

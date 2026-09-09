@@ -15,7 +15,7 @@ export default function TransitionLink({ children, href, className, ...rest }: P
   const pathname = usePathname();
 
   const handleClick = async (e: React.MouseEvent<HTMLAnchorElement>) => {
-    if (href === pathname) return; // already here — do nothing
+    if (href === pathname) return; // already here, do nothing
 
     e.preventDefault();
 
@@ -23,7 +23,7 @@ export default function TransitionLink({ children, href, className, ...rest }: P
     emitPhase('in');
     await sleep(NAVIGATE_AT * 1000);
 
-    // 2. Navigate — new page renders safely behind tiles
+    // 2. Navigate, new page renders safely behind tiles
     router.push(href);
     await sleep(60);
 

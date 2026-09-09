@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import TransitionLink from './utils/TransitionLink';
 
 const navItems = [
-  { href: '/projects',  label: 'Work',    num: '01' },
+  { href: '/projects',  label: 'Projects', num: '01' },
   { href: '/resume',    label: 'CV',      num: '02' },
   { href: '/blog',      label: 'Writing', num: '03' },
   { href: '/journey',   label: 'Journey', num: '04' },

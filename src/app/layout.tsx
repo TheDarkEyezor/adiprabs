@@ -18,9 +18,9 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Adi Prabs — Computing @ Imperial · SRE @ Apple",
+  title: "Adi Prabs · Computing @ Imperial · SRE @ Apple",
   description:
-    "Adi Prabs — Computing student at Imperial College London, SRE at Apple, building production AI systems on the side. Selected work, writing, and a long-form CV.",
+    "Computing student at Imperial College London, SRE at Apple, building production AI systems on the side. Selected work, writing, and a long-form CV.",
   // TODO(domain-swap): flip back to https://adiprabs.com once the domain is bought and DNS is live.
   metadataBase: new URL("https://adiprabs.vercel.app"),
   openGraph: {

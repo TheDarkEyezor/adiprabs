@@ -13,7 +13,7 @@ const config: Config = {
         mono: ['var(--font-jetbrains)', 'ui-monospace', 'SFMono-Regular', 'monospace'],
       },
       colors: {
-        // Engineer/system palette — deep petrol + teal
+        // Engineer/system palette: deep petrol + teal
         ink: {
           bg: '#08100F',          // page bg, deep petrol/near-black
           surface: '#0E1A18',     // raised surfaces / cards

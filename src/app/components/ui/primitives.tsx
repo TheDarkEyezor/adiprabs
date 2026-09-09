@@ -2,7 +2,7 @@ import React from "react";
 import Link from "next/link";
 
 /**
- * Renders `**marked**` substrings in teal — color only, no bold. Used to let
+ * Renders `**marked**` substrings in teal, color only, no bold. Used to let
  * the one real number in a bullet/description read as the anchor of the
  * sentence without shouting the whole phrase.
  */
@@ -55,7 +55,7 @@ export function Section({
   );
 }
 
-/** Mono label with number, e.g. "// 02 — selected work" */
+/** Mono label with number, e.g. "// 02 selected work" */
 export function Label({
   number,
   children,
@@ -74,7 +74,7 @@ export function Label({
   );
 }
 
-/** Small uppercase tag — used for tech stacks and meta. */
+/** Small uppercase tag, used for tech stacks and meta. */
 export function Tag({ children }: { children: React.ReactNode }) {
   return (
     <span className="inline-flex items-center font-mono text-[11px] tracking-wide2 uppercase text-ink-fg2 px-2 py-0.5 border border-ink-line rounded-sm">

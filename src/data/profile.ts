@@ -15,16 +15,17 @@ export const profile = {
   resumeUrl: '/AdiPrabs_SWE.pdf',
 
   bio: [
-    "I'm Adi — Computing student at Imperial College London, currently SRE on the ML Platforms team at Apple.",
-    "On the side, I ship production AI systems for early-stage startups. Past lives: healthcare admin automation (Vani), LLM cost-reduction at Trajex, video saliency ML at Altus Reach.",
-    "I like systems that hold up outside the demo — compilers, infra, agents, and the unglamorous work of turning something that runs once into something someone else can depend on.",
+    "I'm Adi, a Computing student at Imperial College London, currently SRE on the ML Platforms team at Apple.",
+    "On the side, I ship production AI systems for early-stage startups. Past lives: real-time voice infrastructure (Canopy Labs), healthcare admin automation (Vani), LLM cost-reduction at Trajex, video saliency ML at Altus Reach.",
+    "I like systems that hold up outside the demo: compilers, infra, agents, and the unglamorous work of turning something that runs once into something someone else can depend on.",
   ],
 
   now: [
-    'Apple — SRE on ML Platforms.',
+    'Apple, SRE on ML Platforms.',
     'Side work with funded startups (ARR-stage).',
     'Exploring next venture: physical AI / edge AI / hardware-software plays.',
-    'Project Nine: a climbing quadruped robot, MuJoCo-first.',
+    'Project Nine: a quadruped robot on a PPO policy. Terrain first, climbing next.',
+    'Kit: a local-first voice assistant that keeps learning from its own use.',
   ],
 };
 
@@ -43,12 +44,12 @@ export const roles: Role[] = [
   {
     company: 'Apple',
     role: 'Site Reliability Engineer, ML Platforms',
-    period: '2026 — present',
+    period: '2026–present',
     location: 'London, UK',
     tag: 'Placement',
     bullets: [
       'Built a Kubernetes capacity forensics platform end-to-end (collectors, scanners, delta-query UI) used by **30+** SREs to diagnose EC2 capacity exhaustion, saving up to **$3M** per AWS availability zone annually.',
-      'Built a cloud-agnostic capacity request and reservation management system — replaced ad-hoc Slack coordination with an auditable workflow handling hundreds of requests monthly.',
+      'Built a cloud-agnostic capacity request and reservation management system that replaced ad-hoc Slack coordination with an auditable workflow handling hundreds of requests monthly.',
       'Created a Kubernetes manifest validation framework detecting misconfigurations at deploy time; retrospective analysis shows it would have caught **72%** of deployment-related incidents over the prior year.',
     ],
     tech: ['Kubernetes', 'Go', 'AWS', 'SRE', 'Distributed systems', 'Observability', 'Linux'],
@@ -57,7 +58,7 @@ export const roles: Role[] = [
   {
     company: '8x',
     role: 'Full-stack & AI/ML Developer',
-    period: 'Apr 2026 — May 2026',
+    period: 'Apr 2026–May 2026',
     tag: 'Contract',
     bullets: [
       'Optimized production analytics from **24s to sub-second** via SQL-side aggregation and indexed Postgres RPC rewrites; cut /posts payloads **90%+** (22MB → ~1–2MB).',
@@ -69,20 +70,20 @@ export const roles: Role[] = [
   {
     company: 'Canopy Labs',
     role: 'General Engineer',
-    period: 'Mar 2026 — Apr 2026',
+    period: 'Mar 2026–Apr 2026',
     tag: 'Contract',
     bullets: [
-      'Architected, built, and deployed the company\'s flagship full-stack web application, enabling real-time multi-user usage with Docker and Kubernetes orchestration.',
-      'Created agents to enable custom form filling from transcripts, cutting insurance resolution by **15 min** per form.',
-      'Optimized backend concurrency and load balancing, reducing latency **500ms → 120ms**, supporting **100+** active users.',
-      'Implemented AWS CI/CD pipelines with automated testing, shortening release cadence to **6 hours**.',
+      'Consolidated a **5-VM** voice-routing architecture into a single gateway service, eliminating 2 dedicated sync VMs.',
+      'Replaced 3s polling-based cache sync with Redis pub/sub, cutting cache-update latency to **sub-10ms**.',
+      'Built atomic quota enforcement in Redis, closing a client-SDK tampering hole in the API.',
+      'Added per-key rate limiting (60s sliding window, configurable RPM) directly in the gateway\'s WebSocket hot path.',
     ],
-    tech: ['React', 'TypeScript', 'Next.js', 'FastAPI', 'Redis', 'AWS', 'Kubernetes', 'Docker'],
+    tech: ['Redis', 'WebSockets', 'Gateway architecture', 'Rate limiting', 'Distributed systems'],
   },
   {
     company: 'Vani',
     role: 'Full-stack & AI/ML Developer',
-    period: '2025 — 2026',
+    period: '2025–2026',
     tag: 'Founder',
     bullets: [
       'Architected, shipped, and deployed the flagship multi-tenant web app on AWS with Docker + Kubernetes.',
@@ -96,10 +97,10 @@ export const roles: Role[] = [
   {
     company: 'Trajex',
     role: 'Machine Learning Developer',
-    period: '2024 — 2025',
+    period: '2024–2025',
     tag: 'Contract',
     bullets: [
-      'Deployed LLama 3.2-7B-Instruct in production — **20%** cost reduction vs OpenAI, **12%** lower inference latency.',
+      'Deployed LLama 3.2-7B-Instruct in production for a **20%** cost reduction vs OpenAI and **12%** lower inference latency.',
       'Led product design and built the inference backend.',
       'Pitched investors and onboarded K3 Capital Group as a paying client.',
     ],
@@ -111,13 +112,54 @@ export const roles: Role[] = [
     period: '2024',
     tag: 'Contract',
     bullets: [
-      'Team of 3 — built a video saliency model improving prediction accuracy by **19%**.',
+      'Built a video saliency model in a team of 3, improving prediction accuracy by **19%**.',
       'Shipped Azure-hosted inference pipeline for production traffic.',
       'Full-stack work on company web app (TypeScript / Next.js / React).',
     ],
     tech: ['Azure AI', 'Python', 'TypeScript', 'Next.js', 'Computer Vision'],
   },
 ];
+
+/**
+ * A small demo attached to a project card.
+ *
+ * - `interactive` mounts a hand-built React sandbox from
+ *   `src/app/components/demos/`. Add a new one by dropping a component there
+ *   and registering it in `ProjectDemoPanel`'s INTERACTIVE map.
+ * - `video` points at a file in `public/` (an mp4 screen capture works best;
+ *   supply a `poster` so the collapsed card costs nothing to render).
+ * - `embed` iframes an external sandbox or a hosted deploy.
+ *
+ * Everything is lazy: nothing loads until the card is expanded.
+ */
+export type ProjectDemo =
+  | {
+      kind: 'interactive';
+      component:
+        | 'slopfilter' | 'istoria' | 'swyftgesture' | 'wacc'
+        | 'llama' | 'stocksentiment' | 'graphrag' | 'kagschema';
+      /** One line on the card, before the demo is opened. */
+      blurb: string;
+    }
+  | {
+      kind: 'video';
+      title: string;
+      src: string;
+      poster?: string;
+      note?: string;
+      caption?: string;
+      blurb: string;
+    }
+  | {
+      kind: 'embed';
+      title: string;
+      src: string;
+      /** CSS aspect-ratio for the frame, e.g. '16 / 9'. */
+      aspect?: string;
+      note?: string;
+      caption?: string;
+      blurb: string;
+    };
 
 export type Project = {
   slug: string;
@@ -132,19 +174,31 @@ export type Project = {
   award?: string;
   featured?: boolean;
   status?: 'shipped' | 'wip' | 'archived';
+  demo?: ProjectDemo;
 };
 
 export const projects: Project[] = [
   {
     slug: 'nine',
     title: 'Project Nine',
-    tagline: 'Climbing quadruped robot, MuJoCo-first',
+    tagline: 'Climbing quadruped robot, sim-first RL',
     description:
-      'Designing a four-legged climbing robot in simulation before metal. Policy learning in MuJoCo, then sim-to-real on off-the-shelf actuators. Hardware-software play targeting indie verticals.',
+      'A four-legged robot trained in simulation before metal. A PPO policy in Isaac Lab and MuJoCo drives locomotion across varied terrain, trained on AWS GPU instances and trimmed to the smallest parameter count that keeps the policy stable. 0.62 m/s sustained, standing at 17.8s. Now extending the same policy stack toward climbing, then sim-to-real on off-the-shelf actuators.',
     year: '2026',
     category: 'Hardware',
-    tech: ['MuJoCo', 'Python', 'RL', 'Robotics'],
+    tech: ['PyTorch', 'Isaac Lab', 'MuJoCo', 'PPO', 'RL', 'AWS', 'Robotics'],
+    featured: true,
     status: 'wip',
+    demo: {
+      kind: 'video',
+      title: 'nine · hardware model walking',
+      src: '/demos/nine-hw-walk.mp4',
+      poster: '/demos/nine-hw-walk.jpg',
+      note: 'simulation, nothing validated on hardware yet',
+      blurb: 'The 12-DOF CAD-derived model walking under the current PPO policy.',
+      caption:
+        'The sim was rebuilt from the CAD assembly\u2019s own joint origins, dropping 32 DOF of biomimetic cat for the 12 DOF the physical robot actually has. That cut the steps needed for a stable walking policy by roughly an order of magnitude. Still simulation only: nothing here has run on hardware.',
+    },
   },
   {
     slug: 'istoria',
@@ -158,19 +212,102 @@ export const projects: Project[] = [
     github: 'https://github.com/TheDarkEyezor/istoria',
     featured: true,
     status: 'shipped',
+    demo: {
+      kind: 'interactive',
+      component: 'istoria',
+      blurb: 'Re-weight the ranking signals and watch a coffee mug outrank Iceland.',
+    },
   },
   {
     slug: 'sandbox-orchestrator',
     title: 'Sandbox Orchestrator',
     tagline: 'FastAPI producer + async workers for ephemeral sandboxes',
     description:
-      'A lightweight orchestration platform for spinning up isolated execution sandboxes — producer/consumer queues, async lifecycle, blast-radius isolation.',
+      'A lightweight orchestration platform for spinning up isolated execution sandboxes, with producer/consumer queues, async lifecycle and blast-radius isolation.',
     year: '2026',
     category: 'Systems',
     tech: ['FastAPI', 'Python', 'AsyncIO', 'Containers'],
     github: 'https://github.com/TheDarkEyezor/sandbox-orchestrator',
     featured: true,
     status: 'wip',
+  },
+  {
+    slug: 'kit',
+    title: 'Kit',
+    tagline: 'Local-first voice assistant with its own perception and reasoning stack',
+    description:
+      'A personal assistant built end to end. Perception runs YOLO11n for real-time object detection, faster-whisper for speech-to-text and openWakeWord for wake detection, wired into a self-supervised loop that keeps improving the models from live use. Reasoning runs on KAG (knowledge-augmented generation for multi-hop retrieval) inside an OpenClaw harness.',
+    year: '2026',
+    category: 'AI/ML',
+    tech: ['Python', 'YOLO11n', 'faster-whisper', 'openWakeWord', 'KAG', 'OpenClaw', 'Self-supervised learning'],
+    featured: true,
+    status: 'wip',
+  },
+  {
+    slug: 'llama-distillation',
+    title: 'Llama Distillation',
+    tagline: 'Fine-tuning Llama 3.2 on my own messages to sound like me',
+    description:
+      'QLoRA fine-tune of Llama 3.2 3B on years of my WhatsApp history, targeting my speech patterns and conversational style for a voice assistant. **64%** of assessed outputs matched ground-truth tone and style.',
+    year: '2026',
+    category: 'AI/ML',
+    tech: ['PyTorch', 'Llama 3.2', 'QLoRA', 'Fine-tuning', 'Python'],
+    status: 'shipped',
+    demo: {
+      kind: 'interactive',
+      component: 'llama',
+      blurb: 'Set the rank and targets, and see exactly how little of a 3.2B model QLoRA trains.',
+    },
+  },
+  {
+    slug: 'graphrag',
+    title: 'GraphRAG Implementations',
+    tagline: 'Retrieval-augmented generation pipelines, built from the parts up',
+    description:
+      'Notebook implementations of graph-based RAG, composing document retrieval with LLM generation for factual grounding and domain adaptation. Written to understand where retrieval actually helps and where it just adds latency.',
+    year: '2025',
+    category: 'AI/ML',
+    tech: ['Python', 'Jupyter', 'GraphRAG', 'LLMs', 'Retrieval'],
+    github: 'https://github.com/TheDarkEyezor/RAG',
+    status: 'shipped',
+    demo: {
+      kind: 'interactive',
+      component: 'graphrag',
+      blurb: 'Real MiniLM vectors: retrieve, grade, and watch the grounding check fall over.',
+    },
+  },
+  {
+    slug: 'kag-schema',
+    title: 'KAG Schema Diagnostics',
+    tagline: 'Upstream error reporting for OpenSPG\u2019s schema DSL',
+    description:
+      'KAG is OpenSPG\u2019s knowledge-augmented generation framework, and the reasoning layer Kit runs on. My contributions are to its tooling: source-context error reporting for the SPG schema markup language, plus the missing- and duplicate-identifier checks that used to fail downstream with an unrelated message. Also fixed the Ollama client\u2019s JSON response handling for local models.',
+    year: '2025',
+    category: 'Tools',
+    tech: ['Python', 'OpenSPG', 'KAG', 'Parsers', 'Ollama'],
+    github: 'https://github.com/TheDarkEyezor/KAG',
+    status: 'shipped',
+    demo: {
+      kind: 'interactive',
+      component: 'kagschema',
+      blurb: 'Break a schema and see the diagnostics point at the token that broke it.',
+    },
+  },
+  {
+    slug: 'stock-sentiment-dashboard',
+    title: 'Stock Sentiment Dashboard',
+    tagline: 'Equity movement forecasting from price and NLP sentiment signals',
+    description:
+      'An ML pipeline for forecasting equity movement, with feature engineering across price data and NLP sentiment drawn from news, political events and company disclosures.',
+    year: '2025',
+    category: 'AI/ML',
+    tech: ['Python', 'NLP', 'Feature engineering', 'Time series', 'ML'],
+    status: 'shipped',
+    demo: {
+      kind: 'interactive',
+      component: 'stocksentiment',
+      blurb: 'The indicator and sentiment feature stage, running on a synthetic series.',
+    },
   },
   {
     slug: 'wacc-compiler',
@@ -184,6 +321,11 @@ export const projects: Project[] = [
     github: 'https://github.com/TheDarkEyezor/WACC06',
     featured: true,
     status: 'shipped',
+    demo: {
+      kind: 'interactive',
+      component: 'wacc',
+      blurb: 'Type WACC source and watch it tokenise and parse into the real AST.',
+    },
   },
   {
     slug: 'swyftgesture',
@@ -194,9 +336,14 @@ export const projects: Project[] = [
     year: '2022',
     category: 'AI/ML',
     tech: ['Python', 'MediaPipe', 'OpenCV'],
-    github: 'https://github.com/TheDarkEyezor/SwyftGesture',
+    github: 'https://github.com/TheDarkEyezor/Electro-Vision',
     award: '1ST · HACKATHON',
     status: 'shipped',
+    demo: {
+      kind: 'interactive',
+      component: 'swyftgesture',
+      blurb: 'Runs in the browser on your own camera. Same gestures, same thresholds.',
+    },
   },
   {
     slug: 'slopfilter',
@@ -210,13 +357,18 @@ export const projects: Project[] = [
     github: 'https://github.com/TheDarkEyezor/SlopFilter',
     featured: true,
     status: 'shipped',
+    demo: {
+      kind: 'interactive',
+      component: 'slopfilter',
+      blurb: 'Run the three detectors over a sample feed and move the threshold.',
+    },
   },
   {
     slug: 'task-manager',
     title: 'Task Manager (C)',
     tagline: 'GUI task manager, hand-rolled in C',
     description:
-      'A native task manager for the Imperial C lab project — process listing, kill, sort, refresh, written from the ground up in C.',
+      'A native task manager for the Imperial C lab project. Process listing, kill, sort and refresh, written from the ground up in C.',
     year: '2024',
     category: 'Systems',
     tech: ['C', 'GUI'],
@@ -227,7 +379,7 @@ export const projects: Project[] = [
     slug: 'true-concurrency',
     title: 'TrueConcurrency',
     tagline: 'Concurrency primitives in C',
-    description: 'Low-level concurrency primitives in C — locks, channels, schedulers.',
+    description: 'Low-level concurrency primitives in C: locks, channels, schedulers.',
     year: '2025',
     category: 'Systems',
     tech: ['C', 'Concurrency'],
@@ -239,7 +391,7 @@ export const projects: Project[] = [
     title: 'FiduciaLens',
     tagline: 'Investor-facing portfolio lens',
     description:
-      'Explorations in fiduciary tooling — read between an investor and a fund, surface the trades that actually matter.',
+      'Explorations in fiduciary tooling. Read between an investor and a fund, surface the trades that actually matter.',
     year: '2025',
     category: 'Tools',
     tech: ['Python'],
