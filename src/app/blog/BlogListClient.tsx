@@ -106,7 +106,7 @@ export default function BlogListClient({ initialPosts, allTags }: BlogListClient
               Writing
             </h1>
             <p className="mt-4 max-w-reading text-xl text-ink-fg2 leading-snug">
-              Notes on building systems, AI, and whatever I'm thinking about.
+              Notes on building systems, AI, and whatever I’m thinking about.
             </p>
 
             {/* Search */}

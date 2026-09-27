@@ -4,6 +4,8 @@
 import React from 'react';
 import CodeBlock from './CodeBlock';
 
+type Props<T extends keyof React.JSX.IntrinsicElements> = React.ComponentPropsWithoutRef<T>;
+
 // YouTube embed component
 function YouTube({ id, title }: { id: string; title?: string }) {
   return (
@@ -162,62 +164,62 @@ export const mdxComponents = {
   Tweet,
   Divider,
   a: CustomLink,
-  h1: ({ children, ...props }: any) => (
+  h1: ({ children, ...props }: Props<'h1'>) => (
     <h1 className="text-4xl font-bold mt-12 mb-6 bg-gradient-to-r from-[#FF6B6B] to-[#FEC601] bg-clip-text text-transparent" {...props}>
       {children}
     </h1>
   ),
-  h2: ({ children, ...props }: any) => (
+  h2: ({ children, ...props }: Props<'h2'>) => (
     <h2 className="text-3xl font-bold mt-10 mb-4 text-white" {...props}>
       {children}
     </h2>
   ),
-  h3: ({ children, ...props }: any) => (
+  h3: ({ children, ...props }: Props<'h3'>) => (
     <h3 className="text-2xl font-semibold mt-8 mb-3 text-white/90" {...props}>
       {children}
     </h3>
   ),
-  h4: ({ children, ...props }: any) => (
+  h4: ({ children, ...props }: Props<'h4'>) => (
     <h4 className="text-xl font-semibold mt-6 mb-2 text-white/80" {...props}>
       {children}
     </h4>
   ),
-  h5: ({ children, ...props }: any) => (
+  h5: ({ children, ...props }: Props<'h5'>) => (
     <h5 className="text-lg font-semibold mt-4 mb-2 text-white/70" {...props}>
       {children}
     </h5>
   ),
-  h6: ({ children, ...props }: any) => (
+  h6: ({ children, ...props }: Props<'h6'>) => (
     <h6 className="font-semibold mt-3 mb-2 text-white/60" {...props}>
       {children}
     </h6>
   ),
-  p: ({ children, ...props }: any) => (
+  p: ({ children, ...props }: Props<'p'>) => (
     <p className="text-white/80 leading-relaxed mb-4" {...props}>
       {children}
     </p>
   ),
-  ul: ({ children, ...props }: any) => (
+  ul: ({ children, ...props }: Props<'ul'>) => (
     <ul className="list-disc list-inside text-white/80 mb-4 space-y-2 ml-4" {...props}>
       {children}
     </ul>
   ),
-  ol: ({ children, ...props }: any) => (
+  ol: ({ children, ...props }: Props<'ol'>) => (
     <ol className="list-decimal list-inside text-white/80 mb-4 space-y-2 ml-4" {...props}>
       {children}
     </ol>
   ),
-  li: ({ children, ...props }: any) => (
+  li: ({ children, ...props }: Props<'li'>) => (
     <li className="text-white/80" {...props}>
       {children}
     </li>
   ),
-  blockquote: ({ children, ...props }: any) => (
+  blockquote: ({ children, ...props }: Props<'blockquote'>) => (
     <blockquote className="border-l-4 border-[#4A90E2] pl-4 my-6 italic text-white/70" {...props}>
       {children}
     </blockquote>
   ),
-  code: ({ children, className, ...props }: any) => {
+  code: ({ children, className, ...props }: Props<'code'>) => {
     if (!className) {
       return (
         <code className="px-1.5 py-0.5 rounded bg-white/10 text-[#FF6B6B] text-sm font-mono" {...props}>
@@ -227,51 +229,51 @@ export const mdxComponents = {
     }
     return <code className={className} {...props}>{children}</code>;
   },
-  pre: ({ children, ...props }: any) => (
-    <CodeBlock {...props}>{children}</CodeBlock>
+  pre: ({ children, className }: Props<'pre'>) => (
+    <CodeBlock className={className}>{children}</CodeBlock>
   ),
-  img: ({ src, alt, ...props }: any) => (
-    <BlogImage src={src || ''} alt={alt || ''} />
+  img: ({ src, alt }: Props<'img'>) => (
+    <BlogImage src={typeof src === 'string' ? src : ''} alt={alt || ''} />
   ),
   hr: () => <Divider />,
-  table: ({ children, ...props }: any) => (
+  table: ({ children, ...props }: Props<'table'>) => (
     <div className="overflow-x-auto my-6">
       <table className="w-full border-collapse" {...props}>
         {children}
       </table>
     </div>
   ),
-  thead: ({ children, ...props }: any) => (
+  thead: ({ children, ...props }: Props<'thead'>) => (
     <thead className="bg-white/5 border-b border-white/10" {...props}>
       {children}
     </thead>
   ),
-  tbody: ({ children, ...props }: any) => (
+  tbody: ({ children, ...props }: Props<'tbody'>) => (
     <tbody className="divide-y divide-white/5" {...props}>
       {children}
     </tbody>
   ),
-  tr: ({ children, ...props }: any) => (
+  tr: ({ children, ...props }: Props<'tr'>) => (
     <tr className="border-b border-white/5" {...props}>
       {children}
     </tr>
   ),
-  th: ({ children, ...props }: any) => (
+  th: ({ children, ...props }: Props<'th'>) => (
     <th className="text-left px-4 py-2 font-semibold text-white" {...props}>
       {children}
     </th>
   ),
-  td: ({ children, ...props }: any) => (
+  td: ({ children, ...props }: Props<'td'>) => (
     <td className="px-4 py-2 text-white/70" {...props}>
       {children}
     </td>
   ),
-  strong: ({ children, ...props }: any) => (
+  strong: ({ children, ...props }: Props<'strong'>) => (
     <strong className="font-semibold text-white" {...props}>
       {children}
     </strong>
   ),
-  em: ({ children, ...props }: any) => (
+  em: ({ children, ...props }: Props<'em'>) => (
     <em className="italic text-white/90" {...props}>
       {children}
     </em>

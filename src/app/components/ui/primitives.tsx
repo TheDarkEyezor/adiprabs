@@ -67,7 +67,7 @@ export function Label({
 }) {
   return (
     <div className={`label flex items-center gap-3 ${className}`}>
-      <span className="text-ink-muted/70">//</span>
+      <span className="text-ink-muted/70">{'//'}</span>
       {number && <span className="text-teal">{number}</span>}
       <span>{children}</span>
     </div>
