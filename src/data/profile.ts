@@ -25,7 +25,7 @@ export const profile = {
     'Side work with funded startups (ARR-stage).',
     'Exploring next venture: physical AI / edge AI / hardware-software plays.',
     'Project Nine: a quadruped robot on a PPO policy. Terrain first, climbing next.',
-    'Kit: a local-first voice assistant that keeps learning from its own use.',
+    'Kit: one assistant that remembers, runs on its own schedule, and reaches from my server to my screen and kitchen.',
   ],
 };
 
@@ -175,30 +175,39 @@ export type Project = {
   featured?: boolean;
   status?: 'shipped' | 'wip' | 'archived';
   demo?: ProjectDemo;
+  /** For projects made of several pieces: one line per component. */
+  parts?: { name: string; repo?: string; role: string }[];
+  /** Blog posts about the project, by slug under /blog. */
+  writeups?: { title: string; slug: string }[];
 };
 
 export const projects: Project[] = [
   {
     slug: 'nine',
     title: 'Project Nine',
-    tagline: 'Climbing quadruped robot, sim-first RL',
+    tagline: 'A 12-DOF quadruped, trained in simulation before it is built',
     description:
-      'A four-legged robot trained in simulation before metal. A PPO policy in Isaac Lab and MuJoCo drives locomotion across varied terrain, trained on AWS GPU instances and trimmed to the smallest parameter count that keeps the policy stable. 0.62 m/s sustained, standing at 17.8s. Now extending the same policy stack toward climbing, then sim-to-real on off-the-shelf actuators.',
+      'A four-legged robot whose MuJoCo model is generated straight from its Fusion 360 assembly, driven by a PPO policy. Rebuilding the sim from the CAD (12 DOF, down from a 32-DOF biomimetic cat) cut training to **8M** steps, **12x** fewer than the cat\u2019s best walking policy. Walks at **0.65 m/s** on flat ground with zero falls and handles mild terrain. The hardware build is sized at 0.7x scale for bus servos on a \u00a3500 budget; bench tests come first.',
     year: '2026',
     category: 'Hardware',
-    tech: ['PyTorch', 'Isaac Lab', 'MuJoCo', 'PPO', 'RL', 'AWS', 'Robotics'],
+    tech: ['PyTorch', 'MuJoCo', 'PPO', 'RL', 'Fusion 360', 'AWS', 'Robotics'],
     featured: true,
     status: 'wip',
     demo: {
       kind: 'video',
-      title: 'nine · hardware model walking',
-      src: '/demos/nine-hw-walk.mp4',
-      poster: '/demos/nine-hw-walk.jpg',
+      title: 'nine · flat-ground baseline',
+      src: '/blog/nine/hw-flat-ctrl.mp4',
+      poster: '/blog/nine/hw-flat-ctrl.jpg',
       note: 'simulation, nothing validated on hardware yet',
-      blurb: 'The 12-DOF CAD-derived model walking under the current PPO policy.',
+      blurb: 'The CAD-derived model walking under the current PPO policy, on all four legs.',
       caption:
-        'The sim was rebuilt from the CAD assembly\u2019s own joint origins, dropping 32 DOF of biomimetic cat for the 12 DOF the physical robot actually has. That cut the steps needed for a stable walking policy by roughly an order of magnitude. Still simulation only: nothing here has run on hardware.',
+        'Commanded to 1.2 m/s, it reaches about 0.65. The sim was rebuilt from the CAD assembly\u2019s own joint origins, dropping 32 DOF of biomimetic cat for the 12 DOF the physical robot actually has. Still simulation only: nothing here has run on hardware.',
     },
+    writeups: [
+      { title: 'Three months in: I threw out the cat', slug: 'nine-progress-sep-2026' },
+      { title: 'My fastest robot was walking on three legs', slug: 'nine-three-legged-record' },
+      { title: 'Sizing twelve servos for a robot that only exists in simulation', slug: 'nine-sizing-servos' },
+    ],
   },
   {
     slug: 'istoria',
@@ -234,14 +243,41 @@ export const projects: Project[] = [
   {
     slug: 'kit',
     title: 'Kit',
-    tagline: 'Local-first voice assistant with its own perception and reasoning stack',
+    tagline: 'One assistant across my server, laptop, screen and kitchen, built to run without me',
     description:
-      'A personal assistant built end to end. Perception runs YOLO11n for real-time object detection, faster-whisper for speech-to-text and openWakeWord for wake detection, wired into a self-supervised loop that keeps improving the models from live use. Reasoning runs on KAG (knowledge-augmented generation for multi-hop retrieval) inside an OpenClaw harness.',
+      'A personal assistant built as one system rather than a pile of bots. Kit lives on my home server as an agent with its own long-term memory, skills and scheduled jobs: it works in the background, writes down what it learns, pings my phone when something actually needs me, and once a month audits its own conversations and rewrites its instructions. Around that brain, separate local services give it ears, eyes, a screen and a kitchen, all on one Tailscale network, so the same Kit answers whether I speak, gesture, look at something or hold up a tin. Anything that changes the outside world still waits for a yes.',
     year: '2026',
     category: 'AI/ML',
-    tech: ['Python', 'YOLO11n', 'faster-whisper', 'openWakeWord', 'KAG', 'OpenClaw', 'Self-supervised learning'],
+    tech: ['Python', 'Swift', 'OpenClaw', 'faster-whisper', 'Kokoro TTS', 'MediaPipe', 'YOLO', 'Apple Vision', 'Mealie', 'Tailscale'],
     featured: true,
     status: 'wip',
+    parts: [
+      {
+        name: 'Brain',
+        repo: 'kit-workspace',
+        role: 'OpenClaw agent on the home server. Daily and long-term memory kept as files, skills for the kitchen and job applications, cron jobs that reach me through iCloud Reminders, and a monthly self-review that edits its own operating instructions.',
+      },
+      {
+        name: 'Voice',
+        repo: 'kit-voice',
+        role: 'Wake word, Silero VAD end-of-speech, faster-whisper, then Kokoro-82M speech streamed back gaplessly. Interrupt it mid-sentence and it stops; keep talking after it finishes and it keeps listening. A conversation, not a command line.',
+      },
+      {
+        name: 'Hands and eyes',
+        repo: 'kit-control',
+        role: 'MediaPipe gestures, webcam gaze tracking and YOLO scene context, sharing one action library with voice so a gesture and a spoken command call the same function. Asking about a CAD model sends the live Fusion 360 viewport instead of a screenshot.',
+      },
+      {
+        name: 'Screen',
+        repo: 'kit-overlay',
+        role: 'Native Swift overlay on every display with an API to see what I\u2019m doing, guide me through it with cards and spotlights, and act. Actions are proposals: Kit shows what it will click and why, then waits for a keypress, a spoken yes or a gesture. Silence expires the request, and a remote caller can never skip the yes.',
+      },
+      {
+        name: 'Kitchen',
+        repo: 'kit-pantry',
+        role: 'Turn a product in front of the phone camera and it lands in the pantry as a standardised Mealie ingredient with size and brand. Apple Vision reads net weight at arm\u2019s length **55%** of the time against Tesseract\u2019s **1%**; a local Llama 3.2 3B names and files foods Mealie has never seen.',
+      },
+    ],
   },
   {
     slug: 'llama-distillation',

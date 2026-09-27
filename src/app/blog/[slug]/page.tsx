@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { MDXRemote } from 'next-mdx-remote/rsc';
 import rehypeHighlight from 'rehype-highlight';
 import rehypeSlug from 'rehype-slug';
+import remarkGfm from 'remark-gfm';
 import { getPostBySlug, getAllPosts } from '@/lib/blog';
 import { mdxComponents } from '../components/MDXComponents';
 import BlogPostClient from './BlogPostClient';
@@ -72,7 +73,7 @@ async function BlogPostContent({ slug }: { slug: string }) {
           parseFrontmatter: false,
           mdxOptions: {
             rehypePlugins: [rehypeHighlight, rehypeSlug],
-            remarkPlugins: [],
+            remarkPlugins: [remarkGfm],
           },
         }}
       />

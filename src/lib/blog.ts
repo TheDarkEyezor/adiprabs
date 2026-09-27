@@ -1,5 +1,11 @@
+import { promises as fs } from 'fs';
+import path from 'path';
 import matter from 'gray-matter';
 import readingTime from 'reading-time';
+
+// Posts committed to this repo, alongside the ones fetched from GITHUB_REPO.
+// A local post wins if both define the same slug.
+const LOCAL_POSTS_DIR = path.join(process.cwd(), 'content', 'posts');
 
 // Configuration - Update this when you create your blog content repo
 export const BLOG_CONFIG = {
@@ -106,6 +112,26 @@ async function fetchPostContent(filePath: string): Promise<string | null> {
 }
 
 /**
+ * Read the posts committed under content/posts, as [slug, raw] pairs
+ */
+async function readLocalPosts(): Promise<[string, string][]> {
+  try {
+    const names = await fs.readdir(LOCAL_POSTS_DIR);
+    return await Promise.all(
+      names
+        .filter(name => name.endsWith('.mdx') || name.endsWith('.md'))
+        .map(async (name): Promise<[string, string]> => [
+          name.replace(/\.mdx?$/, ''),
+          await fs.readFile(path.join(LOCAL_POSTS_DIR, name), 'utf8'),
+        ])
+    );
+  } catch (error) {
+    console.error('Error reading local posts:', error);
+    return [];
+  }
+}
+
+/**
  * Parse MDX content and extract frontmatter
  */
 function parsePost(content: string, slug: string): BlogPost {
@@ -129,25 +155,27 @@ function parsePost(content: string, slug: string): BlogPost {
  * Get all blog posts (metadata only, for listing)
  */
 export async function getAllPosts(): Promise<BlogPostMeta[]> {
-  const files = await fetchPostFiles();
-  
-  const posts = await Promise.all(
+  const [files, localPosts] = await Promise.all([fetchPostFiles(), readLocalPosts()]);
+  const localSlugs = new Set(localPosts.map(([slug]) => slug));
+
+  const remotePosts = await Promise.all(
     files.map(async (file) => {
+      const slug = file.name.replace(/\.mdx?$/, '');
+      if (localSlugs.has(slug)) return null;
+
       const content = await fetchPostContent(file.path);
       if (!content) return null;
       
-      const slug = file.name.replace(/\.mdx?$/, '');
-      const post = parsePost(content, slug);
-      
-      // Return metadata only (no content)
-      const { content: _, ...meta } = post;
-      return meta;
+      return parsePost(content, slug);
     })
   );
 
-  // Filter out nulls and sort by date (newest first)
+  const posts = [...localPosts.map(([slug, raw]) => parsePost(raw, slug)), ...remotePosts];
+
+  // Filter out nulls, strip content, and sort by date (newest first)
   return posts
-    .filter((post): post is BlogPostMeta => post !== null)
+    .filter((post): post is BlogPost => post !== null)
+    .map(({ content: _, ...meta }) => meta)
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 }
 
@@ -159,6 +187,15 @@ export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
   
   // Try .mdx first, then .md
   const extensions = ['.mdx', '.md'];
+
+  for (const ext of extensions) {
+    try {
+      const raw = await fs.readFile(path.join(LOCAL_POSTS_DIR, `${slug}${ext}`), 'utf8');
+      return parsePost(raw, slug);
+    } catch {
+      // Not a local post; fall through to GitHub.
+    }
+  }
   
   for (const ext of extensions) {
     const content = await fetchPostContent(`${POSTS_FOLDER}/${slug}${ext}`);

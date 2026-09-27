@@ -1,0 +1,95 @@
+---
+title: "Nine, three months in: I threw out the cat and the robot started walking"
+date: "2026-09-27"
+description: "Project Nine started as a 32-joint simulated cat that never learned to walk. Rebuilding it as the 12-joint robot I can actually build cut the training it needed by an order of magnitude. Where it stands, what works, and what still doesn't."
+coverImage: "/blog/nine/nine-hw-hero.jpg"
+tags: ["robotics", "RL", "MuJoCo", "Project Nine"]
+author: "AdiPrabs"
+---
+
+Project Nine is a four-legged robot I'm building, and for now it exists only in simulation. The plan has always been sim first, then metal: train a walking policy in MuJoCo, then move it onto real actuators. This post covers June to the end of September, which is roughly when the project stopped being a cat.
+
+## Act one: the cat
+
+The first version was biomimetic on purpose. It was a 32-DOF cat skeleton with motion capture retargeted onto it, and later a reference walk lifted from 2D footage in a 2009 PLOS ONE feline biomechanics paper. It was trained with PPO to track a commanded velocity.
+
+It never really worked. Across roughly 150M environment steps, the best policies landed in one of two failure modes. Either they walked for two seconds and fell, or they survived the full episode by not walking at all.
+
+<Video
+  src="/blog/nine/cat-32dof-trot.mp4"
+  poster="/blog/nine/cat-32dof-trot.jpg"
+  caption="The 32-DOF cat at 138M steps, commanded to trot at 0.5 m/s. This was one of the better ones."
+/>
+
+| policy | steps | survival | tracked speed |
+|---|---|---|---|
+| 32-DOF, best walking | 97.5M | 2.0 s | 0.78 m/s |
+| 32-DOF, best survival | 153.3M | 16.3 s | 0.05 m/s |
+
+The second row looks like progress in a training dashboard, because episode length went up a lot. In practice the cat learned to stand still for sixteen seconds, and the gait evaluator reported that the gait command had no measurable effect on its behaviour. That was the first lesson on this project, and it wasn't the last time it came up: long episodes are not locomotion.
+
+## Act two: model the robot you're going to build
+
+A 32-joint cat isn't something I can buy actuators for. I had designed the physical robot separately in Fusion 360, with twelve joints (shoulder, hip and knee on each leg) and a rigid chassis. So in September I stopped approximating an animal and generated the simulation directly from the CAD assembly: joint origins and axes read from the assembly's own joints, segment lengths consistent to 0.1 mm across all four legs, and masses including the motors, gears and bearings buried inside the parts.
+
+<BlogImage
+  src="/blog/nine/cad-bearings-aligned.jpg"
+  alt="Fusion 360 assembly of the Nine quadruped, with joint markers on each shoulder, hip and knee"
+  caption="The Fusion 360 assembly the simulation is generated from. The knee motors are hidden inside the upper legs, which is why the CAD only shows eight motor cans for twelve joints."
+/>
+
+<BlogImage
+  src="/blog/nine/nine-hw-views.jpg"
+  alt="Four views of the MuJoCo model generated from the CAD"
+  caption="The MuJoCo model generated from that assembly: 231 mm legs, 266 mm standing height, 4.6 kg."
+/>
+
+I drive the Fusion model from Python over a small local socket bridge, so I can pose the CAD with the same joint angles the policy outputs. That turned out to be the fastest way to catch disagreements between what the sim thinks the robot is and what the CAD says it is.
+
+<Video
+  src="/blog/nine/fusion-walk-cycle.mp4"
+  poster="/blog/nine/fusion-walk-cycle.jpg"
+  caption="A trot cycle played back on the CAD assembly in Fusion 360."
+/>
+
+The effect on training was bigger than any reward change I'd made all summer:
+
+| policy | steps | survival | tracked speed |
+|---|---|---|---|
+| 32-DOF, best walking | 97.5M | 2.0 s | 0.78 m/s |
+| **12-DOF, CAD-derived** | **8.0M** | **18.7 s** | **0.65 m/s** |
+
+That's twelve times fewer steps than the cat's best walking policy, with episodes nine times longer and zero falls in 1000-step evaluations at every commanded speed from 0.2 to 1.2 m/s. A 12M-step run takes about 45 minutes on my laptop. Simulation throughput has never been the bottleneck.
+
+<Video
+  src="/blog/nine/hw-flat-ctrl.mp4"
+  poster="/blog/nine/hw-flat-ctrl.jpg"
+  caption="The current flat-ground baseline, commanded to 1.2 m/s. It reaches about 0.65, on all four legs."
+/>
+
+"On all four legs" is doing a lot of work in that caption. For a while my best result was a robot walking on three, and I wrote a [separate post about how that happened](/blog/nine-three-legged-record).
+
+## Terrain, drops, and a bad ceiling
+
+Rough ground came next. The policy trains on a heightfield curriculum that ramps up in difficulty, with each episode sampling its own roughness so the robot keeps practising on flat ground as well. Warm-starting terrain training from the fast flat policy held 0.52 to 0.65 m/s on flat throughout. The same run from scratch managed 0.30.
+
+The hardest part here was realising the curriculum ceiling was wrong. At maximum difficulty the terrain had 166 mm of relief against a 231 mm leg, which is 72% of the robot's leg length. Most quadrupeds manage 30 to 50%. That's an obstacle course, not rough ground, and the policy correctly learned to stop and wait whenever it met one. I capped the ceiling near 80 mm, around the 5 cm step I actually want the robot to handle.
+
+I also tested drops with a policy that had never trained on them. It survived every height I tried, up to 25 cm, with zero falls, but at 25 cm its peak landing force averaged 8.9 times bodyweight. Its body bottomed out at about 195 mm regardless of drop height. In other words it wasn't absorbing the landing, it was acting as a passive spring. The drop curriculum that would teach it to land properly is built, but I haven't trained it yet.
+
+## What doesn't work yet
+
+- **Gait control.** The policy takes a gait command (trot, pace, bound, pronk) and mostly ignores it. Mean pair synchrony, which measures which feet are down together, sits at +0.09 against a target of +0.5. Pushing the gait-matching reward up to a synchrony of 0.42 cost 60% of top speed, so obeying the gait and going fast trade off directly. Fixing it needs a structural change, not a weight sweep.
+- **It's blind.** There is no height scan in the observation, so everything it knows about terrain comes from its own joints. Adding one changes the observation size and invalidates every checkpoint, so it's waiting until the hardware settles.
+- **Nothing has run on hardware.** Every number on this page comes from simulation.
+
+## Act three: making it buildable
+
+Full size, the robot needs about 20 N·m peak at the shoulder, which puts it in the price range of research actuators. The budget is £500. Torque scales with the fourth power of size, so I'm building it at 0.7x scale instead. That gives 162 mm legs, about 1.4 kg, and hobby-grade bus servos. Picking which servo turned into its [own investigation](/blog/nine-sizing-servos), and it still isn't fully settled.
+
+## Next
+
+1. Bench-test two of each shortlisted servo at real battery voltage, especially their temperature under sustained load, since that's the one thing the sim can't tell me.
+2. Order the remaining ten and the electronics, which I've already costed at about £161.
+3. Train the drop curriculum, and have another go at gait control.
+4. Then the real thing: sim-to-real on the 0.7x robot.

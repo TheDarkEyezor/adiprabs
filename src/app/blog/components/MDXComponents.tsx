@@ -1,6 +1,8 @@
-'use client';
-
+// Server-safe: the post body is rendered by MDXRemote on the server, which
+// cannot resolve components through a 'use client' module's exported object.
+// Anything interactive lives in its own client file, like CodeBlock.
 import React from 'react';
+import CodeBlock from './CodeBlock';
 
 // YouTube embed component
 function YouTube({ id, title }: { id: string; title?: string }) {
@@ -94,35 +96,37 @@ function BlogImage({
   );
 }
 
-// Code block wrapper
-function CodeBlock({ children, className }: { children: React.ReactNode; className?: string }) {
-  const [copied, setCopied] = React.useState(false);
-  const codeRef = React.useRef<HTMLPreElement>(null);
-
-  const handleCopy = () => {
-    if (codeRef.current) {
-      const code = codeRef.current.textContent || '';
-      navigator.clipboard.writeText(code);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
-  };
-
+// Looping video clip with a caption, e.g. a simulation render
+function Video({
+  src,
+  poster,
+  caption,
+}: {
+  src: string;
+  poster?: string;
+  caption?: string;
+}) {
   return (
-    <div className="relative group my-6">
-      <pre
-        ref={codeRef}
-        className={`${className} rounded-xl p-4 overflow-x-auto bg-[#1a1a2e] border border-white/10`}
-      >
-        {children}
-      </pre>
-      <button
-        onClick={handleCopy}
-        className="absolute top-3 right-3 px-2 py-1 text-xs rounded bg-white/10 hover:bg-white/20 text-white/60 hover:text-white transition-all opacity-0 group-hover:opacity-100"
-      >
-        {copied ? 'Copied!' : 'Copy'}
-      </button>
-    </div>
+    <figure className="my-8">
+      <div className="rounded-xl overflow-hidden border border-white/20">
+        <video
+          src={src}
+          poster={poster}
+          className="w-full h-auto"
+          autoPlay
+          loop
+          muted
+          playsInline
+          controls
+          preload="metadata"
+        />
+      </div>
+      {caption && (
+        <figcaption className="text-center text-sm text-white/60 mt-3 italic">
+          {caption}
+        </figcaption>
+      )}
+    </figure>
   );
 }
 
@@ -154,6 +158,7 @@ export const mdxComponents = {
   YouTube,
   Callout,
   BlogImage,
+  Video,
   Tweet,
   Divider,
   a: CustomLink,

@@ -1,0 +1,89 @@
+---
+title: "Sizing twelve servos for a robot that only exists in simulation"
+date: "2026-09-25"
+description: "How Project Nine went from a $7,000 actuator quote to a £500 build: shrink it to 0.7x, measure the torque the policy actually uses, and model the servo as a torque-speed line instead of a torque cap. Plus two experiments that didn't work."
+coverImage: "/blog/nine/k70-sts3215-vs-sts3250.jpg"
+tags: ["robotics", "hardware", "RL", "Project Nine"]
+author: "AdiPrabs"
+---
+
+Project Nine walks well in simulation. The next step is buying twelve actuators, which means answering a question the simulation can only partly answer: how much motor does this robot need?
+
+I got that answer wrong twice before getting it roughly right.
+
+## The first two wrong answers
+
+At full size (231 mm legs, 4.6 kg), measuring the trained policy gave about 20 N·m peak at the shoulder, 5 to 7 N·m continuous, and around 90 rpm while walking. My first reaction was to price integrated actuators rated for that, at about $600 each, which comes to around $7,000 for twelve. The torque figure was right. The sourcing was lazy: people build robots in this class with bare BLDC motors and printed gearboxes for a fraction of that.
+
+Then I overcorrected. A static hold only needs about 0.5 N·m, so I decided the 20 N·m figure must be twenty times too high. That was wrong too. Static hold is the floor for standing still. Peak torque is set by acceleration, landings and recovering from pushes, and those are exactly the loads that break things.
+
+The check that settled it was to recompute torque from MuJoCo's inverse dynamics (`qfrc_bias - qfrc_constraint`), which depends on gravity, inertia and contact but not on the controller's gains. If that disagrees with the actuator force, you're measuring how stiff the controller is, not what the physics demands. Here they agreed. I also compared against the MIT Mini Cheetah, which is heavier but has a similar layout, and the figure held up.
+
+## Shrinking the robot
+
+At £500 for the whole robot, full size was out. But torque scales steeply with size. Scale every length by k with the same materials, and mass goes as k³ while lever arms go as k, so:
+
+```
+torque ~ mass x g x lever ~ k^3 x k = k^4
+```
+
+Halve the robot and it needs a sixteenth of the torque. I settled on **k = 0.7**: 162 mm legs, 186 mm standing height, about 1.36 kg including the servos, battery and electronics. It's small enough for hobby bus servos and big enough to still handle a 5 cm step.
+
+## Measuring instead of predicting
+
+My first sizing doc predicted the 0.7x demand in two ways. It scaled the full-size peak by k⁴, and it applied a shortcut: size to the 90th-percentile torque instead of the peak, because that's roughly where Stanford Pupper's servos sit. The shortcut suggested 1.33 N·m would be enough.
+
+Then I generated the 0.7x robot in sim, trained it, and measured.
+
+| | predicted | measured |
+|---|---|---|
+| peak torque | 4.8 N·m (k⁴ scaling) | **~4.3 N·m** |
+| shoulder p90 | 1.33 N·m (p90 shortcut) | **2.2 N·m** |
+| RMS | | ~1.3 N·m |
+| speed | | ~70 rpm |
+
+The k⁴ scaling held up. The percentile shortcut didn't: it was inferred from a single reference robot, and it was off by 65%. **Scale was a real lever. The percentile rule was not.**
+
+A side note: training the 0.7x robot from scratch learned to stand still and never walked, even after 8M steps. It wasn't a physical limit. A per-step reward breakdown showed walking paid +0.44 against standing's +0.30, so the policy had simply got stuck. Warm-starting from the full-size policy fixed it in 4M steps.
+
+## A torque cap is the wrong servo model
+
+The obvious way to simulate a weaker motor is to clip torque at the servo's stall rating. For a hobby servo that's wrong, because on a hobby servo the speed runs out before the torque does. The servo is a DC motor behind a gearbox, so the torque it can deliver falls linearly with speed until it reaches zero at the no-load speed:
+
+```
+tau in [ -Ts(1 + w/w0),  Ts(1 - w/w0) ]
+```
+
+Here Ts is stall torque and w0 is no-load speed. I apply that line per physics substep. A servo with a generous stall figure but a low top speed spends much of a stride pinned against this line, and a simple torque cap never shows that.
+
+## The shortlist
+
+Every candidate walked with zero falls under its own torque-speed line. The differences are in how often each joint hits the line, and whether RMS torque fits inside the continuous rating.
+
+| servo (12 V) | stall / no-load | time at limit (shoulder / hip / knee) | RMS vs continuous rating | ×12 |
+|---|---|---|---|---|
+| Feetech STS3250 | 4.91 N·m / 75 rpm | 3 / 14 / 18% | 1.37 vs 1.57, inside | ~£390 |
+| Feetech STS3215 | 2.94 N·m / 45 rpm | 15 / 28 / **46%** | 1.24 vs 0.98, **over** | ~£145 |
+| ST3215-HS | 1.96 N·m / 106 rpm | 16 / 34 / 37% | ~1.0 vs unpublished | ~£250 |
+
+<Video
+  src="/blog/nine/k70-sts3215-vs-sts3250.mp4"
+  poster="/blog/nine/k70-sts3215-vs-sts3250.jpg"
+  caption="The 0.7x robot at a 0.6 m/s command. Left: STS3215. Right: STS3250. Both walk, but the cheaper servo spends almost half its knee time pinned against its torque-speed limit."
+/>
+
+A few I ruled out. Plain PWM servos give no position or velocity feedback at all, and the policy needs joint velocity as an input. One budget servo reads position from a 240° potentiometer and has no velocity readback, so it's out for the same reason. Small BLDC actuators work, but at around $105 each with a driver they don't fit the budget.
+
+## Two things I tried that didn't help
+
+**A mixed build.** The idea was to put the strong STS3250 on the shoulders and knees, where the load is, and the cheap STS3215 on the hips. The result was 0.21 m/s against 0.23 for all-STS3215, which is within noise. The saturation just moved to the hips. Worse, shoulder RMS rose to 1.62 N·m, *above* the STS3250's own continuous rating. Give the policy more torque headroom and it spends it: shoulder p90 went from 2.62 to 3.32 N·m.
+
+**A torque penalty.** If the cheap servo's problem is continuous torque, maybe the policy can be taught to use less. Five times the torque penalty cut shoulder RMS from 1.24 to 1.17 N·m, still over the 0.98 rating, and cost 30% of the robot's speed. That's a bad trade.
+
+Both point the same way. The cheap servo's weak spot is heat under sustained load, and the simulation doesn't model heat at all. The sim can't settle that question in either direction.
+
+## So: go and measure it
+
+The remaining budget is set. The electronics come to about £161: an ESP32-S3 (the policy is about 130k multiply-accumulates per step, so compute isn't an issue), a BNO055 IMU, microswitch foot contacts, a 3S battery, a buck converter and proper fusing. That leaves about £339 for twelve actuators.
+
+Before spending it, I'm buying two STS3250s and two STS3215s, about £100, to bench-test at real battery voltage. A 3S pack is 11.1 V against a 12 V rating, so I expect about 8% less than the datasheet. I'll measure stall torque, no-load speed, and above all the temperature after a few minutes of stride-like cyclic load. That's the one number that decides this, and it's the one the simulation can't produce.

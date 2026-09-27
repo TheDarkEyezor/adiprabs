@@ -74,6 +74,37 @@ function TiltCard({
       <p className="mt-1.5 text-ink-fg2 italic">{p.tagline}</p>
       <p className="mt-4 text-ink-fg2/90 leading-relaxed">{withMetrics(p.description)}</p>
 
+      {p.parts && (
+        <dl className="mt-6 divide-y divide-ink-line border-y border-ink-line">
+          {p.parts.map((part) => (
+            <div key={part.name} className="py-3.5 sm:grid sm:grid-cols-[9rem_1fr] sm:gap-5">
+              <dt className="font-mono text-mono-sm">
+                <span className="text-teal">{part.name}</span>
+                {part.repo && <span className="block text-ink-muted">{part.repo}</span>}
+              </dt>
+              <dd className="mt-1 sm:mt-0 text-[14px] text-ink-fg2/85 leading-relaxed">
+                {withMetrics(part.role)}
+              </dd>
+            </div>
+          ))}
+        </dl>
+      )}
+
+      {p.writeups && (p.demo || !href) && (
+        <ul className="mt-6 space-y-1.5">
+          {p.writeups.map((w) => (
+            <li key={w.slug}>
+              <a
+                href={`/blog/${w.slug}`}
+                className="font-mono text-mono-sm text-ink-muted hover:text-teal transition-colors"
+              >
+                {w.title} →
+              </a>
+            </li>
+          ))}
+        </ul>
+      )}
+
       <div className="mt-5 flex flex-wrap gap-2">
         {p.tech.map((t) => (
           <Tag key={t}>{t}</Tag>
@@ -171,7 +202,7 @@ function TiltCard({
       exit={{ opacity: 0, y: -16, transition: { duration: 0.2 } }}
       transition={{ duration: 0.5, delay: (index % 6) * 0.06, ease: [0.16, 1, 0.3, 1] }}
       style={{ rotateX: rotX, rotateY: rotY, transformPerspective: 1000 }}
-      className={open ? 'col-span-12' : 'col-span-12 md:col-span-6 lg:col-span-4'}
+      className={open || p.parts ? 'col-span-12' : 'col-span-12 md:col-span-6 lg:col-span-4'}
     >
       {body}
     </motion.div>

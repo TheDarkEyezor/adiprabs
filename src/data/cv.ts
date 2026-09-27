@@ -40,9 +40,9 @@ export const cvProjects = [
   },
   {
     title: 'Kit',
-    tech: 'Python, YOLO11n, faster-whisper, openWakeWord',
+    tech: 'Python, Swift, OpenClaw, faster-whisper, MediaPipe, YOLO',
     blurb:
-      'Local-first voice assistant with its own perception and reasoning stack, wired into a self-supervised loop that improves the models from live use.',
+      'Unified personal assistant: an always-on agent with persistent memory and scheduled jobs, plus voice, gesture, gaze, a native screen overlay and a pantry scanner. Real-world actions are proposed on screen and wait for a spoken, typed or gestured yes.',
   },
   {
     title: 'Istoria',

@@ -1,0 +1,65 @@
+---
+title: "My fastest robot was walking on three legs"
+date: "2026-09-26"
+description: "A 4.9 mm CAD error left one foot hovering off the ground, and the policy set a speed record without it. Four bugs from Project Nine that the reward curve hid, and what caught them instead."
+coverImage: "/blog/nine/three-legs-vs-four.jpg"
+tags: ["robotics", "RL", "debugging", "Project Nine"]
+author: "AdiPrabs"
+---
+
+For about a day, the best result on Project Nine was 0.62 m/s. It was the fastest the simulated robot had ever gone, well ahead of anything before it, and it came from a policy that had quietly stopped using one of its legs.
+
+<Video
+  src="/blog/nine/three-legs-vs-four.mp4"
+  poster="/blog/nine/three-legs-vs-four.jpg"
+  caption="Left: the 0.62 m/s 'record', walking on three legs on the old model. Right: the corrected model on all four, 0.65 m/s."
+/>
+
+## A foot that couldn't reach the floor
+
+The simulation is generated from the robot's CAD assembly. One thigh motor in that assembly sat 4.9 mm out of place, and the error carried straight through the pipeline, from STEP file to spec to MuJoCo model. When the exporter solved for standing height, it placed the robot so the *lowest* foot touched the ground. That avoided any interpenetration, but it left the fourth foot hovering 4.9 mm in the air.
+
+A foot that can't reach the floor can't push on it. The policy did the sensible thing and worked around it: it learned a three-legged gait and carried the dead leg. Its contact duty, the fraction of time the foot is on the ground, was 0.03. Healthy legs sit between 0.30 and 0.41.
+
+Nothing in training flagged it. The reward went up and speed went up, and the robot survived full episodes. By every number I was logging, this was the best policy on the project.
+
+The fix was a line of geometry: level all four hips, then solve standing height against all four feet. Foot spread went from 4.90 mm to 0.000 mm, and the dead leg's duty went from 0.03 to 0.30. Flat speed on four legs is now 0.65 m/s, which is *faster* than the three-legged record. The old number wasn't just wrong. It was a handicap posing as a win.
+
+## Three more that looked healthy
+
+It wasn't a one-off. Over the same stretch, every real blocker on this project turned out to be a bug in the model, and the training metrics looked fine through all of them.
+
+**The robot was paid to crouch.** The body-height reward compared the torso to an absolute world height. On flat ground that's fine. On terrain, standing correctly on a 150 mm rise scores as a 150 mm error, so the reward pushed the robot down. Return climbed to 778 while the robot slumped from 266 mm to 159 mm, still cycling all four legs. Every metric improved while the gait got worse. The fix was to measure height relative to the terrain under the robot.
+
+**A warm start skipped the whole curriculum.** Terrain difficulty ramps up with the training step count, and resuming from a checkpoint restores that count. Warm-starting a terrain run from an 8M-step flat policy therefore began at maximum difficulty on step one: 200 mm of relief against 231 mm legs. The robot splayed out with three feet pinned to the ground and the fourth waving in the air. The fix was a `--reset-curriculum` flag, so the ramp starts over.
+
+**The viewer lied about the terrain.** My live training viewer uploaded the heightfield once and never again. The terrain was regenerating on every reset, but on screen it looked static forever. That one was a bug in the tool I was using to look for bugs.
+
+There was an earlier one too. The shin capsule sat 0.9 mm below the foot sphere, so the robot was standing on its shins. The foot sensors read zero, and ground contact was being scored as a collision penalty. Fixing it raised return 6.3x at an identical step count.
+
+## Why the reward curve can't catch these
+
+A policy that adapts around a broken model still collects reward. It just collects it by doing something that would be useless, or dangerous, on hardware. RL is very good at finding the easiest route to the number you asked for. If the model has a hole in it, the easiest route usually goes through the hole.
+
+So the curve was never going to show these. What caught them was **watching the robot**: rendering a clip and looking at which feet touch the ground, how high the body sits, and whether the terrain on screen matches the curriculum. Four of these bugs were found that way. None were found by reading training metrics.
+
+## What I check now
+
+When a policy underperforms, I check the model before assuming it needs more training:
+
+- **Contact duty per leg.** A number that should be impossible if the bug is present beats a number that merely looks bad. Duty 0.03 on one leg is unambiguous in a way a slightly low speed never is.
+- **Body height against standing height**, measured relative to the ground under the robot, not world zero.
+- **Where the curriculum actually is**, rather than where I think it is.
+- **Steady state only.** Throw away the settling transient. An episode-wide average of joint range once hid a dead leg from me because the first second of the episode was averaged in.
+
+## The claims I withdrew
+
+I keep a results doc for Nine, and when a number turns out to be wrong I record the withdrawal rather than quietly editing it. Three have gone so far:
+
+| withdrawn | why |
+|---|---|
+| "Speed saturates near 0.34 m/s whatever the command" | Measured at one command point and generalised. Across commands, the same policy scales from 0.17 to 0.43. |
+| "0.62 m/s best speed" | Walking on three legs. See above. |
+| "Gait conditioning weak, cross-gait duty difference 0.014" | The metric couldn't have shown anything else. All four gaits share a duty factor, so a perfect trot and a perfect bound score almost the same. Replaced by pair synchrony, which measures which feet land together. |
+
+The last one is my favourite, because it's a metric bug rather than a model bug. The number was right. It just couldn't have come out any other way.
