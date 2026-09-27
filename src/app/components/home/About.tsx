@@ -33,11 +33,6 @@ export default function About() {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref as React.RefObject<Element>, { once: true, margin: '-10%' });
 
-  const allParas = [
-    ...profile.bio,
-    `Reachable at __email__. Most useful when there's a concrete problem attached.`,
-  ];
-
   return (
     <section className="relative">
       <div className="rule" />

@@ -150,7 +150,8 @@ export default function HeroGrid() {
         ctx.beginPath();
         for (let c = 0; c <= COLS; c++) {
           const p = pts[I(r, c)];
-          c === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y);
+          if (c === 0) ctx.moveTo(p.x, p.y);
+          else ctx.lineTo(p.x, p.y);
         }
         ctx.stroke();
       }
@@ -160,7 +161,8 @@ export default function HeroGrid() {
         ctx.beginPath();
         for (let r = 0; r <= ROWS; r++) {
           const p = pts[I(r, c)];
-          r === 0 ? ctx.moveTo(p.x, p.y) : ctx.lineTo(p.x, p.y);
+          if (r === 0) ctx.moveTo(p.x, p.y);
+          else ctx.lineTo(p.x, p.y);
         }
         ctx.stroke();
       }

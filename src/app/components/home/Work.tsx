@@ -2,7 +2,6 @@
 import React, { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
 import { Container, Label, MetaRow, Tag, LiveDot, withMetrics } from '../ui/primitives';
-import RevealHeading from '../ui/RevealHeading';
 import { roles } from '@/data/profile';
 
 function SlideInRow({

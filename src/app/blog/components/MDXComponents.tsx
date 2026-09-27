@@ -82,6 +82,8 @@ function BlogImage({
   return (
     <figure className="my-8">
       <div className="rounded-xl overflow-hidden border border-white/20">
+        {/* Post images can be on any host with no known size, which next/image needs. */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src={src}
           alt={alt}

@@ -39,6 +39,8 @@ export default function BlogPost({ post, children }: BlogPostProps) {
     <>
       {post.coverImage && (
         <div className="mb-10 border border-ink-line overflow-hidden">
+          {/* Covers can come from the remote blog-content repo: any host, unknown size. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={post.coverImage} alt={post.title} className="w-full h-auto" />
         </div>
       )}
