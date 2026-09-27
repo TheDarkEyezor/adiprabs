@@ -177,6 +177,8 @@ export type Project = {
   demo?: ProjectDemo;
   /** For projects made of several pieces: one line per component. */
   parts?: { name: string; repo?: string; role: string }[];
+  /** Still images shown on the card, e.g. CAD renders. Local files in public/. */
+  gallery?: { src: string; alt: string; caption: string; width: number; height: number }[];
   /** Blog posts about the project, by slug under /blog. */
   writeups?: { title: string; slug: string }[];
 };
@@ -203,6 +205,22 @@ export const projects: Project[] = [
       caption:
         'Commanded to 1.2 m/s, it reaches about 0.65. The sim was rebuilt from the CAD assembly\u2019s own joint origins, dropping 32 DOF of biomimetic cat for the 12 DOF the physical robot actually has. Still simulation only: nothing here has run on hardware.',
     },
+    gallery: [
+      {
+        src: '/blog/nine/cad-bearings-aligned.jpg',
+        alt: 'Fusion 360 assembly of the Nine quadruped, with joint markers on each shoulder, hip and knee',
+        caption: 'The Fusion 360 assembly. The knee motors sit inside the upper legs, so twelve joints show as eight motor cans.',
+        width: 1400,
+        height: 900,
+      },
+      {
+        src: '/blog/nine/nine-hw-views.jpg',
+        alt: 'Four views of the MuJoCo model generated from the CAD',
+        caption: 'The MuJoCo model generated from it: 231 mm legs, 266 mm standing height, 4.6 kg.',
+        width: 1400,
+        height: 900,
+      },
+    ],
     writeups: [
       { title: 'Three months in: I threw out the cat', slug: 'nine-progress-sep-2026' },
       { title: 'My fastest robot was walking on three legs', slug: 'nine-three-legged-record' },

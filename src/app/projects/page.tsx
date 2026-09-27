@@ -1,6 +1,7 @@
 'use client';
 import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform, useInView } from 'framer-motion';
+import Image from 'next/image';
 import ProjectDemoPanel from '../components/demos/ProjectDemoPanel';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -88,6 +89,26 @@ function TiltCard({
             </div>
           ))}
         </dl>
+      )}
+
+      {p.gallery && (
+        <div className="mt-6 grid gap-4 sm:grid-cols-2">
+          {p.gallery.map((g) => (
+            <figure key={g.src}>
+              <div className="border border-ink-line overflow-hidden bg-ink-bg">
+                <Image
+                  src={g.src}
+                  alt={g.alt}
+                  width={g.width}
+                  height={g.height}
+                  sizes="(min-width: 640px) 50vw, 100vw"
+                  className="w-full h-auto"
+                />
+              </div>
+              <figcaption className="mt-2 text-[13px] text-ink-fg2/70 leading-relaxed">{g.caption}</figcaption>
+            </figure>
+          ))}
+        </div>
       )}
 
       {p.writeups && (p.demo || !href) && (
@@ -202,7 +223,7 @@ function TiltCard({
       exit={{ opacity: 0, y: -16, transition: { duration: 0.2 } }}
       transition={{ duration: 0.5, delay: (index % 6) * 0.06, ease: [0.16, 1, 0.3, 1] }}
       style={{ rotateX: rotX, rotateY: rotY, transformPerspective: 1000 }}
-      className={open || p.parts ? 'col-span-12' : 'col-span-12 md:col-span-6 lg:col-span-4'}
+      className={open || p.parts || p.gallery ? 'col-span-12' : 'col-span-12 md:col-span-6 lg:col-span-4'}
     >
       {body}
     </motion.div>
