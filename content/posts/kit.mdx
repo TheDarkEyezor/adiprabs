@@ -1,0 +1,63 @@
+---
+title: "Kit: An Ongoing Build Log of My Home Assistant"
+date: "2026-09-21"
+description: "Kit started as an OpenClaw harness around Claude's API. It now has gestures, a voice, a kitchen and its own layer on my screen. What each piece does and what's next."
+tags: ["AI", "agents", "Kit", "project"]
+author: "AdiPrabs"
+---
+
+This article will be an ongoing progress update on my home assistant, Kit.
+
+## Where it started
+
+Kit started as an OpenClaw harness wrapped around Claude's API, and for a while that was pretty good on its own. Kit could read me the news daily, the way I prefer, from sources I've told it I trust. Over the last couple of months it's also built up a long-term memory of me, from documents about me that I gave it and from me talking to it about my goals and aspirations. That lets it answer some questions more effectively. With interview questions like "what's your best project so far?", it's been easier with Kit to bring up the projects most relevant to whoever's asking. It also managed my inbox on my behalf. Not that I had a lot to manage, but it certainly helped.
+
+But I realised that day to day, that wasn't enough. There were still a lot of things I had to do manually that it should have been helping with. As a uni student working full-time at Apple, you have a lot to manage and very little bandwidth to do it. So I started adding integrations, not only to handle the more mundane parts of my life but also to make the agent's capabilities more powerful.
+
+## Gestures
+
+It started with a gesture system, which was relatively simple since I'd worked on this before with SwyftGesture. The problem was my setup: I have very little space in my room, so every now and then I sit on the bed to watch a movie or read something. That puts some distance between me and my laptop, and sometimes, say when I'm eating a snack, I'd have to wipe my hands before adjusting the brightness, changing the volume or pausing something.
+
+The gesture system uses MediaPipe hand landmarks from a webcam. The first version reacted to everything, including me just raising my hand into frame, so it now runs as a state machine. Nothing happens until I hold up a rock-on sign to wake it. Then I pick a mode: two fingers for music, one for the screen, a thumbs up for system controls. The same gesture means the same kind of thing in every mode. A fist is play/pause (or show desktop), swipes go previous and next, an open palm goes back to the menu and a thumbs down puts it back to sleep. For music, a pinch and drag scrubs through the track horizontally and changes the volume vertically. System controls are two-handed: one hand holds up one or two fingers to pick brightness or volume, and the other pinches and drags to set it.
+
+All the actions that touch the OS run on a background queue. Each AppleScript call takes 150 to 250ms, which was enough to make every gesture feel laggy when it blocked the camera loop.
+
+## Voice
+
+From there I wanted a more proactive, voice-interactive system, where I could just ask any query and get the same capabilities OpenClaw has on its own, but hands-free.
+
+The voice client runs on my laptop. A wake word ("Hey Jarvis" for now, from openWakeWord's pretrained set) starts listening, Silero VAD works out when I've stopped talking, and faster-whisper transcribes it. The text goes to a bridge on my home server, and the reply comes back as Kokoro-82M speech, streamed sentence by sentence into a single audio player so there are no gaps between sentences.
+
+The part that makes it feel like a conversation rather than a command line is turn-taking. If I start talking while Kit is mid-sentence, it stops and listens. When it finishes, it keeps listening for a few more seconds in case I have a follow-up, no wake word needed.
+
+Gestures and voice share one action library, so "pause" as a gesture and "pause" as a spoken command call the literal same function. They also talk to each other: a specific hand sign summons the voice client without the wake word, and a thumbs down cancels whatever it's doing.
+
+## The kitchen
+
+From there I wanted to handle one of the more challenging parts of my life: meal planning. I've been notoriously bad at keeping track of my meals and cooking on time, despite my affinity for the kitchen and my passion for cooking. There's just a lot happening, and you forget to take care of yourself.
+
+So I built a meal planning system on top of a self-hosted Mealie instance. It holds recipes I commonly use so I can refer to them quickly, plus a pantry that keeps track of the ingredients I have at home. Kit gets a kitchen skill over all of it: it can suggest what to cook from what's in the pantry and what's about to expire, add things to the shopping list, and sync that list to Apple Reminders so it's on my phone at the shop.
+
+The value of putting an agent on top of the meal planning and shopping list is that I don't have to do the thinking about what to cook that week. I can say, okay, my goals this week are to cut down on carbs and add more protein, suggest recipes for that. It can even accommodate cravings or special occasions. If I say it's Thanksgiving this week and I'm making these dishes, or I'm craving biryani and I'd love to make it, that gets factored in automatically. I don't have to do the planning.
+
+With the pantry in place, it was relatively easy to build a scanner for the stuff I buy from the grocery store. I turn a product in front of the camera and it lands in the pantry as a standardised Mealie ingredient, with its size and brand. A YOLO model finds the barcode, product name and net weight on the packaging, Apple Vision reads the text, and the barcode gets looked up on Open Food Facts. Apple Vision reads the net weight at arm's length 55% of the time, against Tesseract's 1%. It started on a desktop webcam, but it's moved to my phone: a web page served from my Mac over Tailscale, because the phone's camera focuses close up and it's much easier to turn a product in your hand than to hold it up to a fixed camera.
+
+## The screen
+
+The latest thing I've been working on was inspired by Clicky, made by Farza. Farza is an awesome guy and his work online is amazing. He's the founder of buildspace, which I took part in one of the cohorts of, and he's really motivational about encouraging people to pursue their dreams. He recently made Clicky, which lets a smart agent view your desktop and suggest actions. Normally you take a screenshot, paste it into your Claude chat and wait for a response. The major shortcoming is that Claude can't see which step you're at, so for a more complicated process you end up taking screenshots the entire time and pasting them into the chat. Clicky has a view of your screen, and the agent even has its own cursor, so it can point things out and even complete certain actions on your behalf.
+
+I thought that's one step closer to Jarvis from Iron Man, and I really needed that. So I tried building my own version that integrates with Kit rather than depending on an external API, and it's been somewhat of a success.
+
+Kit's overlay is a native Swift app: a transparent, click-through layer on every display, with an API that the agent on my home server reaches over Tailscale. It can see what I'm doing (the frontmost app, the focused window and field, what's selected, or a screenshot of a region), guide me through it by drawing arrows, spotlights and step-by-step cards on the screen, and act. Actions are only ever proposals, though. Kit shows what it's about to click and why, then waits for a keypress, a spoken yes or a gesture. If I say nothing, the request expires, and nothing calling in remotely can skip the yes.
+
+Every piece of that has been tested on its own. What I haven't done yet is the whole loop: speak into the mic, and watch Kit's answer land on my screen.
+
+## Next
+
+The next couple of features I'm planning on implementing are:
+
+- **The full loop, end to end.** Voice question in, cards and spotlights on the screen out, and actions I approve by saying yes.
+- **Gestures that point at the screen.** Point at something and have the overlay highlight it, so Kit gets my gesture, what's on screen and what I'm asking about all together.
+- **A "Hey Kit" wake word**, trained to replace "Hey Jarvis".
+- **More gestures.** The system already recognises a lot more hand shapes and movements than it uses. Those are going into media, system, 3D design and smart home sets.
+- **A native iPhone app for the pantry scanner**, in place of the web page.

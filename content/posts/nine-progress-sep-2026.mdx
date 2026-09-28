@@ -9,6 +9,20 @@ author: "AdiPrabs"
 
 Project Nine is a four-legged robot I'm building, and for now it exists only in simulation. The plan has always been sim first, then metal: train a walking policy in MuJoCo, then move it onto real actuators. This post covers June to the end of September, which is roughly when the project stopped being a cat.
 
+## Why a robot pet, and is that okay?
+
+Before I get into the progress, there's something I want to acknowledge.
+
+It feels a bit disingenuous to work on a product that preys on people being isolated, one that appeals to people who don't live in great conditions. When I started working on Project Nine, the aim was always to bring a pet into the hands of people like me: people who don't live in the best houses, who don't have the budget to look after a dog or a cat with its regular vet visits and specific food you have to keep buying, and who want some companionship.
+
+Being in a long-distance relationship for the last three years hasn't been easy. Of course I call my girlfriend every day, but having something I could interact with was the initial goal. And with my current living arrangement, despite having two roommates, I usually find myself alone at home, and that starts to get to you after a while. I guess the desire for a cat at home was so strong that I decided to just start learning robotics so I could make one myself.
+
+But that raises the question of whether it's wrong to work on a project that's poised to succeed if people aren't well off: if they aren't socially connected, if they don't live in good homes, if they don't have the income to support another living pet in the house. Four years ago I would have been inclined to say yes. I was a real idealist then, a STEM teen who thought science could solve all our problems.
+
+These days it seems less an issue of science and more one of massive external forces. People are staying on social media more and meeting their friends in person less. Wages are being pushed down for most jobs, and the standard of living is dropping for a lot of people, to the extent that their apartments just can't house another living thing. So it's become more a question of whether you take the opportunity. You can picture some ideal future where these circumstances never arise and nobody would need a product like this, or you can accept that they're close to inevitable.
+
+The forces behind those conditions are the tech giants, the millionaires, the homeowners and landlords. There's nothing I can do, at least in my current capacity, to change them for the better. So I think the best thing I can do is recognise the situation they're creating as inevitable, or at the very least unavoidable, and build a product people would love to have. Recognising that inevitability and simply choosing not to act on it would be more irresponsible for an aspiring founder. We'll see how things turn out, but the morality of it is something I wanted to acknowledge before going further.
+
 ## Act one: the cat
 
 The first version was biomimetic on purpose. It was a 32-DOF cat skeleton with motion capture retargeted onto it, and later a reference walk lifted from 2D footage in a 2009 PLOS ONE feline biomechanics paper. It was trained with PPO to track a commanded velocity.

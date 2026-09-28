@@ -1,0 +1,41 @@
+---
+title: "What I Took Away From Interning at Apple"
+date: "2026-09-14"
+description: "An internship I didn't expect, on a production engineering team behind Apple's ML services: what changed about how I write PRs, and why I trust AI agents less than I used to."
+tags: ["internship", "Apple", "AI", "reflections"]
+author: "AdiPrabs"
+---
+
+## The offer
+
+I'll admit, this one was a bit unexpected. I was about to accept an internship at another company when I got an email from Apple asking if I'd be available for an interview. I didn't have high hopes. Big tech internships seem pretty ruthless, and I didn't have much confidence in myself. But after a couple of rounds, they wanted me on their production engineering team, specifically for the machine learning services: Siri, AI sports insights, Apple Music's recommendation algorithm that picks songs on your behalf.
+
+I was pretty stoked. Of course it meant telling the other company I could no longer accept their offer, which I regretted a bit. But otherwise I was really looking forward to it, and it turned out to be an experience I wasn't expecting and appreciated more by the end of it.
+
+Apple's office, in London at least, is in one of those big corporate buildings with 60 floors, each occupied by a different company. I will say the view from up there was really nice.
+
+## Moving slower on purpose
+
+The internship itself was completely different to anything I'd experienced before. Apple takes confidentiality and secrecy very seriously. Like any company it has intellectual property and expects you not to disclose anything outside the company, but I think they took it to another level altogether. So I want to focus on the technical lessons I took away.
+
+I came from a primarily startup background. I'd had two years of professional experience before this, and both were spent at startups in the UK. There, the culture is that shipping fast is the priority, which it absolutely should be for them. You need to get code out there as quickly as possible, and if something's wrong with it, don't worry, the impact is likely to be minimal and you'll fix it soon enough. Move fast and break things, right?
+
+I remember the first PR I created at Apple. It was addressing dev experience problems: some debugging needed to be added, and I was also building a whole new feature in the same PR, since vibe coding has kind of become the standard. The PR was massive. A colleague pulled me aside and was nice enough to show me how to structure PRs in the more conventional, big tech way. Dev experience changes go in their own PR, and new features are always implemented incrementally. You don't try to build the whole thing right out of the gate. You update the database schema first, then the endpoint that reads from it, then the UI that accesses the endpoint, and so forth.
+
+That was new to me, but it makes sense in Apple's case. Shipping a bad line of code could mean crashing services for millions, if not billions, of people around the world. Everything gets a rigorous run of testing before it even touches production, and people review code at every stage of the process, so naturally you want to make it as easy as possible for them to understand what your PR is trying to do.
+
+## Where AI still falls short
+
+The other big takeaway was that you can't rely on AI all the time, at least as of writing this. AI is smart. It can find gaps you weren't able to catch, and it'll notice very quickly that a line of code you've written isn't as efficient as it could be. What it has yet to do well is cross-system understanding, which becomes a major part of any code you write in big tech.
+
+Take something as simple as a release pipeline. It has multiple components in place, and AI, at least the way it's optimised right now, is built to work over a monorepo with a limited context window. The agentic coding tools we have can't retain long-term memory, so they might suggest features that have already been implemented elsewhere. If you just take the AI's word for it, you might not even realise you're doing the work twice.
+
+I saw a lot of that while vibe coding inside Apple. The agent often seems smarter than you, but it still makes trivial mistakes, like replicating services that already exist or associating the wrong ones with the feature you're trying to build. I know that's hard to picture from the vague descriptions I'm giving, but bear with me. There's a lot of confidentiality, so I can't give specific examples.
+
+There weren't many ethical questions that came up, but one thing was pretty evident: the gap in enthusiasm for AI between corporate leadership and the engineers actually implementing the features. I remember one instance, which I heard secondhand. Agent-generated code had been written and put up in a PR, and a second agent reviewed it. Despite that extra round of review, a bug snuck past both agents and made it into production, because the reviewing agent fundamentally didn't understand what the original coding agent intended. Leadership's proposal was a third agent to review the reviewer.
+
+You could see the exasperation on the engineers' faces as this was proposed to them. They understand clearly that AI isn't the magic silver bullet leadership seems to think it is for every single problem. I think in our attempt to leverage these new advances in transformers, we've been so blinded by the wonder of AI that we throw it at all of our problems these days.
+
+If anything, it's encouraged me to rely on LLMs less and less, especially now that they're being used more and more. That's not to say they aren't useful: they're good for generating boilerplate, putting together quick demos, even making a presentation about the code you've written. But relying on them wholeheartedly without any critical examination is a recipe for disaster.
+
+Yeah, that's a summary of my experience at Apple.
