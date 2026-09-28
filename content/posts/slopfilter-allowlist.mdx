@@ -1,0 +1,60 @@
+---
+title: "My AI-text detector learned to flag good writing"
+date: "2026-03-09"
+description: "A Naive Bayes classifier trained on HC3 learned that discourse connectives mean ChatGPT. Careful human prose looks identical."
+tags: ["machine-learning", "NLP", "browser-extension", "project"]
+author: "AdiPrabs"
+---
+
+I wanted to filter slop, AI-generated filler and rage-bait out of my X and LinkedIn timelines without shipping anything to a server. Browser extension, on-device inference, small enough to update over Chrome sync. Two independent Naive Bayes models (one trained on Davidson's hate/offensive-language corpus for rage, one on Hello-SimpleAI's HC3 human-vs-ChatGPT corpus for AI-text), plus a couple of heuristics and an optional Google Fact Check Tools lookup for misinformation.
+
+Rage came together fine. AI-text was where the story is.
+
+## The naive pass
+
+First version was as bare as it gets: tokenize each document, take the log-odds of every token given the human-vs-ChatGPT label, keep the top-k by absolute score, ship the weights as a small JSON blob.
+
+I turned it on and it flagged half my feed. Not the half I expected.
+
+Anything written with a formal register got scored as AI. Any post that used "however", "moreover", "furthermore", or "additionally" tripped it. A friend's essay on urban planning, human and thoughtful and dense with discourse connectives, scored higher than the actual ChatGPT samples I'd tested it against. Careful academic writing looked, to the model, exactly like a language model trying to sound careful.
+
+## The diagnosis
+
+The model was not miscalibrated. It was, in the strictest sense, right. If you train a token-level classifier on HC3 and ask it which words shift the odds toward "written by ChatGPT," you get a list that is almost entirely composed of discourse connectives, hedges and evaluative closers: "however," "therefore," "moreover," "overall," "in conclusion," "notably." Those tokens really are more frequent in the ChatGPT half of HC3. That's not a bug in the data; it's a real property of the models that generated it.
+
+The problem is that those same tokens are the ones a careful human writer reaches for when they want their sentences to hold together. The distribution overlaps too much where it matters. What the model had learned was a genuine signal (ChatGPT overuses discourse connectives) dressed up as a classifier, at a discrimination it couldn't do. On the tokens with the biggest log-odds, human formal writing and ChatGPT prose were nearly indistinguishable. The model wasn't wrong. It was useless.
+
+## The fix, in three moves
+
+**Move one: restrict the vocabulary.** Not every token that separates the distributions is a token worth trusting. I hand-picked around 40 candidates whose presence *actually* shifts my read of a passage. Things I've watched ChatGPT lean on in a way careful humans don't: `certainly`, `delve`, `landscape`, `robust`, `holistic`, `seamlessly`, `comprehensive`. Everything else went out of the training vocabulary. That's the `AI_ALLOW` set in `train_nb.py`:
+
+```python
+AI_ALLOW = {
+    "certainly", "however", "therefore", "moreover", "furthermore",
+    "additionally", "overall", "conclusion", "summary", "important",
+    "notably", "comprehensive", "explore", "landscape", "insights",
+    "consider", "ensure", "provides", "provide", "assist", "clarify",
+    "generated", "model", "prompt", "synthetic", "deepfake", "dive",
+    "delve", "navigate", "robust", "holistic", "seamlessly", "meanwhile",
+    ...
+}
+```
+
+Then `train_nb()` computes Laplace-smoothed log-odds on document frequencies over exactly that vocabulary, keeps the top 26 by absolute score, and writes the priors as counts scaled into 1–40. Anything not in the allow-list can't influence the score.
+
+**Move two: apply the same trick to the rage model, in reverse.** The Davidson corpus is drawn from Twitter and is dense with slurs and generic profanity. Trained without care, the rage model collapses into a swear-detector: any post containing "fuck" scores as rage; a calmly delivered dehumanising claim scores clean. That's not useful. So the rage side of `train_nb.py` runs the tokenizer with a `BLOCK_TOKENS` set that strips out the generic profanity, plus a `RAGE_ALLOW` set of the tokens that actually mark rage-bait rhetoric: `sheeple`, `globalists`, `invasion`, `replacement`, `rigged`, `censored`, `traitors`, `patriots`, `hoax`, `stolen`, `propaganda`. The rage documents are also pre-filtered to those containing at least one cue token from `RAGE_CUE_RE`, so the "positive" class isn't diluted by generic offensive tweets.
+
+**Move three: compose, don't rely.** The NB scores don't decide anything alone. They feed into a small ensemble alongside slop heuristics (LinkedIn-buzzword regexes, em-dash density, opening phrases like "as an AI language model"), and misinformation goes through the Google Fact Check Tools API when the user provides a key, with a Wikipedia context fallback. Each detector can be toggled independently. If the AI classifier is over-firing on your feed, you can turn it off without losing the rage or slop filtering.
+
+## What that bought me
+
+- Discourse connectives on their own no longer flag a post. They contribute to a score, but they can't carry it.
+- The rage model catches rhetoric, not vocabulary. Someone swearing at their landlord isn't rage-bait; someone calmly writing about "the great replacement" is.
+- Because the priors are just token counts in a small JSON, the whole thing is transparent. You can open `models/nb_models.json` and see exactly which words push a score up and by how much. Language drifts (`delve` used to be neutral, now it's a tell) so `scripts/train_nb.py` is meant to be re-run.
+- On-device, no network calls except the optional Fact Check API. `chrome.storage.sync` handles settings; the model weights ship with the extension.
+
+## What I learned
+
+Log-odds token classifiers over unigrams are the smallest useful thing you can build. That's a feature: it makes them easy to debug and easy to explain. It's also a trap. When the top-signal tokens overlap with normal, valuable behaviour (careful human prose in one case, ordinary swearing in the other), the model is behaving exactly as its training set demands, and it's still wrong for your use case. The fix isn't a bigger model. It's a smaller vocabulary.
+
+Code and priors at [github.com/TheDarkEyezor/SlopFilter](https://github.com/TheDarkEyezor/SlopFilter). Trainer is `scripts/train_nb.py`.

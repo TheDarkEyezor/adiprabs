@@ -1,0 +1,110 @@
+---
+title: "D.O.S.A. - My attempt at Jarvis"
+date: "2025-12-08"
+description: "Architecting a personal AI assistant from scratch using BERT models and modular design"
+tags: ["AI", "machine-learning", "project", "NLP"]
+author: "AdiPrabs"
+---
+
+# The lowdown
+I'll be real, I'm not fond of the personal assistants out there in the world. As an iPhone user, sometimes Siri can't understand what I'm saying or mixes up what my intended action was, or just can't find my WhatsApp group chats to message while I'm busy cycling.
+The best solutions out there are bad or paid, and I don't have much of a budget to spend as a student. (Especially as an international student 😭). So over the past month, I've been chipping away at the problem, and here's what I've got so far.
+
+# The wants
+As with any product, you always need to start off with the features you'd like to include. In my case, it's pretty straightforward:
+- A personalised understanding of me, this includes:
+    - An understanding of the projects I'm working on
+    - Checking in with me every now and then (like a buddy would)
+- Integration with my calendars, reminders and my WhatsApp
+    - Summarising my schedule and chats
+    - CRUD on my behalf
+- A single point for information
+    - Source of personalised news
+    - Perplexity/GPT levels of search, fetch and respond to queries I have
+
+
+Over here, you start to see the problem that most big-tech encounters right out of the gate. It's your interface with the assistant, your speech. Most mainstream assistants rely on Natural Language Processing or NLP to parse together information from sentences you speak.
+
+Language is complicated. There are 100s of different ways to express the same sentiments, and it evolves every day. I mean, could you imagine explaining the concept of "making bank" to a family back in the 1700s? Take the two following phrases for example.
+
+> Schedule Dinner with friend_name at 7pm tomorrow at their house
+> I'm having Dinner tomorrow at 7 at friend_name's house
+
+The same meaning, but different structures here. Early gen assistants needed sentences to be parsed into one consistent sentence structure for creating a calendar event, otherwise it would be difficult for them to extract details.
+The assistant has to under stand if "friend_name" is part of the event name or not. Is friend_name someone in your contacts? Do we have their location on the system already? 7 is ambiguous, is it AM or PM?
+
+It's hard to develop a framework around deconstructing information from sentences, and that's even assuming that the assistant was able to understand your accent or that "Adi" is a name, not a mispronunciation of "Caddy".
+
+Furthermore, how do you tell an algorithm that when you're looking for Jake, it has to look up Jake in your friends list instead of searching Jake Gyllenhaal? This might make LLM integration tough for a more polished product, because LLM context lengths are finite, and you can't feed one an entire gigabyte of info about your college, your family members, friends and projects that you're working on.
+
+Let's try to isolate this into a smaller subsystem we can deal with later. For now, an overarching structure would help us put an image to words.
+
+# The architecture
+
+One of my proudest traits is that I'm lazy... ok hear me out. I'm lazy when it comes to repeating the same tasks over and over again for minimal reward. I want a system that I don't have to redesign and create every 6 months. Instead, I'd like to make it extendable with minimal effort, to the point that I could vibe-code a new integration in a matter of minutes.
+
+So here's what we have:
+
+Audio to text -> Intent classifier -> information extractor
+                                          ↙️     ⬇️        ↘️  ️
+                            personal lookup     contruct       online lookup
+                                             3rd-party api
+                                                payload
+
+and then a response -> followup suggestion
+
+I'll be updating the architecture as we go, since this is what my rough thought process looked like throughout the design process.
+
+Decades of research have already taken care of TTS technology for our use case. I'm not gonna go in-depth in this article. I might do a deep dive on how they work at a later date.
+An intent classifier would be relatively simple. Even a secondary school student could tell you that a supervised learning technique would be optimal here. We'll be using neural networks to pick how we classify the intent of a query.
+Even the response module is as simple as giving an LLM the right context about your previous command and allowing it to respond.
+
+Now the information extractor is the real challenge here. We want it to understand the importance of certain words (or tokens) in a given sentence. Especially since the importance of different tokens can vary depending on your intent. With a calendar command, we'd want something like the following:
+
+```json
+[
+  {"label": "PER", "value": "John", "start": 24, "end": 28},
+  {"label": "DATE", "value": "tomorrow", "start": 29, "end": 37},
+  {"label": "TIME", "value": "at 3pm", "start": 38, "end": 44}
+]
+```
+
+From here, it's easy to deconstruct the dictionary's keywords and send it off the google's calendar API.
+We want to refrain from using an LLM here to extract the information. Overlooking the computational intensity and latency of running one on a personal computer, even with strict prompting it's hard to get it to format its response consistently and correctly over multiple calls.
+
+A BERT model works fantastic here. With their architecture, it's really easy to determine the importance of certain words in sentences. BERTs are bidirectional too, which means they take previous and future words into account when predicting important tokens for parsing together commands.
+They're great at classifying sentences based on intent too. Best of all, they work much faster than LLMs with less of a hardware demand. This means we can combine the intent classification and information extraction into one step. Yay! We've just modularised the design.
+
+[new graph here with intent classifier and information extractor combined]
+
+The next tough thing we want to tackle here is personalisation. We want the assistant to have deep personal knowledge about the user and related elements, and make it easy to retrieve information. We want to make it easy for a system to understand different entities that are related to users. Like the following:
+
+```yaml
+Person:
+    name
+    age
+    contact:
+        - email
+        - phone
+    relation
+
+Organisation:
+    name
+    location
+    role
+```
+
+Your first instinct would be to use a database. And you'd be right! But the type of database matters here. A traditional relational database could work, but we're dealing with entities that have complex relationships. A graph database would be perfect for this use case - it's designed to handle interconnected data where the relationships between entities are just as important as the entities themselves.
+
+Think about it: your friend Jake works at Company X, which is located near your favourite restaurant, and Jake's birthday is coming up next week. A graph database can traverse these connections naturally, making it easy to answer questions like "What's a good birthday gift for Jake?" by considering his workplace, interests, and your shared history.
+
+# What's next?
+
+This article covered the high-level architecture and some of the key decisions I've made so far. In future posts, I'll dive deeper into:
+
+- Training the BERT model for intent classification and entity extraction
+- Setting up the graph database and designing the schema
+- Building integrations with Google Calendar and WhatsApp
+- The response generation module and how context is managed
+
+Stay tuned for more updates on D.O.S.A. - and if you have any suggestions or want to collaborate, feel free to reach out!

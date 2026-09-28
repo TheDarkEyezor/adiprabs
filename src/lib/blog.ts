@@ -3,29 +3,10 @@ import path from 'path';
 import matter from 'gray-matter';
 import readingTime from 'reading-time';
 
-// Posts committed to this repo, alongside the ones fetched from GITHUB_REPO.
-// A local post wins if both define the same slug.
-const LOCAL_POSTS_DIR = path.join(process.cwd(), 'content', 'posts');
-
-// Configuration - Update this when you create your blog content repo
-export const BLOG_CONFIG = {
-  // GitHub repo containing your blog posts
-  // Format: 'username/repo-name'
-  // You'll create this repo to store your MDX files
-  GITHUB_REPO: 'TheDarkEyezor/blog-content',
-  
-  // Branch to fetch from
-  BRANCH: 'main',
-  
-  // Folder in the repo where posts are stored
-  POSTS_FOLDER: 'posts',
-  
-  // GitHub API base URL
-  API_BASE: 'https://api.github.com',
-  
-  // Raw content base URL
-  RAW_BASE: 'https://raw.githubusercontent.com',
-};
+// Every post is an .mdx (or .md) file here; the filename is the slug.
+const POSTS_DIR = path.join(process.cwd(), 'content', 'posts');
+const POST_EXTENSIONS = ['.mdx', '.md'];
+const SLUG_PATTERN = /^[\w-]+$/;
 
 export interface BlogPost {
   slug: string;
@@ -50,83 +31,22 @@ export interface BlogPostMeta {
   readingTime: string;
 }
 
-interface GitHubFile {
-  name: string;
-  path: string;
-  type: string;
-  download_url: string;
-}
-
 /**
- * Fetch the list of all blog post files from GitHub
+ * Read every post file as [slug, raw] pairs
  */
-async function fetchPostFiles(): Promise<GitHubFile[]> {
-  const { GITHUB_REPO, BRANCH, POSTS_FOLDER, API_BASE } = BLOG_CONFIG;
-  const url = `${API_BASE}/repos/${GITHUB_REPO}/contents/${POSTS_FOLDER}?ref=${BRANCH}`;
-  
+async function readPostFiles(): Promise<[string, string][]> {
   try {
-    const response = await fetch(url, {
-      headers: {
-        'Accept': 'application/vnd.github.v3+json',
-        // Add token for private repos or higher rate limits
-        // 'Authorization': `token ${process.env.GITHUB_TOKEN}`,
-      },
-      next: { revalidate: 60 }, // Revalidate every 60 seconds
-    });
-
-    if (!response.ok) {
-      console.error(`GitHub API error: ${response.status}`);
-      return [];
-    }
-
-    const files: GitHubFile[] = await response.json();
-    return files.filter(file => file.name.endsWith('.mdx') || file.name.endsWith('.md'));
-  } catch (error) {
-    console.error('Error fetching post files:', error);
-    return [];
-  }
-}
-
-/**
- * Fetch the raw content of a single post
- */
-async function fetchPostContent(filePath: string): Promise<string | null> {
-  const { GITHUB_REPO, BRANCH, RAW_BASE } = BLOG_CONFIG;
-  const url = `${RAW_BASE}/${GITHUB_REPO}/${BRANCH}/${filePath}`;
-  
-  try {
-    const response = await fetch(url, {
-      next: { revalidate: 60 },
-    });
-
-    if (!response.ok) {
-      console.error(`Error fetching post content: ${response.status}`);
-      return null;
-    }
-
-    return await response.text();
-  } catch (error) {
-    console.error('Error fetching post content:', error);
-    return null;
-  }
-}
-
-/**
- * Read the posts committed under content/posts, as [slug, raw] pairs
- */
-async function readLocalPosts(): Promise<[string, string][]> {
-  try {
-    const names = await fs.readdir(LOCAL_POSTS_DIR);
+    const names = await fs.readdir(POSTS_DIR);
     return await Promise.all(
       names
-        .filter(name => name.endsWith('.mdx') || name.endsWith('.md'))
+        .filter(name => POST_EXTENSIONS.some(ext => name.endsWith(ext)))
         .map(async (name): Promise<[string, string]> => [
           name.replace(/\.mdx?$/, ''),
-          await fs.readFile(path.join(LOCAL_POSTS_DIR, name), 'utf8'),
+          await fs.readFile(path.join(POSTS_DIR, name), 'utf8'),
         ])
     );
   } catch (error) {
-    console.error('Error reading local posts:', error);
+    console.error('Error reading posts:', error);
     return [];
   }
 }
@@ -155,26 +75,11 @@ function parsePost(content: string, slug: string): BlogPost {
  * Get all blog posts (metadata only, for listing)
  */
 export async function getAllPosts(): Promise<BlogPostMeta[]> {
-  const [files, localPosts] = await Promise.all([fetchPostFiles(), readLocalPosts()]);
-  const localSlugs = new Set(localPosts.map(([slug]) => slug));
+  const files = await readPostFiles();
 
-  const remotePosts = await Promise.all(
-    files.map(async (file) => {
-      const slug = file.name.replace(/\.mdx?$/, '');
-      if (localSlugs.has(slug)) return null;
-
-      const content = await fetchPostContent(file.path);
-      if (!content) return null;
-      
-      return parsePost(content, slug);
-    })
-  );
-
-  const posts = [...localPosts.map(([slug, raw]) => parsePost(raw, slug)), ...remotePosts];
-
-  // Filter out nulls, strip content, and sort by date (newest first)
-  return posts
-    .filter((post): post is BlogPost => post !== null)
+  // Strip content and sort by date (newest first)
+  return files
+    .map(([slug, raw]) => parsePost(raw, slug))
     .map(({ content: _, ...meta }) => meta)
     .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 }
@@ -183,27 +88,19 @@ export async function getAllPosts(): Promise<BlogPostMeta[]> {
  * Get a single blog post by slug (includes full content)
  */
 export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
-  const { POSTS_FOLDER } = BLOG_CONFIG;
-  
-  // Try .mdx first, then .md
-  const extensions = ['.mdx', '.md'];
+  // The slug comes from the URL, so keep it from reaching outside POSTS_DIR.
+  if (!SLUG_PATTERN.test(slug)) return null;
 
-  for (const ext of extensions) {
+  // Try .mdx first, then .md
+  for (const ext of POST_EXTENSIONS) {
     try {
-      const raw = await fs.readFile(path.join(LOCAL_POSTS_DIR, `${slug}${ext}`), 'utf8');
+      const raw = await fs.readFile(path.join(POSTS_DIR, `${slug}${ext}`), 'utf8');
       return parsePost(raw, slug);
     } catch {
-      // Not a local post; fall through to GitHub.
+      // Try the next extension.
     }
   }
-  
-  for (const ext of extensions) {
-    const content = await fetchPostContent(`${POSTS_FOLDER}/${slug}${ext}`);
-    if (content) {
-      return parsePost(content, slug);
-    }
-  }
-  
+
   return null;
 }
 

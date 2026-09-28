@@ -2,8 +2,6 @@ import { Suspense } from 'react';
 import { getAllPosts, getAllTags } from '@/lib/blog';
 import BlogListClient from './BlogListClient';
 
-export const revalidate = 60; // Revalidate every 60 seconds
-
 export const metadata = {
   title: 'Blog | AdiPrabs',
   description: 'Thoughts, tutorials, and insights on technology, AI, and more.',

@@ -9,9 +9,6 @@ import { getPostBySlug, getAllPosts } from '@/lib/blog';
 import { mdxComponents } from '../components/MDXComponents';
 import BlogPostClient from './BlogPostClient';
 
-export const revalidate = 60;
-export const dynamic = 'force-dynamic';  // Disable static generation for now
-
 interface PageProps {
   params: Promise<{ slug: string }>;
 }
